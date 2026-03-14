@@ -1,0 +1,59 @@
+import React from 'react';
+import { SplineSceneBasic } from "./SplineSceneBasic";
+import { BentoSection } from "./BentoSection";
+import { HowItWorks } from "./HowItWorks";
+import { PricingSection } from "./PricingSection";
+import { SparklesDemo } from "./SparklesDemo";
+import { Testimonials } from "./ui/unique-testimonial";
+import { Footer } from "./ui/footer-section";
+import { NavBar } from "./ui/tube-light-navbar";
+import { User, Briefcase, Bot, DollarSign, BookOpen, LayoutDashboard } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+export const LandingPage = () => {
+  const navItems = [
+    { name: 'Product', url: '#', icon: Briefcase },
+    { name: 'Pricing', url: '#pricing', icon: DollarSign },
+    { name: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
+    { name: 'About', url: '#', icon: User }
+  ];
+
+  return (
+    <div className="min-h-screen bg-black flex flex-col items-center relative">
+      {/* Header Container */}
+      <div className="fixed top-0 left-0 right-0 z-[201] p-4 md:p-6 flex items-center justify-between w-full pointer-events-none">
+        {/* Brand */}
+        <div className="flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-lg py-2 px-3 md:px-4 rounded-full pointer-events-auto shadow-lg transition-all hover:bg-white/10 group cursor-pointer">
+          <div className="bg-white/10 p-1 rounded-full group-hover:scale-110 transition-transform">
+            <Bot className="text-white w-4 h-4 md:w-5 md:h-5" />
+          </div>
+          <span className="text-white font-bold tracking-tight text-sm md:text-base">ResolveAI</span>
+        </div>
+
+        {/* Auth */}
+        <div className="flex items-center gap-1 bg-white/5 border border-white/10 backdrop-blur-lg py-1 px-1 rounded-full pointer-events-auto shadow-lg">
+          <Link to="/signup" className="text-white/80 hover:text-white text-xs md:text-sm font-semibold px-3 md:px-5 py-2 transition-colors cursor-pointer">
+            Login
+          </Link>
+          <Link to="/signup" className="bg-white text-black text-xs md:text-sm font-bold px-3 md:px-5 py-2 rounded-full hover:bg-neutral-200 transition-all cursor-pointer">
+            Sign up
+          </Link>
+        </div>
+      </div>
+
+      {/* Navigation Bar */}
+      <NavBar items={navItems} />
+
+      {/* Main Content */}
+      <div className="w-full flex-1 flex flex-col items-center">
+        <SplineSceneBasic />
+        <BentoSection />
+        <SparklesDemo />
+        <HowItWorks />
+        <Testimonials />
+        <PricingSection />
+        <Footer />
+      </div>
+    </div>
+  );
+};
