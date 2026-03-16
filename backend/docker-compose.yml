@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -17,20 +17,21 @@ services:
       - .:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-  # ---------- PostgreSQL 16 ----------
-  postgres:
-    image: postgres:16-alpine
-    container_name: resolveai-postgres
+  # ---------- MySQL 8.4 ----------
+  mysql:
+    image: mysql:8.4
+    container_name: resolveai-mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
     environment:
-      POSTGRES_USER: resolveai
-      POSTGRES_PASSWORD: resolveai_dev
-      POSTGRES_DB: resolveai
+      MYSQL_ROOT_PASSWORD: resolveai_root
+      MYSQL_DATABASE: resolveai
+      MYSQL_USER: resolveai
+      MYSQL_PASSWORD: resolveai_dev
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U resolveai"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -50,5 +51,5 @@ services:
       retries: 5
 
 volumes:
-  postgres_data:
+  mysql_data:
   redis_data:

@@ -12,7 +12,7 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-# Async engine — connection pool to PostgreSQL
+# Async engine — connection pool to MySQL
 engine = create_async_engine(
     settings.DATABASE_URL,
     echo=settings.DEBUG,
