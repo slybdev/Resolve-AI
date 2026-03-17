@@ -23,11 +23,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # ── Database ──
-<<<<<<< HEAD
     DATABASE_URL: str = "mysql+aiomysql://resolveai:resolveai_dev@localhost:3306/resolveai"
-=======
-    DATABASE_URL: str = "mysql+asyncmy://resolveai:resolveai_dev@localhost:3306/resolveai"
->>>>>>> 8b916b04c14f4bf91ef437b8746a745925244bf1
 
     # ── Redis ──
     REDIS_URL: str = "redis://localhost:6379/0"
