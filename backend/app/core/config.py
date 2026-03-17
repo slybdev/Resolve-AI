@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # ── Database ──
-    DATABASE_URL: str = "postgresql+asyncpg://resolveai:resolveai_dev@localhost:5432/resolveai"
+    DATABASE_URL: str = "mysql+aiomysql://resolveai:resolveai_dev@localhost:3306/resolveai"
 
     # ── Redis ──
     REDIS_URL: str = "redis://localhost:6379/0"
@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-to-a-random-secret-key"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     # ── Google Gemini AI ──
     GEMINI_API_KEY: str = ""

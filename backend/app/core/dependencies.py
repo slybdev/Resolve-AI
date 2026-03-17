@@ -4,10 +4,11 @@ Shared dependency injection — database sessions and auth.
 These are used across all route files via FastAPI's `Depends()`.
 """
 
-from typing import Any
+import uuid
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.security import decode_access_token
@@ -26,20 +27,42 @@ async def get_db(
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-) -> dict[str, Any]:
+    db: AsyncSession = Depends(get_db),
+):
     """Extract and validate the current user from the JWT bearer token.
 
     Returns:
-        The decoded token payload (contains at minimum {"sub": user_id}).
+        The User ORM instance.
 
     Raises:
         HTTPException 401: if the token is missing, invalid, or expired.
     """
+    from app.models.user import User
+
     payload = decode_access_token(credentials.credentials)
-    if payload is None:
+    if payload is None or payload.get("type") != "access":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return payload
+
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    result = await db.execute(select(User).where(User.id == uuid.UUID(user_id)))
+    user = result.scalar_one_or_none()
+
+    if not user or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found or disabled",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    return user

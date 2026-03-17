@@ -56,8 +56,14 @@ def create_app() -> FastAPI:
         return {"status": "healthy"}
 
     # ── Register routers ──
-    # Engineers: add your routers below using app.include_router().
     # Engineer A routers:
+    from app.api.auth import router as auth_router
+    from app.api.onboarding import router as onboarding_router
+    from app.api.workspaces import router as workspaces_router
+
+    app.include_router(auth_router)
+    app.include_router(workspaces_router)
+    app.include_router(onboarding_router)
     # Engineer B routers:
 
     return app

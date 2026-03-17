@@ -12,9 +12,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY pyproject.toml README.md ./
 COPY app/ ./app/
 
-# Install Python dependencies
+# Install Python dependencies (non-editable for portability)
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -e .
+    && pip install --no-cache-dir .
 
 # ---------- Stage 2: Runtime ----------
 FROM python:3.12-slim AS runtime

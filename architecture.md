@@ -105,7 +105,7 @@ The frontend is a **Vite + React 19 + TypeScript** SPA. All data is currently **
               ┌────────────────┼────────────────┐
               │                │                │
     ┌─────────▼──┐   ┌────────▼───┐   ┌────────▼───┐
-    │ PostgreSQL │   │   Redis    │   │  Gemini AI │
+    │  MySQL 8   │   │   Redis    │   │  Gemini AI │
     │ (Primary)  │   │ (Cache +   │   │  API       │
     │            │   │  Queues)   │   │            │
     └────────────┘   └────────────┘   └────────────┘
@@ -117,7 +117,7 @@ The frontend is a **Vite + React 19 + TypeScript** SPA. All data is currently **
 | ---------------- | ----------------------------------------- |
 | Framework        | **FastAPI** (async, type-safe)             |
 | ORM              | **SQLAlchemy 2.0** + Alembic migrations   |
-| Database         | **PostgreSQL 16**                         |
+| Database         | **MySQL 8.0**                             |
 | Cache / Queues   | **Redis** (caching, pub/sub, task queue)  |
 | Auth             | **JWT** + OAuth2 (Google, Microsoft)      |
 | AI               | **Google Gemini API** (via `google-genai`) |
