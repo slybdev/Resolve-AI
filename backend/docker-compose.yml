@@ -25,14 +25,24 @@ services:
     restart: unless-stopped
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
+<<<<<<< HEAD
   # ---------- MySQL 8.0 ----------
   mysql:
     image: mysql:8.0
+=======
+  # ---------- MySQL 8.4 ----------
+  mysql:
+    image: mysql:8.4
+>>>>>>> 8b916b04c14f4bf91ef437b8746a745925244bf1
     container_name: resolveai-mysql
     ports:
       - "3306:3306"
     environment:
+<<<<<<< HEAD
       MYSQL_ROOT_PASSWORD: root_dev
+=======
+      MYSQL_ROOT_PASSWORD: resolveai_root
+>>>>>>> 8b916b04c14f4bf91ef437b8746a745925244bf1
       MYSQL_DATABASE: resolveai
       MYSQL_USER: resolveai
       MYSQL_PASSWORD: resolveai_dev
