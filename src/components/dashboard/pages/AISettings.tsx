@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Cpu, Sliders, Zap, ShieldCheck, AlertCircle, Save, RefreshCw, MessageSquare } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
-export const AISettings = () => {
+export const AISettings = ({ workspaceId }: { workspaceId: string }) => {
   const [model, setModel] = useState('gemini-3.1-pro-preview');
   const [temperature, setTemperature] = useState(0.7);
   const [maxTokens, setMaxTokens] = useState(2048);

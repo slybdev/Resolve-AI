@@ -2,8 +2,9 @@ import React from 'react';
 import { Slack } from 'lucide-react';
 import { ChannelPage } from './ChannelPage';
 
-export const SlackChannel = () => (
+export const SlackChannel = ({ workspaceId }: { workspaceId: string }) => (
   <ChannelPage 
+    workspaceId={workspaceId}
     type="slack"
     title="Slack Channel"
     icon={Slack}

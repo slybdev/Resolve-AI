@@ -2,7 +2,7 @@ import React from 'react';
 import { AllConversations } from './AllConversations';
 import { Clock, AlertCircle, ShieldCheck } from 'lucide-react';
 
-export const AssignedToMe = () => {
+export const AssignedToMe = ({ workspaceId }: { workspaceId: string }) => {
   return (
     <div className="flex flex-col h-full w-full bg-background">
       {/* Header for Assigned to Me */}
@@ -36,7 +36,7 @@ export const AssignedToMe = () => {
 
       {/* Reusing the AllConversations layout but filtered (mocked here) */}
       <div className="flex-1 overflow-hidden">
-        <AllConversations />
+        <AllConversations workspaceId={workspaceId} />
       </div>
     </div>
   );

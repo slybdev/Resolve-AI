@@ -91,7 +91,7 @@ const protocolTemplates = [
   }
 ];
 
-export const Protocols = () => {
+export const Protocols = ({ workspaceId }: { workspaceId: string }) => {
   const [selectedProtocol, setSelectedProtocol] = useState<Protocol | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);

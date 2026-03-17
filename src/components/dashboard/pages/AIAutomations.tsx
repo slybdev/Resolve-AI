@@ -71,7 +71,7 @@ const templates = [
   { id: 't4', name: 'Sales Inquiry Tagging', description: 'Detect pricing questions and tag conversation.' },
 ];
 
-export const AIAutomations = () => {
+export const AIAutomations = ({ workspaceId }: { workspaceId: string }) => {
   const [automations, setAutomations] = useState<Automation[]>(initialAutomations);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);

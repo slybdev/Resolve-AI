@@ -11,7 +11,7 @@ interface TestMessage {
   sources?: string[];
 }
 
-export const ResponseTesting = () => {
+export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
   const [messages, setMessages] = useState<TestMessage[]>([
     {
       id: '1',

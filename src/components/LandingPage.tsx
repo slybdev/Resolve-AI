@@ -9,12 +9,12 @@ import { Footer } from "./ui/footer-section";
 import { NavBar } from "./ui/tube-light-navbar";
 import { User, Briefcase, Bot, DollarSign, BookOpen, LayoutDashboard } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { api } from '@/src/lib/api';
 
 export const LandingPage = () => {
   const navItems = [
     { name: 'Product', url: '#', icon: Briefcase },
     { name: 'Pricing', url: '#pricing', icon: DollarSign },
-    { name: 'Dashboard', url: '/dashboard', icon: LayoutDashboard },
     { name: 'About', url: '#', icon: User }
   ];
 
@@ -32,12 +32,20 @@ export const LandingPage = () => {
 
         {/* Auth */}
         <div className="flex items-center gap-1 bg-white/5 border border-white/10 backdrop-blur-lg py-1 px-1 rounded-full pointer-events-auto shadow-lg">
-          <Link to="/signup" className="text-white/80 hover:text-white text-xs md:text-sm font-semibold px-3 md:px-5 py-2 transition-colors cursor-pointer">
-            Login
-          </Link>
-          <Link to="/signup" className="bg-white text-black text-xs md:text-sm font-bold px-3 md:px-5 py-2 rounded-full hover:bg-neutral-200 transition-all cursor-pointer">
-            Sign up
-          </Link>
+          {api.isAuthenticated() ? (
+            <Link to="/dashboard" className="bg-white text-black text-xs md:text-sm font-bold px-4 md:px-6 py-2 rounded-full hover:bg-neutral-200 transition-all cursor-pointer">
+              Go to Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="text-white/80 hover:text-white text-xs md:text-sm font-semibold px-3 md:px-5 py-2 transition-colors cursor-pointer">
+                Login
+              </Link>
+              <Link to="/signup" className="bg-white text-black text-xs md:text-sm font-bold px-3 md:px-5 py-2 rounded-full hover:bg-neutral-200 transition-all cursor-pointer">
+                Sign up
+              </Link>
+            </>
+          )}
         </div>
       </div>
 

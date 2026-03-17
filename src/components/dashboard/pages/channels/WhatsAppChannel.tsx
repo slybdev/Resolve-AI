@@ -2,8 +2,9 @@ import React from 'react';
 import { MessageSquare } from 'lucide-react';
 import { ChannelPage } from './ChannelPage';
 
-export const WhatsAppChannel = () => (
+export const WhatsAppChannel = ({ workspaceId }: { workspaceId: string }) => (
   <ChannelPage 
+    workspaceId={workspaceId}
     type="whatsapp"
     title="WhatsApp Channel"
     icon={MessageSquare}

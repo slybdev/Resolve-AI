@@ -1,6 +1,7 @@
-import React from 'react';
-import { Plus, Search, User, Mail, Shield, MoreVertical, CheckCircle2, XCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, User, Mail, Shield, MoreVertical, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { api } from '@/src/lib/api';
 
 interface Member {
   id: string;
@@ -10,14 +11,34 @@ interface Member {
   status: 'active' | 'invited' | 'inactive';
 }
 
-const members: Member[] = [
-  { id: '1', name: 'Tony Stark', email: 'tony@stark.com', role: 'Admin', status: 'active' },
-  { id: '2', name: 'Steve Rogers', email: 'steve@avengers.com', role: 'Manager', status: 'active' },
-  { id: '3', name: 'Natasha Romanoff', email: 'natasha@shield.gov', role: 'Agent', status: 'active' },
-  { id: '4', name: 'Peter Parker', email: 'peter@dailybugle.com', role: 'Agent', status: 'invited' }
-];
+export const TeamMembers = ({ workspaceId }: { workspaceId: string }) => {
+  const [teamMembers, setTeamMembers] = useState<Member[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export const TeamMembers = () => {
+  useEffect(() => {
+    fetchTeamMembers();
+  }, [workspaceId]);
+
+  const fetchTeamMembers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.team.members(workspaceId);
+      // Map WorkspaceMember to the frontend Member interface
+      const mappedMembers: Member[] = response.map((m: any) => ({
+        id: m.user_id,
+        name: m.user?.full_name || 'Unknown',
+        email: m.user?.email || '',
+        role: (m.role.charAt(0).toUpperCase() + m.role.slice(1)) as any,
+        status: m.user ? 'active' : 'inactive'
+      }));
+      setTeamMembers(mappedMembers);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
       <div className="max-w-6xl w-full mx-auto space-y-8">
@@ -53,12 +74,36 @@ export const TeamMembers = () => {
               </tr>
             </thead>
             <tbody>
-              {members.map((member) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-20 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                      <div className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Loading Team...</div>
+                    </div>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-20 text-center text-red-500 font-bold">{error}</td>
+                </tr>
+              ) : teamMembers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-6 py-20 text-center text-muted-foreground font-bold">No team members found.</td>
+                </tr>
+              ) : teamMembers.map((member) => (
                 <tr key={member.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors group">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center">
-                        <User className="w-5 h-5 text-muted-foreground" />
+                      <div className="w-10 h-10 rounded-xl bg-muted border border-border flex items-center justify-center overflow-hidden">
+                        <img 
+                          src={`https://picsum.photos/seed/${member.id}/100/100`} 
+                          alt={member.name} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as any).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2'%3E%3C/path%3E%3Ccircle cx='12' cy='7' r='4'%3E%3C/circle%3E%3C/svg%3E";
+                          }}
+                        />
                       </div>
                       <div>
                         <h4 className="text-sm font-bold text-foreground">{member.name}</h4>
@@ -89,7 +134,7 @@ export const TeamMembers = () => {
                       {member.status}
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-muted-foreground font-mono">2h ago</td>
+                  <td className="px-6 py-4 text-sm text-muted-foreground font-mono">Just now</td>
                   <td className="px-6 py-4 text-right">
                     <button className="p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors">
                       <MoreVertical className="w-4 h-4" />

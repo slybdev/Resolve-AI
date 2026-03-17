@@ -21,7 +21,7 @@ const integrations: Integration[] = [
   { id: 'zapier', name: 'Zapier', description: 'Connect with 5000+ apps via Zapier.', icon: Zap, status: 'not-connected', category: 'Automation', color: 'text-orange-500' }
 ];
 
-export const Integrations = () => {
+export const Integrations = ({ workspaceId }: { workspaceId: string }) => {
   return (
     <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
       <div className="max-w-6xl w-full mx-auto space-y-8">

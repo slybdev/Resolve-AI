@@ -24,6 +24,8 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
+import { api } from '@/src/lib/api';
+import { useToast } from '@/src/components/ui/Toast';
 
 interface Step {
   id: number;
@@ -37,6 +39,7 @@ const steps: Step[] = [
 ];
 
 export const OnboardingFlow = () => {
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
   const [activeTask, setActiveTask] = useState<string | null>(null);
   const [workspaceData, setWorkspaceData] = useState({
@@ -52,8 +55,25 @@ export const OnboardingFlow = () => {
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const navigate = useNavigate();
 
-  const handleNext = () => {
-    if (currentStep < 3) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleNext = async () => {
+    if (currentStep === 2) {
+      setIsLoading(true);
+      try {
+        await api.onboarding.setup({
+          workspace_name: workspaceData.name,
+          industry: workspaceData.useCase,
+          ai_agent_name: aiData.name,
+          ai_tone: aiData.personality.toLowerCase()
+        });
+        setCurrentStep(3);
+      } catch (err: any) {
+        toast('Error', err.message || 'Failed to save onboarding data', 'error');
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     } else {
       navigate('/dashboard');

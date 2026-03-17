@@ -49,7 +49,7 @@ const StatCard = ({ label, value, trend, icon: Icon, colorClass }: { label: stri
   </div>
 );
 
-export const AgentPerformance = () => {
+export const AgentPerformance = ({ workspaceId }: { workspaceId: string }) => {
   return (
     <div className="flex flex-col h-full w-full bg-background p-6 overflow-y-auto no-scrollbar">
       <div className="max-w-7xl w-full mx-auto space-y-6">

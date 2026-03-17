@@ -13,9 +13,10 @@ interface ChannelPageProps {
   title: string;
   icon: any;
   description: string;
+  workspaceId: string;
 }
 
-export const ChannelPage = ({ type, title, icon: Icon, description }: ChannelPageProps) => {
+export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId }: ChannelPageProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 

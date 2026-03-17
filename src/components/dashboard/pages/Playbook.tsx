@@ -73,7 +73,7 @@ const playbookTemplates = [
   }
 ];
 
-export const Playbook = () => {
+export const Playbook = ({ workspaceId }: { workspaceId: string }) => {
   const [selectedDirective, setSelectedDirective] = useState<Directive | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);

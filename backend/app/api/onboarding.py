@@ -32,6 +32,7 @@ async def onboarding_setup(
         ai_agent_name=body.ai_agent_name,
         ai_tone=body.ai_tone,
     )
+    await db.refresh(workspace)
     return OnboardingSetupResponse(
         workspace=WorkspaceInfo.model_validate(workspace),
     )

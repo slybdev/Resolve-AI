@@ -44,6 +44,13 @@ class WorkspaceMemberResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+from app.schemas.auth import UserResponse
+
+
+class WorkspaceMemberWithUser(WorkspaceMemberResponse):
+    user: UserResponse | None = None
+
+
 class WorkspaceResponse(BaseModel):
     id: uuid.UUID
     name: str
@@ -75,6 +82,30 @@ class InviteResponse(BaseModel):
     role: str
     status: str
     expires_at: datetime
+    created_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class BusinessHourResponse(BaseModel):
+    id: uuid.UUID
+    day_of_week: int
+    open_time: str | None = None
+    close_time: str | None = None
+    is_closed: bool
+    workspace_id: uuid.UUID
+
+    model_config = {"from_attributes": True}
+
+
+class APIKeyResponse(BaseModel):
+    id: uuid.UUID
+    name: str
+    key_prefix: str
+    is_active: bool
+    # Plain text key only returned once on creation
+    plain_key: str | None = None
+    workspace_id: uuid.UUID
     created_at: datetime
 
     model_config = {"from_attributes": True}

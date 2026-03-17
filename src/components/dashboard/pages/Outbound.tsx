@@ -57,7 +57,7 @@ const mockCampaigns: Campaign[] = [
   },
 ];
 
-export const Outbound = () => {
+export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState<'campaigns' | 'templates' | 'analytics'>('campaigns');
 
   return (

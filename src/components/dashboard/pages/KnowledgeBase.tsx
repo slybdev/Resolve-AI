@@ -132,7 +132,7 @@ const knowledgeItems: KnowledgeItem[] = [
   }
 ];
 
-export const KnowledgeBase = () => {
+export const KnowledgeBase = ({ workspaceId }: { workspaceId: string }) => {
   const [activeSubView, setActiveSubView] = useState<'sources' | 'content'>('content');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');

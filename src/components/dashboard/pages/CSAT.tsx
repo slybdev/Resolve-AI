@@ -29,7 +29,7 @@ const csatScores = [
   { score: '1 Star', count: 12, color: '#ef4444' },
 ];
 
-export const CSAT = () => {
+export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'surveys' | 'sentiment'>('overview');
 
   return (

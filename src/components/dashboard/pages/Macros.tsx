@@ -57,7 +57,7 @@ const mockMacros: Macro[] = [
   },
 ];
 
-export const Macros = () => {
+export const Macros = ({ workspaceId }: { workspaceId: string }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (

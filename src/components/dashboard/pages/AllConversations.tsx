@@ -163,7 +163,7 @@ const initialMessages: Record<string, Message[]> = {
   ]
 };
 
-export const AllConversations = () => {
+export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Record<string, Message[]>>(initialMessages);
   const [isListOpen, setIsListOpen] = useState(true);

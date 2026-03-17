@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Cpu, Save, RefreshCw, Play, ShieldCheck, MessageSquare, AlertCircle } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
-export const PromptEditor = () => {
+export const PromptEditor = ({ workspaceId }: { workspaceId: string }) => {
   const [prompt, setPrompt] = useState(`You are a helpful AI customer support assistant.
 Answer questions using the company knowledge base.
 If you cannot find an answer, escalate to a human agent.`);

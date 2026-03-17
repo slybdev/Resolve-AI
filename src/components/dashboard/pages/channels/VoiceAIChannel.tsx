@@ -2,8 +2,9 @@ import React from 'react';
 import { Mic } from 'lucide-react';
 import { ChannelPage } from './ChannelPage';
 
-export const VoiceAIChannel = () => (
+export const VoiceAIChannel = ({ workspaceId }: { workspaceId: string }) => (
   <ChannelPage 
+    workspaceId={workspaceId}
     type="voice"
     title="Voice AI"
     icon={Mic}

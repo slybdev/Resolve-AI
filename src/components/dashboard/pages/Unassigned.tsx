@@ -30,7 +30,7 @@ const unassignedTickets: UnassignedTicket[] = [
   }
 ];
 
-export const Unassigned = () => {
+export const Unassigned = ({ workspaceId }: { workspaceId: string }) => {
   return (
     <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
       <div className="max-w-6xl w-full mx-auto space-y-8">

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { api } from '@/src/lib/api';
 import { 
   Users, Search, Filter, Download, MoreHorizontal, 
   Mail, Phone, MapPin, Calendar, Tag, ExternalLink,
@@ -106,9 +107,41 @@ const SegmentItem = ({ label, count, active, onClick, icon: Icon }: any) => (
   </button>
 );
 
-export const People = () => {
+export const People = ({ workspaceId }: { workspaceId: string }) => {
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [activeSegment, setActiveSegment] = useState('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [workspaceId]);
+
+  const fetchCustomers = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.contacts.list(workspaceId);
+      // Transform backend data to frontend interface if necessary
+      const formatted = response.items.map((item: any) => ({
+        ...item,
+        avatar: `https://picsum.photos/seed/${item.id}/100/100`,
+        status: 'active', // Placeholder as backend doesn't have status yet
+        plan: 'Free',
+        lastSeen: 'Just now',
+        totalSpend: '$0',
+        conversations: 0,
+        sentiment: 'neutral',
+        company: item.company?.name || 'Independent',
+        location: 'Remote'
+      }));
+      setCustomers(formatted);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="h-full flex bg-[#050505] overflow-hidden">
@@ -192,7 +225,24 @@ export const People = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {mockCustomers.map((customer) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan={5} className="px-8 py-20 text-center">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-8 h-8 border-4 border-white/10 border-t-white rounded-full animate-spin" />
+                      <div className="text-xs font-black text-muted-foreground uppercase tracking-widest">Loading Customers...</div>
+                    </div>
+                  </td>
+                </tr>
+              ) : error ? (
+                <tr>
+                  <td colSpan={5} className="px-8 py-20 text-center text-red-500 font-bold">{error}</td>
+                </tr>
+              ) : customers.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-8 py-20 text-center text-muted-foreground font-bold">No customers found.</td>
+                </tr>
+              ) : customers.map((customer) => (
                 <motion.tr 
                   key={customer.id}
                   initial={{ opacity: 0 }}

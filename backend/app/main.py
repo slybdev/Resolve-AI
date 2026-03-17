@@ -65,6 +65,19 @@ def create_app() -> FastAPI:
     app.include_router(workspaces_router)
     app.include_router(onboarding_router)
     # Engineer B routers:
+    from app.api.companies import router as companies_router
+    from app.api.contacts import router as contacts_router
+    from app.api.tags import router as tags_router
+    from app.api.team import router as team_router
+    from app.api.settings import router as settings_router
+    from app.api.api_keys import router as api_keys_router
+
+    app.include_router(contacts_router)
+    app.include_router(companies_router)
+    app.include_router(tags_router)
+    app.include_router(team_router)
+    app.include_router(settings_router)
+    app.include_router(api_keys_router)
 
     return app
 

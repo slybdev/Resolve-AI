@@ -6,4 +6,9 @@ from app.models.invite import Invite  # noqa: F401
 from app.models.user import User  # noqa: F401
 from app.models.workspace import Workspace, WorkspaceMember  # noqa: F401
 
-# Engineer B models — add below this line:
+# Engineer B models (Milestone 1)
+from app.models.contact import Contact  # noqa: F401
+from app.models.company import Company  # noqa: F401
+from app.models.tag import Tag  # noqa: F401
+from app.models.business_hours import BusinessHours  # noqa: F401
+from app.models.api_key import APIKey  # noqa: F401

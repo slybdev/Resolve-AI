@@ -61,7 +61,7 @@ const nodeTypes = [
   ]}
 ];
 
-export const Workflows = () => {
+export const Workflows = ({ workspaceId }: { workspaceId: string }) => {
   const [zoom, setZoom] = useState(100);
 
   return (

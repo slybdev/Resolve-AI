@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ShieldCheck, MessageSquare, AlertCircle, Bell, Mail, Slack, Send, Smartphone } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
-export const Escalations = () => {
+export const Escalations = ({ workspaceId }: { workspaceId: string }) => {
   const [threshold, setThreshold] = useState(70);
 
   return (

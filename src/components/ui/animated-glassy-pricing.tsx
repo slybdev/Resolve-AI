@@ -233,7 +233,7 @@ export const ModernPricingPage = ({
   showAnimatedBackground = true,
 }: ModernPricingPageProps) => {
   return (
-    <div className="bg-background text-foreground min-h-screen w-full overflow-x-hidden">
+    <div className="bg-black text-foreground min-h-screen w-full overflow-x-hidden">
       {showAnimatedBackground && <ShaderCanvas />}
       <main className="relative w-full min-h-screen flex flex-col items-center justify-center px-4 py-8">
         <div className="w-full max-w-5xl mx-auto text-center mb-14">

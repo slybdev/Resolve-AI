@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { MessageCircle, Settings, Palette, Code, Eye, Save, RefreshCw, Smartphone, Monitor } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 
-export const ChatWidget = () => {
+export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
   const [primaryColor, setPrimaryColor] = useState('#3B82F6');
   const [title, setTitle] = useState('Stark Support');
   const [welcomeMessage, setWelcomeMessage] = useState('Hello! How can I help you today?');

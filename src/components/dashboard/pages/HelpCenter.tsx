@@ -96,7 +96,7 @@ const StatCard = ({ label, value, change, icon: Icon }: any) => (
   </div>
 );
 
-export const HelpCenter = () => {
+export const HelpCenter = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState('articles');
 
   return (

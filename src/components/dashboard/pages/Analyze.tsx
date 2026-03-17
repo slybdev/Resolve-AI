@@ -6,7 +6,7 @@ import { AIPerformance } from './AIPerformance';
 import { cn } from '@/src/lib/utils';
 import { motion } from 'framer-motion';
 
-export const Analyze = () => {
+export const Analyze = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
   const tabs = [
@@ -18,11 +18,11 @@ export const Analyze = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'overview': return <AnalyticsOverview />;
-      case 'conversations': return <ConversationsAnalytics />;
-      case 'agent-performance': return <AgentPerformance />;
-      case 'ai-performance': return <AIPerformance />;
-      default: return <AnalyticsOverview />;
+      case 'overview': return <AnalyticsOverview workspaceId={workspaceId} />;
+      case 'conversations': return <ConversationsAnalytics workspaceId={workspaceId} />;
+      case 'agent-performance': return <AgentPerformance workspaceId={workspaceId} />;
+      case 'ai-performance': return <AIPerformance workspaceId={workspaceId} />;
+      default: return <AnalyticsOverview workspaceId={workspaceId} />;
     }
   };
 

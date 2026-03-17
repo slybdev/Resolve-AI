@@ -3,6 +3,7 @@ Workspace API routes — /api/v1/workspaces
 """
 
 import uuid
+from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
@@ -22,6 +23,20 @@ from app.services import invite_service
 from app.services.onboarding_service import _generate_unique_slug, _slugify
 
 router = APIRouter(prefix="/api/v1/workspaces", tags=["workspaces"])
+
+
+@router.get("", response_model=List[WorkspaceResponse])
+async def list_workspaces(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all workspaces the current user belongs to."""
+    result = await db.execute(
+        select(Workspace)
+        .join(WorkspaceMember)
+        .where(WorkspaceMember.user_id == current_user.id)
+    )
+    return result.scalars().all()
 
 
 @router.post("", response_model=WorkspaceResponse, status_code=201)

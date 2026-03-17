@@ -5,7 +5,7 @@ import { Protocols } from './Protocols';
 import { cn } from '@/src/lib/utils';
 import { motion } from 'framer-motion';
 
-export const Train = () => {
+export const Train = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState('intelligence');
 
   const tabs = [
@@ -16,10 +16,10 @@ export const Train = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'intelligence': return <Intelligence />;
-      case 'playbook': return <Playbook />;
-      case 'protocols': return <Protocols />;
-      default: return <Intelligence />;
+      case 'intelligence': return <Intelligence workspaceId={workspaceId} />;
+      case 'playbook': return <Playbook workspaceId={workspaceId} />;
+      case 'protocols': return <Protocols workspaceId={workspaceId} />;
+      default: return <Intelligence workspaceId={workspaceId} />;
     }
   };
 

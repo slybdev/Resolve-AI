@@ -38,7 +38,7 @@ const newsItems: NewsItem[] = [
   { id: '4', title: 'New Integration: Slack & Microsoft Teams', status: 'draft', author: 'Bruce Banner', views: 0, clicks: 0, date: 'Mar 15, 2026', category: 'Integrations' },
 ];
 
-export const News = () => {
+export const News = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState<'all' | 'published' | 'drafts'>('all');
 
   return (
