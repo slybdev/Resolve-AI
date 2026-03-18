@@ -10,6 +10,7 @@ import {
   BookOpen, 
   FileText, 
   Globe, 
+  Facebook,
   Cpu, 
   Sliders, 
   TestTube, 
@@ -39,7 +40,9 @@ import {
   Megaphone,
   Star,
   Clock,
-  Settings
+  Instagram,
+  Settings,
+  LogOut
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useTheme } from 'next-themes';
@@ -139,15 +142,17 @@ interface SidebarProps {
   onViewChange: (view: string) => void;
   isCollapsed?: boolean;
   onToggle?: () => void;
+  onLogout?: () => void;
 }
 
-export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onToggle }: SidebarProps) => {
+export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onToggle, onLogout }: SidebarProps) => {
   const { theme, setTheme } = useTheme();
 
   return (
     <div className={cn(
-      "h-screen bg-background border-r border-border flex flex-col p-4 shrink-0 overflow-y-auto overflow-x-hidden no-scrollbar transition-all duration-300",
-      isCollapsed ? "w-20 items-center" : "w-64"
+      "h-full bg-card/60 backdrop-blur-xl dark:bg-card/60 dark:backdrop-blur-xl flex flex-col items-center py-4 shrink-0 overflow-y-auto overflow-x-hidden no-scrollbar transition-all duration-300",
+      "light:bg-card light:backdrop-blur-none", // Explicit solid white in light mode
+      isCollapsed ? "w-16" : "w-80"
     )}>
       <div className={cn("mb-6 w-full", isCollapsed && "flex flex-col items-center")}>
         <motion.div 
@@ -192,6 +197,8 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
           <NavItem icon={Globe} label="Website Chat" active={currentView === 'website-chat'} onClick={() => onViewChange('website-chat')} isCollapsed={isCollapsed} />
           <NavItem icon={Mail} label="Email" active={currentView === 'email'} onClick={() => onViewChange('email')} isCollapsed={isCollapsed} />
           <NavItem icon={MessageCircle} label="WhatsApp" active={currentView === 'whatsapp'} onClick={() => onViewChange('whatsapp')} isCollapsed={isCollapsed} />
+          <NavItem icon={Instagram} label="Instagram" active={currentView === 'instagram'} onClick={() => onViewChange('instagram')} isCollapsed={isCollapsed} />
+          <NavItem icon={Facebook} label="Facebook Messenger" active={currentView === 'facebook'} onClick={() => onViewChange('facebook')} isCollapsed={isCollapsed} />
           <NavItem icon={Send} label="Telegram" active={currentView === 'telegram'} onClick={() => onViewChange('telegram')} isCollapsed={isCollapsed} />
           <NavItem icon={Hash} label="Slack" active={currentView === 'slack'} onClick={() => onViewChange('slack')} isCollapsed={isCollapsed} />
           <NavItem icon={Mic} label="Voice AI" active={currentView === 'voice-ai'} onClick={() => onViewChange('voice-ai')} isCollapsed={isCollapsed} />
@@ -211,12 +218,18 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
           <NavItem icon={MessageCircle} label="Chat Widget" active={currentView === 'chat-widget'} onClick={() => onViewChange('chat-widget')} isCollapsed={isCollapsed} />
           <NavItem icon={CreditCard} label="Billing" active={currentView === 'billing'} onClick={() => onViewChange('billing')} isCollapsed={isCollapsed} />
           <NavItem icon={Key} label="API Keys" active={currentView === 'api-keys'} onClick={() => onViewChange('api-keys')} isCollapsed={isCollapsed} />
+          <NavItem 
+            icon={LogOut} 
+            label="Logout" 
+            onClick={() => onLogout?.()} 
+            isCollapsed={isCollapsed}
+          />
         </SidebarSection>
       </div>
 
       <div className={cn("mt-auto pt-6 border-t border-border space-y-4 w-full", isCollapsed && "flex flex-col items-center")}>
         <div className={cn("flex items-center justify-between px-4 w-full", isCollapsed && "flex-col gap-4 px-0")}>
-          {!isCollapsed && <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-50">Stark v0.12</p>}
+          {!isCollapsed && <p className="text-[9px] text-muted-foreground font-black uppercase tracking-widest opacity-50">XentralDesk v0.12</p>}
           <button 
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             className="p-2 rounded-xl bg-foreground/5 hover:bg-foreground/10 text-foreground transition-all duration-200 btn-press"

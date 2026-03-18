@@ -32,9 +32,9 @@ interface NewsItem {
 }
 
 const newsItems: NewsItem[] = [
-  { id: '1', title: 'New Feature: AI Copilot for Agents', status: 'published', author: 'Tony Stark', views: 1240, clicks: 450, date: 'Mar 12, 2026', category: 'Product Update' },
+  { id: '1', title: 'New Feature: AI Copilot for Agents', status: 'published', author: 'Tony XentralDesk', views: 1240, clicks: 450, date: 'Mar 12, 2026', category: 'Product Update' },
   { id: '2', title: 'Scheduled Maintenance: March 20th', status: 'scheduled', author: 'Steve Rogers', views: 0, clicks: 0, date: 'Mar 20, 2026', category: 'Maintenance' },
-  { id: '3', title: 'Stark UI Professional Refresh', status: 'published', author: 'Natasha Romanoff', views: 890, clicks: 210, date: 'Mar 10, 2026', category: 'Design' },
+  { id: '3', title: 'XentralDesk UI Professional Refresh', status: 'published', author: 'Natasha Romanoff', views: 890, clicks: 210, date: 'Mar 10, 2026', category: 'Design' },
   { id: '4', title: 'New Integration: Slack & Microsoft Teams', status: 'draft', author: 'Bruce Banner', views: 0, clicks: 0, date: 'Mar 15, 2026', category: 'Integrations' },
 ];
 
@@ -42,8 +42,8 @@ export const News = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState<'all' | 'published' | 'drafts'>('all');
 
   return (
-    <div className="flex h-full w-full bg-background overflow-hidden">
-      <div className="flex-1 flex flex-col min-w-0 p-8 overflow-y-auto no-scrollbar">
+    <div className="flex h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="flex-1 flex flex-col min-w-0 p-8 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl">
         <div className="max-w-6xl w-full mx-auto space-y-8">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -175,7 +175,7 @@ export const News = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Right Panel: Preview */}
-      <div className="w-96 border-l border-border bg-accent/30 p-8 flex flex-col shrink-0">
+      <div className="w-96 border border-border bg-card p-8 flex flex-col shrink-0 rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Messenger Preview</h3>
           <div className="flex items-center gap-2">
@@ -195,7 +195,7 @@ export const News = ({ workspaceId }: { workspaceId: string }) => {
               </div>
               <div>
                 <h4 className="text-lg font-bold text-white leading-tight">What's New</h4>
-                <p className="text-xs text-white/80">Stay up to date with the latest from Stark.</p>
+                <p className="text-xs text-white/80">Stay up to date with the latest from XentralDesk.</p>
               </div>
             </div>
 

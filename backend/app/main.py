@@ -71,6 +71,7 @@ def create_app() -> FastAPI:
     from app.api.team import router as team_router
     from app.api.settings import router as settings_router
     from app.api.api_keys import router as api_keys_router
+    from app.api.channels import router as channels_router
 
     app.include_router(contacts_router)
     app.include_router(companies_router)
@@ -78,6 +79,15 @@ def create_app() -> FastAPI:
     app.include_router(team_router)
     app.include_router(settings_router)
     app.include_router(api_keys_router)
+    app.include_router(channels_router)
+    from app.api.webhooks import router as webhooks_router
+    app.include_router(webhooks_router)
+    from app.api.widget import router as widget_router
+    app.include_router(widget_router)
+    from app.api.conversations import router as conversations_router
+    app.include_router(conversations_router)
+    from app.api.websocket import router as websocket_router
+    app.include_router(websocket_router)
 
     return app
 

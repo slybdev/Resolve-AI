@@ -50,7 +50,7 @@ const mockMacros: Macro[] = [
     id: '4',
     name: 'Meeting Link',
     shortcut: '/call',
-    content: 'You can book a call with our team here: https://calendly.com/stark-ai',
+    content: 'You can book a call with our team here: https://calendly.com/xentraldesk-ai',
     usageCount: 156,
     lastUsed: '3 days ago',
     category: 'Sales',
@@ -61,9 +61,9 @@ export const Macros = ({ workspaceId }: { workspaceId: string }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <div className="h-full flex flex-col bg-background overflow-hidden">
+    <div className="h-full flex flex-col bg-transparent overflow-hidden gap-2 p-2">
       {/* Header */}
-      <div className="p-6 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm">
+      <div className="p-6 border border-border flex items-center justify-between bg-card rounded-2xl">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Zap className="w-6 h-6 text-primary" />
@@ -80,7 +80,7 @@ export const Macros = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Search & Filters */}
-      <div className="p-4 border-b border-border flex items-center gap-4 bg-card/30">
+      <div className="p-4 border border-border flex items-center gap-4 bg-card rounded-2xl">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input 

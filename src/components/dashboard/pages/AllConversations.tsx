@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, 
   MoreHorizontal, 
@@ -35,7 +35,8 @@ import {
   Zap,
   Quote,
   Mic,
-  ArrowRight
+  ArrowRight,
+  Lock
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { PromptInputBox } from '../../ui/ai-prompt-box';
@@ -43,6 +44,7 @@ import { Spinner } from '@/src/components/ui/ios-spinner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/src/components/ui/Toast';
 import { CallOverlay } from '../ui/CallOverlay';
+import { api } from '@/src/lib/api';
 
 interface Conversation {
   id: string;
@@ -52,148 +54,235 @@ interface Conversation {
   isAI: boolean;
   status: 'open' | 'closed' | 'pending';
   avatar: string;
-  channel: 'website' | 'whatsapp' | 'email' | 'telegram' | 'slack' | 'voice';
+  channel: 'website' | 'whatsapp' | 'email' | 'telegram' | 'slack' | 'voice' | 'unknown';
 }
-
-const conversations: Conversation[] = [
-  {
-    id: '1',
-    customerName: 'Tony Stark',
-    lastMessage: 'I need help with my arc reactor billing.',
-    time: '2m ago',
-    isAI: true,
-    status: 'open',
-    avatar: 'https://i.pravatar.cc/150?u=tony',
-    channel: 'website'
-  },
-  {
-    id: '2',
-    customerName: 'Steve Rogers',
-    lastMessage: 'Where is my shield delivery?',
-    time: '15m ago',
-    isAI: false,
-    status: 'pending',
-    avatar: 'https://i.pravatar.cc/150?u=steve',
-    channel: 'whatsapp'
-  },
-  {
-    id: '3',
-    customerName: 'Natasha Romanoff',
-    lastMessage: 'The tracking number is not working.',
-    time: '1h ago',
-    isAI: true,
-    status: 'open',
-    avatar: 'https://i.pravatar.cc/150?u=natasha',
-    channel: 'email'
-  },
-  {
-    id: '4',
-    customerName: 'Bruce Banner',
-    lastMessage: 'How do I manage my gamma radiation levels?',
-    time: '3h ago',
-    isAI: false,
-    status: 'open',
-    avatar: 'https://i.pravatar.cc/150?u=bruce',
-    channel: 'slack'
-  },
-  {
-    id: '5',
-    customerName: 'Thor Odinson',
-    lastMessage: 'My hammer is making a weird noise.',
-    time: '5h ago',
-    isAI: true,
-    status: 'pending',
-    avatar: 'https://i.pravatar.cc/150?u=thor',
-    channel: 'telegram'
-  },
-  {
-    id: '6',
-    customerName: 'Wanda Maximoff',
-    lastMessage: 'I would like to speak to a human agent.',
-    time: '1d ago',
-    isAI: false,
-    status: 'open',
-    avatar: 'https://i.pravatar.cc/150?u=wanda',
-    channel: 'voice'
-  }
-];
 
 interface Message {
   id: string;
-  sender: 'customer' | 'ai' | 'human';
+  sender: 'customer' | 'ai' | 'human' | 'agent' | 'system';
   text: string;
   time: string;
   avatar?: string;
   isInternal?: boolean;
 }
 
-const initialMessages: Record<string, Message[]> = {
-  '1': [
-    {
-      id: 'm1',
-      sender: 'customer',
-      text: 'I need help with my arc reactor billing. It seems I was charged twice for the palladium refill.',
-      time: '10:42 AM',
-      avatar: 'https://i.pravatar.cc/150?u=tony'
-    },
-    {
-      id: 'm2',
-      sender: 'ai',
-      text: "Hello Mr. Stark! I've looked into your account. It appears there was a duplicate transaction on March 5th. I can initiate a refund for you immediately. Would you like me to proceed?",
-      time: '10:43 AM'
-    }
-  ],
-  '2': [
-    {
-      id: 'm3',
-      sender: 'customer',
-      text: 'Where is my shield delivery?',
-      time: '09:15 AM',
-      avatar: 'https://i.pravatar.cc/150?u=steve'
-    }
-  ],
-  '3': [
-    {
-      id: 'm4',
-      sender: 'customer',
-      text: 'The tracking number is not working.',
-      time: '08:30 AM',
-      avatar: 'https://i.pravatar.cc/150?u=natasha'
-    }
-  ]
+const CollapsibleNote = ({ msg }: { msg: Message }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  return (
+    <motion.div 
+      layout
+      onClick={(e) => {
+        e.stopPropagation();
+        setIsExpanded(!isExpanded);
+      }}
+      className={cn(
+        "cursor-pointer transition-all duration-300 group flex items-start",
+        isExpanded ? "w-full" : "w-fit"
+      )}
+    >
+      <div className={cn(
+        "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all shadow-sm",
+        isExpanded 
+          ? "bg-amber-500/5 border-amber-500/20 w-full p-4 rounded-xl flex-col items-start gap-3" 
+          : "bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30"
+      )}>
+        <div className="flex items-center gap-2 w-full">
+          <div className="w-5 h-5 rounded bg-amber-500 flex items-center justify-center shrink-0 shadow-sm shadow-amber-500/20">
+            <Lock className="w-3 h-3 text-black" />
+          </div>
+          <div className="flex-1 flex items-center justify-between min-w-0">
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                "text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest whitespace-nowrap",
+                !isExpanded && "animate-pulse" // Subtle hint
+              )}>Private Note</span>
+              <div className="w-1 h-1 rounded-full bg-amber-500/30" />
+              <span className="text-[9px] font-bold text-muted-foreground uppercase">{msg.time}</span>
+            </div>
+            {isExpanded && (
+              <div className="flex items-center gap-1.5 ml-4">
+                <img src={msg.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=agent"} className="w-3.5 h-3.5 rounded-full" alt="" />
+                <span className="text-[9px] text-muted-foreground font-bold">You</span>
+              </div>
+            )}
+            {!isExpanded && (
+              <ChevronDown className="w-3 h-3 text-amber-500/50 group-hover:translate-y-0.5 transition-transform" />
+            )}
+          </div>
+        </div>
+
+        {isExpanded && (
+          <div className="w-full">
+            <p className="text-xs text-foreground italic leading-relaxed border-l-2 border-amber-500/30 pl-3">
+              {msg.text}
+            </p>
+            <div className="flex justify-end mt-2">
+               <span className="text-[8px] text-amber-500/50 uppercase font-black">Click to collapse</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
 };
 
 export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Record<string, Message[]>>(initialMessages);
+  const [conversationsList, setConversationsList] = useState<Conversation[]>([]);
+  const [messages, setMessages] = useState<Record<string, Message[]>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'unread'>('all');
   const [isListOpen, setIsListOpen] = useState(true);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
   const [isCopilotOpen, setIsCopilotOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isCallActive, setIsCallActive] = useState(false);
   const [activeTab, setActiveTab] = useState<'reply' | 'note'>('reply');
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const prevMsgCountRef = useRef<number>(0);
   const { toast } = useToast();
 
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      setShowScrollButton(false);
+    }
+  };
+
+  // Handle switching conversations
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1500);
-    return () => clearTimeout(timer);
-  }, []);
+    if (selectedId) {
+      // Use short timeout to ensure DOM is ready
+      setTimeout(scrollToBottom, 50);
+      prevMsgCountRef.current = messages[selectedId]?.length || 0;
+    }
+  }, [selectedId]);
+
+  // Handle new messages within same conversation
+  useEffect(() => {
+    if (selectedId) {
+      const currentMessages = messages[selectedId] || [];
+      const msgCount = currentMessages.length;
+      
+      if (msgCount > prevMsgCountRef.current) {
+        const lastMessage = currentMessages[msgCount - 1];
+        const isAgentMessage = lastMessage?.sender === 'ai' || lastMessage?.sender === 'human';
+
+        // Auto-scroll only if user is already at the bottom or if the message is from the agent/AI
+        if (isAgentMessage || !showScrollButton) {
+          setTimeout(scrollToBottom, 50);
+        }
+      }
+      prevMsgCountRef.current = msgCount;
+    }
+  }, [messages[selectedId]]);
+
+  const handleScroll = () => {
+    if (scrollRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+      // Show button if scrolled up more than 150px
+      const isScrolledUp = scrollHeight - scrollTop - clientHeight > 150;
+      setShowScrollButton(isScrolledUp);
+    }
+  };
+
+  useEffect(() => {
+    fetchConversations();
+    const interval = setInterval(fetchConversations, 5000); // Poll every 5s
+    return () => clearInterval(interval);
+  }, [workspaceId]);
+
+  useEffect(() => {
+    if (selectedId) {
+      fetchMessages(selectedId);
+      const interval = setInterval(() => fetchMessages(selectedId), 3000); // Poll messages every 3s
+      return () => clearInterval(interval);
+    }
+  }, [selectedId]);
+
+  const fetchConversations = async () => {
+    try {
+      const data = await api.conversations.list(workspaceId);
+      setConversationsList(data);
+    } catch (err) {
+      console.error('Failed to fetch conversations:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchMessages = async (id: string) => {
+    try {
+      const data = await api.conversations.getMessages(id);
+      const mappedMessages: Message[] = data.map((m: any) => {
+        // Ensure created_at is treated as UTC if it's not already
+        const dateStr = m.created_at.endsWith('Z') || m.created_at.includes('+') ? m.created_at : `${m.created_at}Z`;
+        return {
+          id: m.id,
+          sender: m.sender_type === 'agent' ? 'human' : m.sender_type,
+          text: m.body,
+          time: new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          avatar: m.sender_type === 'customer' ? conversationsList.find(c => c.id === id)?.avatar : undefined,
+          isInternal: m.message_type === 'note'
+        };
+      });
+      setMessages(prev => ({ ...prev, [id]: mappedMessages }));
+    } catch (err) {
+      console.error('Failed to fetch messages:', err);
+    }
+  };
+
+    const filteredConversations = conversationsList.filter(chat => {
+      const matchesSearch = chat.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                           chat.lastMessage.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFilter = filterType === 'all' || (chat as any).unreadCount > 0;
+      return matchesSearch && matchesFilter;
+    });
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-background relative">
+    <div className="flex h-full w-full overflow-hidden bg-transparent relative gap-2">
       {/* Left Panel: Conversation List */}
       <div className={cn(
-        "border-r border-border flex flex-col shrink-0 transition-all duration-300 ease-in-out bg-card",
+        "border border-border flex flex-col shrink-0 transition-all duration-300 ease-in-out bg-card rounded-2xl",
         isListOpen ? "w-80" : "w-0 overflow-hidden"
       )}>
-        <div className="p-4 border-b border-border">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div className="px-6 py-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-foreground">Inbox</h1>
+          </div>
+
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input 
               type="text" 
-              placeholder="Search chats..." 
-              className="w-full pl-9 pr-4 py-2 bg-accent/50 border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
+              placeholder="Search or start a new chat" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-1.5 bg-accent/50 hover:bg-accent/70 border border-zinc-200 dark:border-transparent rounded-full text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all shadow-sm"
             />
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            <button 
+              onClick={() => setFilterType('all')}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all",
+                filterType === 'all' ? "bg-primary/10 text-primary" : "bg-accent/50 text-muted-foreground hover:bg-accent"
+              )}
+            >
+              All
+            </button>
+            <button 
+              onClick={() => setFilterType('unread')}
+              className={cn(
+                "px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap transition-all",
+                filterType === 'unread' ? "bg-primary/10 text-primary" : "bg-accent/50 text-muted-foreground hover:bg-accent"
+              )}
+            >
+              Unread
+            </button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto no-scrollbar">
@@ -202,8 +291,13 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
               <Spinner size="lg" />
               <span className="text-xs font-medium text-muted-foreground">Loading conversations...</span>
             </div>
+          ) : filteredConversations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20 px-6 text-center opacity-50">
+              <Search className="w-8 h-8 mb-2" />
+              <p className="text-sm font-medium">No results found for "{searchTerm}"</p>
+            </div>
           ) : (
-            conversations.map((chat) => (
+            filteredConversations.map((chat) => (
               <motion.div 
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -211,31 +305,71 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                 onClick={() => {
                   setSelectedId(chat.id);
                   setIsDetailsOpen(true);
+                  // Mark as read and update local state optimally
+                  api.conversations.markAsRead(chat.id).catch(console.error);
+                  setConversationsList(prev => prev.map(c => 
+                    c.id === chat.id ? { ...c, unreadCount: 0 } : c
+                  ));
                 }}
                 className={cn(
                   "p-4 cursor-pointer border-b border-border transition-all duration-200 relative group",
-                  selectedId === chat.id ? "bg-accent" : "hover:bg-accent/50"
+                  selectedId === chat.id ? "bg-accent/40 rounded-xl mx-2" : "hover:bg-accent/30 rounded-xl mx-2"
                 )}
               >
-                {chat.id === '1' && (
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary pulse-indicator" />
-                )}
-                <div className="flex items-center gap-3 mb-1">
-                  <img src={chat.avatar} className="w-10 h-10 rounded-full border border-border" alt="" referrerPolicy="no-referrer" />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-foreground truncate">{chat.customerName}</h4>
-                      <span className="text-[10px] text-muted-foreground">{chat.time}</span>
+                <div className="flex items-center gap-3 relative">
+                  {/* Status Indicator Bar */}
+                  <div className={cn(
+                    "absolute -left-4 top-0 bottom-0 w-1 transition-all rounded-r-full",
+                    selectedId === chat.id ? "bg-primary" : "bg-transparent group-hover:bg-primary/20"
+                  )} />
+                  
+                  <div className="relative shrink-0">
+                    <img src={chat.avatar} className="w-12 h-12 rounded-full border border-border/50 object-cover" alt="" referrerPolicy="no-referrer" />
+                    <div className={cn(
+                      "absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card",
+                      chat.status === 'open' ? "bg-green-500" : "bg-zinc-400"
+                    )} />
+                  </div>
+
+                  <div className="flex-1 min-w-0 py-0.5">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <h4 className={cn(
+                        "text-sm font-bold truncate transition-colors",
+                        selectedId === chat.id ? "text-primary" : "text-foreground group-hover:text-primary/80"
+                      )}>{chat.customerName}</h4>
+                      <span className="text-[10px] text-muted-foreground font-medium shrink-0 ml-2">{chat.time}</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {chat.isAI ? (
-                        <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded text-[9px] font-bold uppercase">AI</span>
-                      ) : (
-                        <span className="px-1.5 py-0.5 bg-primary/10 text-primary rounded text-[9px] font-bold uppercase">Human</span>
-                      )}
+
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        {(!chat.isAI && chat.channel === 'whatsapp') && (
+                          <CheckCircle2 className="w-3 h-3 text-blue-500 shrink-0" />
+                        )}
+                        <p className="text-xs text-muted-foreground truncate leading-relaxed">
+                          {(() => {
+                            const conversationMessages = messages[chat.id] || [];
+                            const lastNonInternal = [...conversationMessages].reverse().find(m => !m.isInternal);
+                            return lastNonInternal ? lastNonInternal.text : chat.lastMessage;
+                          })()}
+                        </p>
+                      </div>
                       
-                      {/* Channel Tag */}
-                      <div className="flex items-center gap-1 px-1.5 py-0.5 bg-accent rounded text-[9px] font-bold text-muted-foreground uppercase">
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {chat.isAI && (
+                          <div className="p-1 rounded bg-blue-500/10" title="AI Managed">
+                            <Bot className="w-3 h-3 text-blue-500" />
+                          </div>
+                        )}
+                        {(chat as any).unreadCount > 0 && (
+                          <div className="min-w-[18px] h-[18px] px-1 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
+                            <span className="text-[9px] font-black text-white">{(chat as any).unreadCount}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 px-1.5 py-0.5 bg-accent/50 rounded text-[8px] font-black text-muted-foreground uppercase tracking-tighter">
                         {chat.channel === 'website' && <Globe className="w-2.5 h-2.5" />}
                         {chat.channel === 'whatsapp' && <MessageCircle className="w-2.5 h-2.5" />}
                         {chat.channel === 'email' && <Mail className="w-2.5 h-2.5" />}
@@ -244,15 +378,9 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                         {chat.channel === 'voice' && <Mic className="w-2.5 h-2.5" />}
                         <span>{chat.channel}</span>
                       </div>
-
-                      <div className={cn(
-                        "w-1.5 h-1.5 rounded-full",
-                        chat.status === 'open' ? "bg-green-500" : chat.status === 'pending' ? "bg-yellow-500" : "bg-gray-500"
-                      )} />
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground truncate">{chat.lastMessage}</p>
               </motion.div>
             ))
           )}
@@ -260,9 +388,9 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Middle Panel: Chat Interface */}
-      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300">
+      <div className="flex-1 flex flex-col min-w-0 transition-all duration-300 bg-card border border-border rounded-2xl overflow-hidden">
         {!selectedId ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-4 bg-background/50">
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-4 bg-card">
             <div className="w-16 h-16 rounded-full bg-accent flex items-center justify-center mb-4">
               <MessageSquare className="w-8 h-8 text-muted-foreground" />
             </div>
@@ -274,7 +402,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
         ) : (
           <>
             {/* Chat Header */}
-            <div className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 bg-card/50 backdrop-blur-md z-10">
+            <div className="h-16 border-b border-border flex items-center justify-between px-4 shrink-0 bg-card z-10">
               <div className="flex items-center gap-3 min-w-0">
                 <button 
                   onClick={() => {
@@ -294,10 +422,9 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                   onClick={() => setIsDetailsOpen(true)}
                   title="Show Customer Details"
                 >
-                  <img src={conversations.find(c => c.id === selectedId)?.avatar} className="w-8 h-8 rounded-full border border-border shrink-0" alt="" referrerPolicy="no-referrer" />
+                  <img src={conversationsList.find(c => c.id === selectedId)?.avatar} className="w-8 h-8 rounded-full border border-border shrink-0" alt="" referrerPolicy="no-referrer" />
                   <div className="min-w-0">
-                    <h3 className="text-sm font-bold text-foreground truncate">{conversations.find(c => c.id === selectedId)?.customerName}</h3>
-                    <p className="text-[10px] text-muted-foreground truncate">Active 2m ago</p>
+                    <h3 className="text-sm font-bold text-foreground truncate">{conversationsList.find(c => c.id === selectedId)?.customerName}</h3>
                   </div>
                 </div>
               </div>
@@ -335,9 +462,9 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                   </button>
                 </div>
 
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-[11px] font-bold hover:opacity-90 transition-all shadow-sm">
+                <button className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-full text-[11px] font-bold hover:opacity-90 transition-all shadow-sm">
                   <Archive className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Close Ticket</span>
+                  <span className="hidden md:inline">Close</span>
                 </button>
 
                 {!isDetailsOpen && (
@@ -356,7 +483,25 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar bg-background/50">
+            <div 
+              ref={scrollRef}
+              onScroll={handleScroll}
+              className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar bg-card relative"
+            >
+              <AnimatePresence>
+                {showScrollButton && (
+                  <motion.button
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    onClick={scrollToBottom}
+                    className="fixed bottom-32 left-1/2 -translate-x-1/2 p-2.5 bg-primary/90 backdrop-blur-sm text-primary-foreground rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all z-[100] flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest border border-primary-foreground/20"
+                  >
+                    <ChevronDown className="w-3.5 h-3.5" />
+                    Jump to End
+                  </motion.button>
+                )}
+              </AnimatePresence>
               <div className="flex justify-center">
                 <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest bg-accent px-3 py-1 rounded-full">Today</span>
               </div>
@@ -374,18 +519,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                     )}
                   >
                     {msg.isInternal ? (
-                      <div className="w-full bg-yellow-500/5 border border-yellow-500/20 rounded-xl p-4 flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center shrink-0">
-                          <Quote className="w-4 h-4 text-black" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[10px] font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-widest">Internal Note • You</span>
-                            <span className="text-[10px] text-muted-foreground">{msg.time}</span>
-                          </div>
-                          <p className="text-sm text-foreground italic">"{msg.text}"</p>
-                        </div>
-                      </div>
+                      <CollapsibleNote msg={msg} />
                     ) : (
                       <>
                         {msg.sender === 'customer' ? (
@@ -424,31 +558,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                 ))}
               </AnimatePresence>
 
-              {/* Typing Indicator */}
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-2 text-[10px] text-muted-foreground"
-              >
-                <div className="flex gap-1">
-                  <motion.div 
-                    animate={{ scale: [1, 1.5, 1] }}
-                    transition={{ repeat: Infinity, duration: 0.6, delay: 0 }}
-                    className="w-1 h-1 bg-muted-foreground rounded-full" 
-                  />
-                  <motion.div 
-                    animate={{ scale: [1, 1.5, 1] }}
-                    transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }}
-                    className="w-1 h-1 bg-muted-foreground rounded-full" 
-                  />
-                  <motion.div 
-                    animate={{ scale: [1, 1.5, 1] }}
-                    transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }}
-                    className="w-1 h-1 bg-muted-foreground rounded-full" 
-                  />
-                </div>
-                <span>AI is thinking...</span>
-              </motion.div>
+              {/* Typing Indicator removed until real-time status is implemented */}
             </div>
 
             {/* Input Area */}
@@ -476,21 +586,15 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                 </button>
               </div>
               <PromptInputBox 
-                onSend={(msg) => {
+                onSend={async (msg) => {
                   if (!selectedId) return;
                   
-                  const newMessage: Message = {
-                    id: Date.now().toString(),
-                    sender: 'human',
-                    text: msg,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    isInternal: activeTab === 'note'
-                  };
-
-                  setMessages(prev => ({
-                    ...prev,
-                    [selectedId]: [...(prev[selectedId] || []), newMessage]
-                  }));
+                  try {
+                    await api.conversations.sendMessage(selectedId, msg, activeTab === 'note');
+                    fetchMessages(selectedId);
+                  } catch (err) {
+                    toast('Error', 'Failed to send message', 'error');
+                  }
                 }}
                 placeholder={activeTab === 'reply' ? "Type a message or use / for commands..." : "Type an internal note (only visible to teammates)..."}
               />
@@ -583,7 +687,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
 
       {/* Right Panel: Details */}
       <div className={cn(
-        "border-l border-border flex flex-col shrink-0 bg-card transition-all duration-300 ease-in-out z-10",
+        "border border-border flex flex-col shrink-0 bg-card transition-all duration-300 ease-in-out z-10 rounded-2xl",
         isDetailsOpen && selectedId ? "w-80" : "w-0 overflow-hidden"
       )}>
         {selectedId && (
@@ -598,14 +702,12 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
               </button>
               <div className="flex flex-col items-center text-center mb-6">
                 <div className="relative mb-4">
-                  <img src={conversations.find(c => c.id === selectedId)?.avatar} className="w-20 h-20 rounded-full border-2 border-border shadow-2xl" alt="" referrerPolicy="no-referrer" />
-                  <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-2 border-card rounded-full" />
+                  <img src={conversationsList.find(c => c.id === selectedId)?.avatar} className="w-20 h-20 rounded-full border-2 border-border shadow-2xl" alt="" referrerPolicy="no-referrer" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground leading-tight">{conversations.find(c => c.id === selectedId)?.customerName}</h3>
-                <p className="text-xs text-muted-foreground mt-1">tony@starkindustries.com</p>
+                <h3 className="text-lg font-bold text-foreground leading-tight">{conversationsList.find(c => c.id === selectedId)?.customerName}</h3>
+                <p className="text-xs text-muted-foreground mt-1">Contact Details</p>
                 <div className="flex items-center gap-2 mt-3">
                   <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px] font-bold uppercase tracking-wider">Customer</span>
-                  <span className="px-2 py-0.5 bg-accent text-muted-foreground rounded text-[10px] font-bold uppercase tracking-wider">VIP</span>
                 </div>
               </div>
 
@@ -681,11 +783,11 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
         )}
       </div>
       {/* Call Overlay */}
-      <CallOverlay 
+        <CallOverlay 
         isOpen={isCallActive}
         onClose={() => setIsCallActive(false)}
-        participantName={conversations.find(c => c.id === selectedId)?.customerName || 'Customer'}
-        participantAvatar={conversations.find(c => c.id === selectedId)?.avatar || ''}
+        participantName={conversationsList.find(c => c.id === selectedId)?.customerName || 'Customer'}
+        participantAvatar={conversationsList.find(c => c.id === selectedId)?.avatar || ''}
       />
     </div>
   );

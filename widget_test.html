@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XentralDesk Widget Test (Dev)</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .hero {
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #1a1c1e;
+        }
+
+        p {
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hero">
+        <h1>Welcome (Dev Mode)</h1>
+        <p>The XentralDesk chat widget should appear in the bottom right corner.</p>
+    </div>
+
+    <script>
+        window.XENTRALDESK_WORKSPACE_ID = "97a7f665-a202-497d-93fc-ef4109365990";
+        window.XENTRALDESK_COLOR = "#1b1c1d";
+        window.XENTRALDESK_TITLE = "XentralDesk Support";
+        window.XENTRALDESK_THEME = "dark";
+    </script>
+    <script type="module" src="http://localhost:3000/src/widget/main.tsx"></script>
+</body>
+
+</html>

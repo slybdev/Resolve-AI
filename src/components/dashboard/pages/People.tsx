@@ -144,9 +144,9 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="h-full flex bg-[#050505] overflow-hidden">
+    <div className="h-full flex bg-transparent overflow-hidden gap-2 p-2">
       {/* Segments Sidebar */}
-      <div className="w-64 border-r border-white/5 flex flex-col p-6 space-y-8">
+      <div className="w-64 border border-border flex flex-col p-6 space-y-8 bg-card rounded-2xl">
         <div>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 px-4">Segments</h2>
           <div className="space-y-1">
@@ -177,9 +177,9 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden bg-card border border-border rounded-2xl">
         {/* Header */}
-        <div className="p-8 border-b border-white/5 flex items-center justify-between bg-gradient-to-b from-white/[0.02] to-transparent">
+        <div className="p-8 border-b border-border flex items-center justify-between bg-card">
           <div>
             <h1 className="text-3xl font-black text-white tracking-tighter mb-1">People & CRM</h1>
             <p className="text-muted-foreground text-sm font-medium">Manage your customer relationships and interaction history.</p>
@@ -197,16 +197,16 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
         </div>
 
         {/* Search & Bulk Actions */}
-        <div className="px-8 py-4 border-b border-white/5 flex items-center gap-4 bg-white/[0.01]">
+        <div className="px-8 py-4 border-b border-border flex items-center gap-4 bg-card/50">
           <div className="relative flex-1 max-w-xl">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input 
               type="text" 
               placeholder="Search by name, email, company or custom attributes..."
-              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl py-3 pl-12 pr-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/10 transition-all"
+              className="w-full bg-accent/30 border border-border rounded-2xl py-3 pl-12 pr-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all"
             />
           </div>
-          <button className="flex items-center gap-2 px-4 py-3 rounded-xl bg-white/5 text-muted-foreground hover:text-white transition-all text-xs font-bold border border-white/5">
+          <button className="flex items-center gap-2 px-4 py-3 rounded-xl bg-accent text-muted-foreground hover:text-foreground transition-all text-xs font-bold border border-border">
             <Filter className="w-4 h-4" />
             More Filters
           </button>
@@ -215,7 +215,7 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
         {/* Table */}
         <div className="flex-1 overflow-y-auto no-scrollbar">
           <table className="w-full text-left border-collapse">
-            <thead className="sticky top-0 bg-[#050505]/80 backdrop-blur-md z-10 border-b border-white/5">
+            <thead className="sticky top-0 bg-card/80 backdrop-blur-md z-10 border-b border-border">
               <tr>
                 <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Person</th>
                 <th className="px-8 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Company</th>

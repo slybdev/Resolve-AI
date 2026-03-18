@@ -24,8 +24,8 @@ export const Train = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background overflow-hidden">
-      <div className="px-8 pt-8 border-b border-border bg-card/50 backdrop-blur-md shrink-0">
+    <div className="flex flex-col h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="px-8 py-8 border border-border bg-card rounded-2xl shrink-0 shadow-sm">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-2xl font-bold text-foreground">Train Agent</h1>
@@ -61,7 +61,7 @@ export const Train = ({ workspaceId }: { workspaceId: string }) => {
           </div>
         </div>
       </div>
-      <div className="flex-1 overflow-y-auto no-scrollbar">
+      <div className="flex-1 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl">
         {renderContent()}
       </div>
     </div>

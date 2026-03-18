@@ -4,9 +4,9 @@ import { Clock, AlertCircle, ShieldCheck } from 'lucide-react';
 
 export const AssignedToMe = ({ workspaceId }: { workspaceId: string }) => {
   return (
-    <div className="flex flex-col h-full w-full bg-background">
+    <div className="flex flex-col h-full w-full bg-transparent overflow-hidden gap-2 p-2">
       {/* Header for Assigned to Me */}
-      <div className="h-20 border-b border-border flex items-center justify-between px-8 shrink-0 bg-card/50">
+      <div className="h-20 border border-border flex items-center justify-between px-8 shrink-0 bg-card rounded-2xl shadow-sm">
         <div className="flex items-center gap-8">
           <div>
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Total Assigned</p>

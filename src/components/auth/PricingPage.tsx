@@ -10,7 +10,7 @@ const plans = [
     description: 'Perfect for small teams starting with AI.',
     features: ['1,000 AI messages/mo', '2 Team members', 'Basic analytics', 'Website widget'],
     color: 'border-white/10',
-    button: 'Start Free Trial'
+    button: 'Start 14-day Free Trial'
   },
   {
     name: 'Pro',
@@ -93,7 +93,7 @@ export const PricingPage = () => {
             </div>
 
             <button
-              onClick={() => navigate('/onboarding')}
+              onClick={() => navigate(`/signup?plan=${plan.name.toLowerCase()}`)}
               className={`w-full py-3 rounded-xl font-bold transition-all active:scale-[0.98] ${
                 plan.popular 
                   ? 'bg-primary text-primary-foreground hover:opacity-90' 

@@ -61,9 +61,9 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState<'campaigns' | 'templates' | 'analytics'>('campaigns');
 
   return (
-    <div className="h-full flex flex-col bg-background overflow-hidden">
+    <div className="h-full flex flex-col bg-transparent overflow-hidden gap-2 p-2">
       {/* Header */}
-      <div className="p-6 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm">
+      <div className="p-6 border border-border flex items-center justify-between bg-card rounded-2xl shadow-sm">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Megaphone className="w-6 h-6 text-primary" />
@@ -84,7 +84,7 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Tabs */}
-      <div className="px-6 border-b border-border bg-card/30 flex items-center justify-between">
+      <div className="px-6 border border-border bg-card flex items-center justify-between rounded-2xl shadow-sm shrink-0">
         <div className="flex items-center gap-8">
           {[
             { id: 'campaigns', label: 'Campaigns', icon: Layout },

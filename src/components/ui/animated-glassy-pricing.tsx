@@ -160,13 +160,14 @@ export interface PricingCardProps {
   buttonText: string;
   isPopular?: boolean;
   buttonVariant?: 'primary' | 'secondary';
+  onClick?: () => void;
 }
 
 /**
  * We export the PricingCard component itself in case you want to use it elsewhere.
  */
 export const PricingCard = ({
-  planName, description, price, features, buttonText, isPopular = false, buttonVariant = 'primary'
+  planName, description, price, features, buttonText, isPopular = false, buttonVariant = 'primary', onClick
 }: PricingCardProps) => {
   const cardClasses = `
     backdrop-blur-[14px] bg-gradient-to-br rounded-2xl shadow-xl flex-1 max-w-xs px-7 py-8 flex flex-col transition-all duration-300
@@ -207,7 +208,7 @@ export const PricingCard = ({
           </li>
         ))}
       </ul>
-      <RippleButton className={buttonClasses.trim()}>{buttonText}</RippleButton>
+      <RippleButton onClick={onClick} className={buttonClasses.trim()}>{buttonText}</RippleButton>
     </div>
   );
 };

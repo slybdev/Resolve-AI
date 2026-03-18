@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '@/src/lib/api';
 import { Sidebar } from './dashboard/Sidebar';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -35,12 +36,16 @@ import { BusinessHours } from './dashboard/pages/BusinessHours';
 import { WebsiteChatChannel } from './dashboard/pages/channels/WebsiteChatChannel';
 import { EmailChannel } from './dashboard/pages/channels/EmailChannel';
 import { WhatsAppChannel } from './dashboard/pages/channels/WhatsAppChannel';
+import { InstagramChannel } from './dashboard/pages/channels/InstagramChannel';
+import { FacebookChannel } from './dashboard/pages/channels/FacebookChannel';
 import { TelegramChannel } from './dashboard/pages/channels/TelegramChannel';
+import { DiscordChannel } from './dashboard/pages/channels/DiscordChannel';
 import { SlackChannel } from './dashboard/pages/channels/SlackChannel';
 import { VoiceAIChannel } from './dashboard/pages/channels/VoiceAIChannel';
 import { CommandPalette } from './dashboard/CommandPalette';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [currentView, setCurrentView] = useState('all-conversations');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -83,6 +88,11 @@ const Dashboard = () => {
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+  
+  const handleLogout = () => {
+    api.auth.logout();
+    navigate('/login');
   };
 
   const renderView = () => {
@@ -128,7 +138,10 @@ const Dashboard = () => {
       case 'website-chat': return <WebsiteChatChannel workspaceId={workspaceId} />;
       case 'email': return <EmailChannel workspaceId={workspaceId} />;
       case 'whatsapp': return <WhatsAppChannel workspaceId={workspaceId} />;
+      case 'instagram': return <InstagramChannel workspaceId={workspaceId} />;
+      case 'facebook': return <FacebookChannel workspaceId={workspaceId} />;
       case 'telegram': return <TelegramChannel workspaceId={workspaceId} />;
+      case 'discord': return <DiscordChannel workspaceId={workspaceId} />;
       case 'slack': return <SlackChannel workspaceId={workspaceId} />;
       case 'voice-ai': return <VoiceAIChannel workspaceId={workspaceId} />;
       case 'ai-automations': return <AIAutomations workspaceId={workspaceId} />;
@@ -143,7 +156,7 @@ const Dashboard = () => {
       case 'ai-settings': return <AISettings workspaceId={workspaceId} />;
       case 'team-members': return <TeamMembers workspaceId={workspaceId} />;
       case 'business-hours': return <BusinessHours workspaceId={workspaceId} />;
-      case 'integrations': return <Integrations workspaceId={workspaceId} />;
+      case 'integrations': return <Integrations workspaceId={workspaceId} onViewChange={handleViewChange} />;
       case 'chat-widget': return <ChatWidget workspaceId={workspaceId} />;
       case 'billing': return <Billing workspaceId={workspaceId} />;
       case 'api-keys': return <APIKeys workspaceId={workspaceId} />;
@@ -152,16 +165,17 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-background text-foreground overflow-hidden font-sans relative">
+    <div className="flex h-screen w-full bg-background text-foreground overflow-hidden font-sans relative p-2 gap-2">
       <div className={cn(
-        "transition-all duration-300 ease-in-out flex shrink-0 overflow-hidden border-r border-white/5",
-        isSidebarOpen ? "w-64" : "w-16"
+        "transition-all duration-300 ease-in-out flex shrink-0 overflow-hidden border border-zinc-200/50 dark:border-zinc-800/50 rounded-2xl bg-card",
+        isSidebarOpen ? "w-80" : "w-16"
       )}>
         <Sidebar 
           currentView={currentView} 
           onViewChange={handleViewChange} 
           isCollapsed={!isSidebarOpen} 
           onToggle={toggleSidebar}
+          onLogout={handleLogout}
         />
       </div>
 

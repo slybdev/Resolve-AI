@@ -148,11 +148,11 @@ export const AICalls = () => {
   };
 
   return (
-    <div className="flex h-full w-full bg-background overflow-hidden relative">
+    <div className="flex h-full w-full bg-transparent overflow-hidden relative gap-2 p-2">
       {/* Main Content */}
       <div className={cn(
-        "flex-1 flex flex-col h-full p-8 overflow-y-auto no-scrollbar transition-all duration-300",
-        (selectedCall && isDetailsOpen) ? "mr-[400px]" : ""
+        "flex-1 flex flex-col h-full overflow-y-auto no-scrollbar transition-all duration-300 bg-card border border-border rounded-2xl p-8",
+        (selectedCall && isDetailsOpen) ? "mr-[408px]" : ""
       )}>
         <div className="max-w-6xl w-full mx-auto space-y-12">
           
@@ -334,8 +334,8 @@ export const AICalls = () => {
       {/* Call Details Panel */}
       {selectedCall && (
         <div className={cn(
-          "fixed top-0 right-0 w-[400px] h-screen bg-card border-l border-border flex flex-col transition-all duration-300 z-40 shadow-2xl",
-          !isDetailsOpen && "translate-x-full"
+          "fixed top-2 bottom-2 right-2 w-[400px] bg-card border border-border flex flex-col transition-all duration-300 z-40 shadow-2xl rounded-2xl overflow-hidden",
+          !isDetailsOpen && "translate-x-[calc(100%+8px)]"
         )}>
           <div className="p-6 border-b border-border flex items-center justify-between bg-accent/50">
             <h2 className="text-lg font-bold text-foreground">Call Details</h2>

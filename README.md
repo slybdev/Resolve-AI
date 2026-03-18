@@ -6,9 +6,9 @@
   <img src="https://img.shields.io/badge/Gemini_AI-API-4285F4?style=for-the-badge&logo=google" />
 </p>
 
-# 🤖 ResolveAI
+# 🤖 XentralDesk
 
-**ResolveAI** is a modern, AI-powered customer support platform built with React, TypeScript, and the Gemini AI API. It provides businesses with an intelligent dashboard to manage conversations, automate workflows, train AI agents, and engage customers across multiple channels — all from a single, beautifully designed interface.
+**XentralDesk** is a modern, AI-powered customer support platform built with React, TypeScript, and the Gemini AI API. It provides businesses with an intelligent dashboard to manage conversations, automate workflows, train AI agents, and engage customers across multiple channels — all from a single, beautifully designed interface.
 
 ---
 
@@ -67,7 +67,7 @@
 ## 📁 Project Structure
 
 ```
-ResolveAI/
+XentralDesk/
 ├── index.html                    # HTML entry point
 ├── vite.config.ts                # Vite configuration with Tailwind CSS plugin
 ├── package.json                  # Dependencies and scripts
@@ -179,7 +179,7 @@ ResolveAI/
 
 ### 1. Landing Page (`/`)
 
-The public-facing homepage that introduces ResolveAI to visitors.
+The public-facing homepage that introduces XentralDesk to visitors.
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -262,8 +262,8 @@ The main application interface after authentication. Features a collapsible side
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-username/ResolveAI.git
-cd ResolveAI
+git clone https://github.com/your-username/XentralDesk.git
+cd XentralDesk
 
 # 2. Install dependencies
 npm install
@@ -367,7 +367,7 @@ Create a `.env` file in the project root with the following variables:
 
 ## 🎨 UI Components
 
-ResolveAI includes a rich library of reusable UI components:
+XentralDesk includes a rich library of reusable UI components:
 
 | Component                    | Description                                     |
 | ---------------------------- | ----------------------------------------------- |
@@ -393,7 +393,7 @@ ResolveAI includes a rich library of reusable UI components:
 
 ## 🌗 Theming
 
-ResolveAI supports **dark** and **light** modes via `next-themes` with CSS custom properties.
+XentralDesk supports **dark** and **light** modes via `next-themes` with CSS custom properties.
 
 - Theme is toggled from the sidebar's sun/moon button
 - Default theme is **dark**
@@ -434,5 +434,5 @@ This project is licensed under the [Apache-2.0 License](LICENSE).
 ---
 
 <p align="center">
-  Built with ❤️ by the ResolveAI Team
+  Built with ❤️ by the XentralDesk Team
 </p>

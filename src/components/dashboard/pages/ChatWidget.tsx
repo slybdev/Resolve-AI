@@ -1,11 +1,48 @@
 import React, { useState } from 'react';
+import { api } from '@/src/lib/api';
 import { MessageCircle, Settings, Palette, Code, Eye, Save, RefreshCw, Smartphone, Monitor } from 'lucide-react';
+import { ChatWidgetPublic } from '@/src/components/widget/ChatWidgetPublic';
 import { cn } from '@/src/lib/utils';
+import { useToast } from '@/src/components/ui/Toast';
 
 export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
   const [primaryColor, setPrimaryColor] = useState('#3B82F6');
-  const [title, setTitle] = useState('Stark Support');
+  const [title, setTitle] = useState('XentralDesk Support');
   const [welcomeMessage, setWelcomeMessage] = useState('Hello! How can I help you today?');
+  const [theme, setTheme] = useState('dark');
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
+
+  React.useEffect(() => {
+    // Fetch current config using the API client
+    api.widget.getConfig(workspaceId)
+      .then(data => {
+        if (data.primary_color) setPrimaryColor(data.primary_color);
+        if (data.settings?.title) setTitle(data.settings.title);
+        if (data.settings?.welcome_message) setWelcomeMessage(data.settings.welcome_message);
+        if (data.theme) setTheme(data.theme);
+      })
+      .catch(err => console.error('Failed to fetch widget config:', err));
+  }, [workspaceId]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await api.widget.saveConfig(workspaceId, {
+        primary_color: primaryColor,
+        theme: theme,
+        settings: {
+          title: title,
+          welcome_message: welcomeMessage
+        }
+      });
+      toast('Saved!', 'Widget configuration updated successfully.', 'success');
+    } catch (error) {
+      toast('Error', 'Failed to save widget configuration.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <div className="flex h-full w-full bg-background overflow-hidden">
@@ -22,9 +59,13 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
                 <RefreshCw className="w-4 h-4" />
                 Reset
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all btn-press shadow-lg shadow-primary/20">
-                <Save className="w-4 h-4" />
-                Save Changes
+              <button 
+                onClick={handleSave}
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all btn-press shadow-lg shadow-primary/20 disabled:opacity-50"
+              >
+                {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {isSaving ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>
@@ -58,8 +99,24 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Theme Mode</label>
                   <div className="flex gap-2">
-                    <button className="flex-1 py-3 bg-accent/50 border border-border rounded-xl text-xs font-bold text-foreground hover:bg-accent transition-colors btn-press">Light</button>
-                    <button className="flex-1 py-3 bg-primary/10 border border-primary/50 rounded-xl text-xs font-bold text-primary btn-press">Dark</button>
+                    <button 
+                      onClick={() => setTheme('light')}
+                      className={cn(
+                        "flex-1 py-3 rounded-xl text-xs font-bold transition-all btn-press",
+                        theme === 'light' ? "bg-primary/10 border border-primary/50 text-primary" : "bg-accent/50 border border-border text-foreground hover:bg-accent"
+                      )}
+                    >
+                      Light
+                    </button>
+                    <button 
+                      onClick={() => setTheme('dark')}
+                      className={cn(
+                        "flex-1 py-3 rounded-xl text-xs font-bold transition-all btn-press",
+                        theme === 'dark' ? "bg-primary/10 border border-primary/50 text-primary" : "bg-accent/50 border border-border text-foreground hover:bg-accent"
+                      )}
+                    >
+                      Dark
+                    </button>
                   </div>
                 </div>
               </div>
@@ -98,18 +155,64 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
                 <Code className="w-5 h-5 text-primary" />
                 <h2 className="text-lg font-bold text-foreground">Installation</h2>
               </div>
-              <div className="bg-card border border-border rounded-3xl p-6 space-y-4 shadow-sm">
-                <p className="text-xs text-muted-foreground leading-relaxed">Copy and paste this snippet before the closing &lt;/body&gt; tag of your website.</p>
-                <div className="relative">
-                  <pre className="p-4 bg-accent/50 border border-border rounded-xl text-[10px] font-mono text-primary overflow-x-auto">
-                    {`<script src="https://cdn.stark.ai/widget.js" 
-  data-id="STARK-123-ABC" 
-  data-color="${primaryColor}">
-</script>`}
-                  </pre>
-                  <button className="absolute top-2 right-2 p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors btn-press">
-                    <Code className="w-4 h-4" />
-                  </button>
+              
+              <div className="space-y-4">
+                <div className="bg-card border border-border rounded-3xl p-6 space-y-4 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-foreground">Production Snippet</h3>
+                    <span className="px-2 py-1 bg-green-500/10 text-[10px] font-bold text-green-500 rounded-md">CDN</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Copy and paste this snippet before the &lt;/body&gt; tag of your production site.</p>
+                  <div className="relative">
+                    <pre className="p-4 bg-accent/50 border border-border rounded-xl text-[10px] font-mono text-primary overflow-x-auto">
+{`<script 
+  src="${window.location.origin}/widget.js" 
+  data-xentraldesk-id="${workspaceId}" 
+  data-color="${primaryColor}"
+  data-title="${title}"
+  data-theme="${theme}"
+></script>`}
+                    </pre>
+                    <button 
+                      onClick={() => {
+                        const snippet = `<script src="${window.location.origin}/widget.js" data-xentraldesk-id="${workspaceId}" data-color="${primaryColor}" data-title="${title}" data-theme="${theme}"></script>`;
+                        navigator.clipboard.writeText(snippet);
+                        toast('Copied!', 'Production snippet copied to clipboard.', 'success');
+                      }}
+                      className="absolute top-2 right-2 p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors btn-press"
+                    >
+                      <Code className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-card border border-border rounded-3xl p-6 space-y-4 shadow-sm border-dashed">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-foreground">Local Development</h3>
+                    <span className="px-2 py-1 bg-primary/10 text-[10px] font-bold text-primary rounded-md">DEV</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Use this snippet to test the widget locally on your development machine.</p>
+                  <div className="relative">
+                    <pre className="p-4 bg-accent/50 border border-border rounded-xl text-[10px] font-mono text-foreground/50 overflow-x-auto">
+{`<script>
+  window.XENTRALDESK_WORKSPACE_ID = "${workspaceId}";
+  window.XENTRALDESK_COLOR = "${primaryColor}";
+  window.XENTRALDESK_TITLE = "${title}";
+  window.XENTRALDESK_THEME = "${theme}";
+</script>
+<script type="module" src="${window.location.origin}/src/widget/main.tsx"></script>`}
+                    </pre>
+                    <button 
+                      onClick={() => {
+                        const snippet = `<script>\n  window.XENTRALDESK_WORKSPACE_ID = "${workspaceId}";\n  window.XENTRALDESK_COLOR = "${primaryColor}";\n  window.XENTRALDESK_TITLE = "${title}";\n  window.XENTRALDESK_THEME = "${theme}";\n</script>\n<script type="module" src="${window.location.origin}/src/widget/main.tsx"></script>`;
+                        navigator.clipboard.writeText(snippet);
+                        toast('Copied!', 'Development snippet copied to clipboard.', 'info');
+                      }}
+                      className="absolute top-2 right-2 p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors btn-press"
+                    >
+                      <Code className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -141,24 +244,16 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
             </div>
           </div>
 
-          {/* Mock Widget */}
-          <div className="absolute bottom-6 right-6 w-72 h-96 bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-            <div className="p-4 flex items-center gap-3 border-b border-border" style={{ backgroundColor: primaryColor }}>
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                <MessageCircle className="w-5 h-5 text-white" />
-              </div>
-              <h4 className="text-sm font-bold text-white">{title}</h4>
-            </div>
-            <div className="flex-1 p-4 space-y-4">
-              <div className="bg-accent border border-border p-3 rounded-2xl rounded-tl-none text-[10px] text-foreground">
-                {welcomeMessage}
-              </div>
-            </div>
-            <div className="p-4 border-t border-border">
-              <div className="w-full h-8 bg-accent/50 border border-border rounded-xl px-3 flex items-center text-[10px] text-muted-foreground">
-                Type a message...
-              </div>
-            </div>
+          {/* Real Widget Preview */}
+          <div className="absolute bottom-6 right-6 scale-[0.8] origin-bottom-right">
+            <ChatWidgetPublic 
+              workspaceId={workspaceId}
+              primaryColor={primaryColor}
+              title={title}
+              welcomeMessage={welcomeMessage}
+              theme={theme as 'light' | 'dark'}
+              isPreview={true}
+            />
           </div>
         </div>
       </div>

@@ -5,13 +5,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: resolveai-api
+    container_name: xentraldesk-api
     ports:
       - "8000:8000"
     env_file:
       - .env
     environment:
-      - DATABASE_URL=mysql+aiomysql://resolveai:resolveai_dev@mysql:3306/resolveai
+      - DATABASE_URL=mysql+aiomysql://xentraldesk:xentraldesk_dev@mysql:3306/xentraldesk
       - REDIS_URL=redis://redis:6379/0
     depends_on:
       mysql:
@@ -22,20 +22,21 @@ services:
       - ./app:/app/app
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
+      - ./tests:/app/tests
     restart: unless-stopped
     command: /bin/sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   # ---------- MySQL 8.0 ----------
   mysql:
     image: mysql:8.0
-    container_name: resolveai-mysql
+    container_name: xentraldesk-mysql
     ports:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root_dev
-      MYSQL_DATABASE: resolveai
-      MYSQL_USER: resolveai
-      MYSQL_PASSWORD: resolveai_dev
+      MYSQL_DATABASE: xentraldesk
+      MYSQL_USER: xentraldesk
+      MYSQL_PASSWORD: xentraldesk_dev
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -47,7 +48,7 @@ services:
   # ---------- Redis 7 ----------
   redis:
     image: redis:7-alpine
-    container_name: resolveai-redis
+    container_name: xentraldesk-redis
     ports:
       - "6379:6379"
     volumes:

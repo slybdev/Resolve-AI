@@ -73,8 +73,8 @@ export const BusinessHours = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="flex h-full w-full bg-background overflow-hidden">
-      <div className="flex-1 flex flex-col min-w-0 p-8 overflow-y-auto no-scrollbar">
+    <div className="flex h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="flex-1 flex flex-col min-w-0 p-8 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl">
         <div className="max-w-4xl w-full mx-auto space-y-12">
           {/* Header */}
           <div className="flex items-center justify-between">

@@ -11,7 +11,7 @@ from pydantic import BaseModel, Field
 class OnboardingSetupRequest(BaseModel):
     workspace_name: str = Field(min_length=1, max_length=255)
     industry: str | None = Field(default=None, max_length=100)
-    ai_agent_name: str | None = Field(default="ResolveAI Assistant", max_length=255)
+    ai_agent_name: str | None = Field(default="XentralDesk Assistant", max_length=255)
     ai_tone: str | None = Field(
         default="professional",
         description="AI response tone: professional, friendly, formal",

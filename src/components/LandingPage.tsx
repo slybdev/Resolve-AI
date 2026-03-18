@@ -27,7 +27,7 @@ export const LandingPage = () => {
           <div className="bg-white/10 p-1 rounded-full group-hover:scale-110 transition-transform">
             <Bot className="text-white w-4 h-4 md:w-5 md:h-5" />
           </div>
-          <span className="text-white font-bold tracking-tight text-sm md:text-base">ResolveAI</span>
+          <span className="text-white font-bold tracking-tight text-sm md:text-base">XentralDesk</span>
         </div>
 
         {/* Auth */}
@@ -42,7 +42,7 @@ export const LandingPage = () => {
                 Login
               </Link>
               <Link to="/signup" className="bg-white text-black text-xs md:text-sm font-bold px-3 md:px-5 py-2 rounded-full hover:bg-neutral-200 transition-all cursor-pointer">
-                Sign up
+                Start Free Trial
               </Link>
             </>
           )}

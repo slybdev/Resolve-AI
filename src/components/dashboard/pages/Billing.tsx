@@ -4,7 +4,7 @@ import { cn } from '@/src/lib/utils';
 
 export const Billing = ({ workspaceId }: { workspaceId: string }) => {
   return (
-    <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
+    <div className="flex flex-col h-full w-full bg-transparent p-8 overflow-y-auto no-scrollbar">
       <div className="max-w-5xl w-full mx-auto space-y-12">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Billing & Subscription</h1>

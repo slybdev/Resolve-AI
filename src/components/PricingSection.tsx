@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { ModernPricingPage, PricingCardProps } from "./ui/animated-glassy-pricing";
 
 const pricingPlans: PricingCardProps[] = [
@@ -11,7 +12,7 @@ const pricingPlans: PricingCardProps[] = [
       'Chat widget + email support',
       'Basic analytics dashboard'
     ], 
-    buttonText: 'Get Started', 
+    buttonText: 'Start 14-day Free Trial', 
     buttonVariant: 'secondary'
   },
   { 
@@ -25,7 +26,7 @@ const pricingPlans: PricingCardProps[] = [
       'Advanced analytics + performance tracking',
       'Multiple agent accounts'
     ], 
-    buttonText: 'Start Growth', 
+    buttonText: 'Start 14-day Free Trial', 
     isPopular: true, 
     buttonVariant: 'primary' 
   },
@@ -46,6 +47,13 @@ const pricingPlans: PricingCardProps[] = [
 ];
 
 export const PricingSection = () => {
+  const navigate = useNavigate();
+
+  const pricingWithHandlers = pricingPlans.map(plan => ({
+    ...plan,
+    onClick: () => navigate(`/signup?plan=${plan.planName.toLowerCase()}`)
+  }));
+
   return (
     <div id="pricing" className="w-full">
       <ModernPricingPage
@@ -55,7 +63,7 @@ export const PricingSection = () => {
           </>
         }
         subtitle="Choose the plan that fits your business needs. All plans include our core AI engine."
-        plans={pricingPlans}
+        plans={pricingWithHandlers}
         showAnimatedBackground={false} // We already have background effects in the main app
       />
     </div>

@@ -196,9 +196,9 @@ export const KnowledgeBase = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="flex h-full w-full bg-background overflow-hidden">
+    <div className="flex h-full w-full bg-transparent overflow-hidden gap-2">
       {/* Left Sidebar - Knowledge Navigation */}
-      <div className="w-64 border-r border-border bg-card/30 flex flex-col shrink-0">
+      <div className="w-64 border border-border bg-card flex flex-col shrink-0 rounded-2xl overflow-hidden">
         <div className="p-6">
           <h2 className="text-lg font-bold text-foreground">Knowledge</h2>
         </div>
@@ -252,11 +252,11 @@ export const KnowledgeBase = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 bg-background">
+      <div className="flex-1 flex flex-col min-w-0 bg-card border border-border rounded-2xl overflow-hidden">
         {activeSubView === 'content' ? (
           <>
             {/* Header */}
-            <div className="px-8 py-4 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-md">
+            <div className="px-8 py-4 border-b border-border flex items-center justify-between bg-card shrink-0">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-muted-foreground" />
                 <div className="flex items-center gap-1">

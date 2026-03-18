@@ -32,8 +32,9 @@ const unassignedTickets: UnassignedTicket[] = [
 
 export const Unassigned = ({ workspaceId }: { workspaceId: string }) => {
   return (
-    <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
-      <div className="max-w-6xl w-full mx-auto space-y-8">
+    <div className="flex flex-col h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="flex-1 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl p-8 shadow-sm">
+        <div className="max-w-6xl w-full mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">Unassigned Conversations</h1>
@@ -85,6 +86,7 @@ export const Unassigned = ({ workspaceId }: { workspaceId: string }) => {
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );

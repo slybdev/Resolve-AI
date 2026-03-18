@@ -65,9 +65,9 @@ export const Workflows = ({ workspaceId }: { workspaceId: string }) => {
   const [zoom, setZoom] = useState(100);
 
   return (
-    <div className="flex h-full w-full bg-background overflow-hidden">
+    <div className="flex h-full w-full bg-transparent overflow-hidden gap-2 p-2">
       {/* Left Sidebar: Node Types */}
-      <div className="w-72 border-r border-border bg-card flex flex-col shrink-0 overflow-hidden">
+      <div className="w-72 border border-border bg-card flex flex-col shrink-0 overflow-hidden rounded-2xl shadow-sm">
         <div className="p-6 border-b border-border">
           <h2 className="text-lg font-bold text-foreground mb-4">Workflow Nodes</h2>
           <div className="relative">
@@ -106,7 +106,7 @@ export const Workflows = ({ workspaceId }: { workspaceId: string }) => {
       {/* Main Builder Area */}
       <div className="flex-1 flex flex-col min-w-0 relative">
         {/* Builder Header */}
-        <div className="h-16 border-b border-border flex items-center justify-between px-8 shrink-0 bg-card/50 backdrop-blur-md">
+        <div className="h-16 border border-border flex items-center justify-between px-8 shrink-0 bg-card rounded-2xl shadow-sm mb-2">
           <div className="flex items-center gap-4">
             <h1 className="text-sm font-bold text-foreground">Customer Support Flow</h1>
             <span className="px-2 py-0.5 bg-green-500/10 text-green-500 border border-green-500/20 rounded text-[9px] font-bold uppercase">Active</span>
@@ -122,7 +122,7 @@ export const Workflows = ({ workspaceId }: { workspaceId: string }) => {
         </div>
 
         {/* Canvas */}
-        <div className="flex-1 relative overflow-hidden bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:24px_24px]">
+        <div className="flex-1 relative overflow-hidden bg-card border border-border rounded-2xl shadow-sm bg-[radial-gradient(var(--border)_1px,transparent_1px)] [background-size:24px_24px]">
           <div 
             className="absolute inset-0 transition-transform duration-200"
             style={{ transform: `scale(${zoom / 100})` }}

@@ -12,19 +12,19 @@ interface CrawledPage {
 const initialPages: CrawledPage[] = [
   {
     id: '1',
-    url: 'https://docs.stark.com/faq',
+    url: 'https://docs.xentraldesk.com/faq',
     status: 'indexed',
     lastCrawled: '2h ago'
   },
   {
     id: '2',
-    url: 'https://docs.stark.com/pricing',
+    url: 'https://docs.xentraldesk.com/pricing',
     status: 'indexed',
     lastCrawled: '1d ago'
   },
   {
     id: '3',
-    url: 'https://docs.stark.com/support',
+    url: 'https://docs.xentraldesk.com/support',
     status: 'indexing',
     lastCrawled: 'Just now'
   }

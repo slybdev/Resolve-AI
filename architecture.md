@@ -1,6 +1,6 @@
-# ResolveAI — Backend Architecture & Engineering Workstream Plan
+# XentralDesk — Backend Architecture & Engineering Workstream Plan
 
-> **Purpose**: This document defines the full-stack architecture for two Python backend engineers (**Engineer A** and **Engineer B**) to build the ResolveAI backend simultaneously with zero merge conflicts. Work is organized by milestones. Each milestone has clearly separated ownership boundaries.
+> **Purpose**: This document defines the full-stack architecture for two Python backend engineers (**Engineer A** and **Engineer B**) to build the XentralDesk backend simultaneously with zero merge conflicts. Work is organized by milestones. Each milestone has clearly separated ownership boundaries.
 
 ---
 

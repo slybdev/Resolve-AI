@@ -90,12 +90,12 @@ export const APIKeys = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
+    <div className="flex flex-col h-full w-full bg-transparent p-8 overflow-y-auto no-scrollbar">
       <div className="max-w-6xl w-full mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground">API Keys</h1>
-            <p className="text-muted-foreground">Manage your API keys for programmatic access to Stark AI.</p>
+            <p className="text-muted-foreground">Manage your API keys for programmatic access to XentralDesk AI.</p>
           </div>
           <button 
             disabled={isCreating}

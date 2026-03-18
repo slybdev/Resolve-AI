@@ -70,7 +70,7 @@ export function HowItWorks() {
             How It Works
           </h2>
           <p className="text-white/60 max-w-2xl mx-auto">
-            Five simple steps to transform your customer support with ResolveAI.
+            Five simple steps to transform your customer support with XentralDesk.
           </p>
         </div>
         

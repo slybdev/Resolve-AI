@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "resolveai-backend"
+name = "xentraldesk-backend"
 version = "0.1.0"
-description = "ResolveAI — AI-powered customer support backend"
+description = "XentralDesk — AI-powered customer support backend"
 readme = "README.md" 
 requires-python = ">=3.12"
 dependencies = [
@@ -29,6 +29,10 @@ dependencies = [
     "httpx>=0.28.0",
     # AI
     "google-genai>=1.0.0",
+    # Google OAuth & Gmail API
+    "google-api-python-client>=2.100.0",
+    "google-auth-httplib2>=0.1.1",
+    "google-auth-oauthlib>=1.1.0",
     # Payments
     "stripe>=11.0.0",
     # Utils

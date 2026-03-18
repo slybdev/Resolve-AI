@@ -6,8 +6,9 @@ export const Escalations = ({ workspaceId }: { workspaceId: string }) => {
   const [threshold, setThreshold] = useState(70);
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
-      <div className="max-w-4xl w-full mx-auto space-y-12">
+    <div className="flex flex-col h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="flex-1 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl p-8 shadow-sm">
+        <div className="max-w-4xl w-full mx-auto space-y-12">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Escalation Settings</h1>
           <p className="text-muted-foreground">Configure when and how AI escalates to human agents.</p>
@@ -101,6 +102,7 @@ export const Escalations = ({ workspaceId }: { workspaceId: string }) => {
             Save Settings
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

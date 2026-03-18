@@ -1,20 +1,20 @@
 /// <reference types="vite/client" />
 /**
- * ResolveAI API Client
+ * XentralDesk API Client
  * Centralized communication layer with the backend.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 class APIClient {
-  private accessToken: string | null = localStorage.getItem('resolveai_token');
+  private accessToken: string | null = localStorage.getItem('xentraldesk_token');
 
   setToken(token: string | null) {
     this.accessToken = token;
     if (token) {
-      localStorage.setItem('resolveai_token', token);
+      localStorage.setItem('xentraldesk_token', token);
     } else {
-      localStorage.removeItem('resolveai_token');
+      localStorage.removeItem('xentraldesk_token');
     }
   }
 
@@ -39,6 +39,13 @@ class APIClient {
     });
 
     if (!response.ok) {
+      // Handle Unauthorized (401) sessions
+      if (response.status === 401 && !endpoint.includes('/auth/')) {
+        this.auth.logout();
+        window.location.href = '/login';
+        return null;
+      }
+
       const error = await response.json().catch(() => ({ detail: 'Unknown error' }));
       throw new Error(error.detail || response.statusText);
     }
@@ -155,6 +162,53 @@ class APIClient {
         body: JSON.stringify({ name }),
       }),
     delete: (id: string) => this.request(`/api-keys/${id}`, { method: 'DELETE' }),
+  };
+
+  // Channels
+  channels = {
+    list: (workspaceId: string) => this.request(`/channels/?workspace_id=${workspaceId}`),
+    get: (id: string) => this.request(`/channels/${id}`),
+    create: (workspaceId: string, data: any) => 
+      this.request(`/channels/?workspace_id=${workspaceId}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    update: (id: string, data: any) => 
+      this.request(`/channels/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+    delete: (id: string) => this.request(`/channels/${id}`, { method: 'DELETE' }),
+    stats: (id: string) => this.request(`/channels/${id}/stats`),
+    verify: (id: string) => this.request(`/channels/${id}/verify`, { method: 'POST' }),
+    sync: (id: string) => this.request(`/channels/${id}/sync`, { method: 'POST' }),
+  };
+
+  // Widget
+  widget = {
+    getConfig: (workspaceId: string) => this.request(`/widget/${workspaceId}/config`),
+    saveConfig: (workspaceId: string, data: any) => 
+      this.request(`/widget/${workspaceId}/config`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+  };
+
+  // Conversations
+  conversations = {
+    list: (workspace_id: string, status?: string) => 
+      this.request(`/conversations/?workspace_id=${workspace_id}${status ? `&status=${status}` : ''}`),
+    getMessages: (conversation_id: string) => 
+      this.request(`/conversations/${conversation_id}/messages`),
+    sendMessage: (conversation_id: string, body: string, is_internal: boolean = false) => 
+      this.request(`/conversations/${conversation_id}/messages`, {
+        method: 'POST',
+        body: JSON.stringify({ body, is_internal }),
+      }),
+    markAsRead: (conversation_id: string) => 
+      this.request(`/conversations/${conversation_id}/read`, {
+        method: 'POST',
+      }),
   };
 }
 

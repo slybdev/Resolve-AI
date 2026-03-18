@@ -1,4 +1,4 @@
-# ResolveAI Backend
+# XentralDesk Backend
 
 AI-powered customer support backend.
 

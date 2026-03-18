@@ -1,5 +1,5 @@
 """
-Pytest fixtures for the ResolveAI test suite.
+Pytest fixtures for the XentralDesk test suite.
 
 Provides:
 - In-memory async SQLite engine for fast, isolated tests

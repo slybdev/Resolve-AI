@@ -118,8 +118,9 @@ export const AIAutomations = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
-      <div className="max-w-6xl w-full mx-auto space-y-12">
+    <div className="flex flex-col h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="flex-1 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl p-8">
+        <div className="max-w-6xl w-full mx-auto space-y-12">
         
         {/* Header Section */}
         <div className="flex items-center justify-between">
@@ -544,6 +545,7 @@ export const AIAutomations = ({ workspaceId }: { workspaceId: string }) => {
           </div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   );
 };

@@ -25,8 +25,11 @@ export function SplineSceneBasic() {
             unmatched speed.
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
-            <button className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-neutral-200 transition-all flex items-center gap-2 group">
-              Get Started
+            <button 
+              onClick={() => window.location.href = '/signup'}
+              className="px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-neutral-200 transition-all flex items-center gap-2 group cursor-pointer"
+            >
+              Start Free Trial
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </button>
             <button className="px-8 py-4 bg-transparent border border-white/20 text-white font-semibold rounded-full hover:bg-white/5 transition-all">

@@ -40,7 +40,7 @@ export const TeamMembers = ({ workspaceId }: { workspaceId: string }) => {
     }
   };
   return (
-    <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
+    <div className="flex flex-col h-full w-full bg-transparent p-8 overflow-y-auto no-scrollbar">
       <div className="max-w-6xl w-full mx-auto space-y-8">
         <div className="flex items-center justify-between">
           <div>

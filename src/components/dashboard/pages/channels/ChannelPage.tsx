@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Globe, Mail, MessageSquare, Send, Slack, Mic, 
   CheckCircle2, AlertCircle, Settings, BarChart3, 
   RefreshCw, Save, ExternalLink, ShieldCheck,
-  Zap, Clock, MessageCircle
+  Zap, Clock, MessageCircle, Eye, EyeOff
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/src/lib/utils';
+import { api } from '@/src/lib/api';
+import { useToast } from '@/src/components/ui/Toast';
 
 interface ChannelPageProps {
-  type: 'website' | 'email' | 'whatsapp' | 'telegram' | 'slack' | 'voice';
+  type: 'website' | 'email' | 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'discord' | 'slack' | 'voice';
   title: string;
   icon: any;
   description: string;
@@ -19,33 +21,207 @@ interface ChannelPageProps {
 export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId }: ChannelPageProps) => {
   const [isConnected, setIsConnected] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [channelId, setChannelId] = useState<string | null>(null);
+  const { toast } = useToast();
+  
+  // Form State
+  const [config, setConfig] = useState<any>({});
+  const [name, setName] = useState(title);
+  const [channelStats, setChannelStats] = useState<any>({
+    total_messages: 0,
+    avg_response_time: 0,
+    resolution_rate: 0,
+    ai_automation_rate: 0
+  });
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState<{success: boolean, detail: string} | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [showToken, setShowToken] = useState(false);
 
-  const stats = [
-    { label: 'Total Messages', value: '12,482', change: '+12%', icon: MessageSquare },
-    { label: 'Avg. Response Time', value: '1.4m', change: '-15%', icon: Clock },
-    { label: 'Resolution Rate', value: '94.2%', change: '+2%', icon: CheckCircle2 },
-    { label: 'AI Automation', value: '88%', change: '+5%', icon: Zap },
+  const statsDisplay = [
+    { label: 'Total Messages', value: channelStats.total_messages.toLocaleString(), change: '+0%', icon: MessageSquare, color: 'emerald' },
+    { label: 'Avg. Response Time', value: `${channelStats.avg_response_time}m`, change: '-0%', icon: Clock, color: 'red' },
+    { label: 'Resolution Rate', value: `${channelStats.resolution_rate.toFixed(1)}%`, change: '+0%', icon: CheckCircle2, color: 'emerald' },
+    { label: 'AI Automation', value: `${channelStats.ai_automation_rate.toFixed(1)}%`, change: '+0%', icon: Zap, color: 'emerald' },
   ];
 
-  const [advancedSettings, setAdvancedSettings] = useState([
-    { id: 'auto-reply', label: 'Auto-Reply', desc: 'Send automated confirmation when a message is received.', enabled: true },
-    { id: 'sla-tracking', label: 'SLA Tracking', desc: 'Monitor and alert when response times exceed targets.', enabled: true },
-    { id: 'sentiment', label: 'AI Sentiment Analysis', desc: 'Detect customer mood and prioritize frustrated users.', enabled: false },
-    { id: 'handoff', label: 'Human Handoff', desc: 'Automatically escalate to human if AI confidence is low.', enabled: true },
-  ]);
+  const advancedSettings = [
+    { id: 'auto_reply', label: 'Auto-Reply', desc: 'Send automated confirmation when a message is received.' },
+    { id: 'sla_tracking', label: 'SLA Tracking', desc: 'Monitor and alert when response times exceed targets.' },
+    { id: 'sentiment', label: 'AI Sentiment Analysis', desc: 'Detect customer mood and prioritize frustrated users.' },
+    { id: 'handoff', label: 'Human Handoff', desc: 'Automatically escalate to human if AI confidence is low.' },
+  ];
 
   const toggleSetting = (id: string) => {
-    setAdvancedSettings(prev => prev.map(item => 
-      item.id === id ? { ...item, enabled: !item.enabled } : item
-    ));
+    setConfig((prev: any) => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
 
-  const handleConnect = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      setIsConnected(!isConnected);
+  const channelTypeMap: Record<string, string> = {
+    'website': 'widget',
+    'email': 'email',
+    'whatsapp': 'whatsapp',
+    'instagram': 'instagram',
+    'facebook': 'facebook',
+    'telegram': 'telegram',
+    'discord': 'discord',
+    'slack': 'slack',
+    'voice': 'voice'
+  };
+
+  const backType = channelTypeMap[type];
+
+  useEffect(() => {
+    fetchChannel();
+  }, [workspaceId, type]);
+
+  const fetchChannel = async () => {
+    setIsLoading(true);
+    try {
+      const channels = await api.channels.list(workspaceId);
+      const existing = channels.find((c: any) => c.type === backType);
+      if (existing) {
+        setIsConnected(existing.is_active);
+        setChannelId(existing.id);
+        setConfig(existing.config || {});
+        setName(existing.name);
+        // Fetch stats if channel exists
+        const statsData = await api.channels.stats(existing.id);
+        setChannelStats(statsData);
+      } else {
+        setIsConnected(false);
+        setChannelId(null);
+        setConfig({});
+      }
+    } catch (err) {
+      console.error('Failed to fetch channel:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleVerify = async () => {
+    if (!channelId) return;
+    setIsVerifying(true);
+    setVerificationResult(null);
+    try {
+      const res = await api.channels.verify(channelId);
+      setVerificationResult({ success: res.success, detail: res.detail });
+      if (res.success) {
+        toast('Success', res.detail, 'success');
+      } else {
+        toast('Verification Failed', res.detail, 'error');
+      }
+    } catch (err: any) {
+      setVerificationResult({ success: false, detail: err.message });
+      toast('Error', err.message, 'error');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleSync = async () => {
+    if (!channelId) return;
+    setIsSyncing(true);
+    try {
+      const res = await api.channels.sync(channelId);
+      toast('Success', `Synced ${res.synced_count} message(s).`, 'success');
+      fetchChannel(); // Refresh stats
+    } catch (err: any) {
+      toast('Error', err.message || 'Failed to sync messages', 'error');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    let currentId = channelId;
+    if (!currentId) {
+      // Create channel first
+      setIsSaving(true);
+      try {
+        const res = await api.channels.create(workspaceId, {
+          name,
+          type: backType,
+          config: {}
+        });
+        currentId = res.id;
+        setChannelId(res.id);
+        setIsConnected(true);
+      } catch (err: any) {
+        toast('Error', err.message || 'Failed to initialize channel', 'error');
+        setIsSaving(false);
+        return;
+      }
+    }
+
+    try {
+      const baseUrl = import.meta.env.VITE_API_URL;
+      const settings = await (await fetch(`${baseUrl}/channels/${currentId}/google/login`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('xentraldesk_token')}`
+        }
+      })).json();
+      
+      if (settings.auth_url) {
+        window.location.href = settings.auth_url;
+      }
+    } catch (err: any) {
+      toast('Error', 'Failed to start Google OAuth', 'error');
+    } finally {
       setIsSaving(false);
-    }, 1500);
+    }
+  };
+
+  const handleConnect = async () => {
+    setIsSaving(true);
+    try {
+      if (isConnected && channelId) {
+        // Disconnect logic (we'll just deactivate or delete)
+        await api.channels.delete(channelId);
+        toast('Success', `${title} disconnected`, 'success');
+        setIsConnected(false);
+        setChannelId(null);
+      } else {
+        // Connect logic
+        const res = await api.channels.create(workspaceId, {
+          name,
+          type: backType,
+          config,
+          is_active: true
+        });
+        setChannelId(res.id);
+        setIsConnected(true);
+        toast('Success', `${title} connected successfully`, 'success');
+      }
+    } catch (err: any) {
+      toast('Error', err.message || 'Failed to update channel', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!channelId) {
+      handleConnect();
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await api.channels.update(channelId, {
+        name,
+        config
+      });
+      toast('Success', 'Settings saved', 'success');
+    } catch (err: any) {
+      toast('Error', err.message || 'Failed to save settings', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -92,7 +268,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {stats.map((stat, i) => (
+          {statsDisplay.map((stat, i) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20 }}
@@ -104,7 +280,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                 <stat.icon className="w-4 h-4 text-muted-foreground" />
                 <span className={cn(
                   "text-[10px] font-bold px-1.5 py-0.5 rounded",
-                  stat.change.startsWith('+') ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
+                  stat.color === 'emerald' ? "bg-emerald-500/10 text-emerald-500" : "bg-red-500/10 text-red-500"
                 )}>
                   {stat.change}
                 </span>
@@ -129,29 +305,266 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Support Email</label>
-                      <input type="email" placeholder="support@company.com" className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                      <input 
+                        type="email" 
+                        value={config.smtp_user || ''} 
+                        onChange={(e) => setConfig({...config, smtp_user: e.target.value})}
+                        placeholder="support@company.com" 
+                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Sender Name</label>
-                      <input type="text" placeholder="Stark Support" className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                      <input type="text" placeholder="XentralDesk Support" className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Email Signature</label>
-                    <textarea rows={3} placeholder="Best regards, The Team" className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none" />
+                    <textarea 
+                      rows={3} 
+                      value={config.signature || ''}
+                      onChange={(e) => setConfig({...config, signature: e.target.value})}
+                      placeholder="Best regards, The Team" 
+                      className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 resize-none" 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {type === 'email' && (
+                <div className="space-y-6">
+                  <div className="p-8 border-2 border-dashed border-border/50 rounded-3xl bg-accent/10 flex flex-col items-center justify-center text-center space-y-4">
+                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+                      <Mail className="w-8 h-8 text-primary" />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-lg font-bold">Connect your Gmail</h3>
+                      <p className="text-sm text-muted-foreground max-w-[280px]">
+                        Sync your support emails directly into XentralDesk using Google's secure OAuth flow.
+                      </p>
+                    </div>
+                    
+                    {!isConnected ? (
+                      <button 
+                        onClick={handleGoogleLogin}
+                        disabled={isSaving}
+                        className="flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-2xl text-sm font-bold hover:opacity-90 transition-all cursor-pointer shadow-lg shadow-black/5"
+                      >
+                        <svg className="w-4 h-4" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                          <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                          <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
+                          <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                        </svg>
+                        Sign in with Google
+                      </button>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 text-emerald-500 rounded-xl text-xs font-bold ring-1 ring-emerald-500/20">
+                          <CheckCircle2 className="w-3 h-3" />
+                          Authorized as {config.from_email || 'Google User'}
+                        </div>
+                        <button 
+                          onClick={handleGoogleLogin}
+                          className="text-[10px] text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+                        >
+                          Reconnect or switch account
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
               {type === 'whatsapp' && (
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">WhatsApp Business Number</label>
-                    <input type="text" placeholder="+1 (555) 000-0000" className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">WhatsApp Business Number</label>
+                      <input 
+                        type="text" 
+                        value={config.phone_number || ''}
+                        onChange={(e) => setConfig({...config, phone_number: e.target.value})}
+                        placeholder="+1 (555) 000-0000" 
+                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Phone Number ID</label>
+                      <input 
+                        type="text" 
+                        value={config.phone_number_id || ''}
+                        onChange={(e) => setConfig({...config, phone_number_id: e.target.value})}
+                        placeholder="123456789012345" 
+                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">API Key / Token</label>
-                    <input type="password" value="••••••••••••••••" readOnly className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none" />
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">System Access Token</label>
+                    <div className="relative">
+                      <input 
+                        type={showToken ? 'text' : 'password'}
+                        value={config.access_token || ''} 
+                        onChange={(e) => setConfig({...config, access_token: e.target.value})}
+                        placeholder="EAAB..." 
+                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowToken(!showToken)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Webhook Info for Meta Dashboard */}
+                  <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-primary" />
+                      <h3 className="text-xs font-bold text-foreground">Webhook Configuration (Meta Dashboard)</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Callback URL</span>
+                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
+                          {import.meta.env.VITE_API_URL}/webhooks/whatsapp
+                        </code>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Verify Token</span>
+                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
+                          xentraldesk_verify_token
+                        </code>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+                      Copy these values into your Meta App's WhatsApp Webhook settings.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {type === 'instagram' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Instagram Page ID</label>
+                      <input 
+                        type="text" 
+                        value={config.instagram_page_id || ''}
+                        onChange={(e) => setConfig({...config, instagram_page_id: e.target.value})}
+                        placeholder="123456789012345" 
+                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Page Access Token</label>
+                      <div className="relative">
+                        <input 
+                          type={showToken ? 'text' : 'password'}
+                          value={config.access_token || ''} 
+                          onChange={(e) => setConfig({...config, access_token: e.target.value})}
+                          placeholder="EAAB..." 
+                          className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowToken(!showToken)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Webhook Info for Meta Dashboard */}
+                  <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-primary" />
+                      <h3 className="text-xs font-bold text-foreground">Webhook Configuration (Meta Dashboard)</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Callback URL</span>
+                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
+                          {import.meta.env.VITE_API_URL}/webhooks/instagram
+                        </code>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Verify Token</span>
+                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
+                          xentraldesk_verify_token
+                        </code>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+                      Copy these values into your Meta App's Instagram Webhook settings.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {type === 'facebook' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Facebook Page ID</label>
+                      <input 
+                        type="text" 
+                        value={config.facebook_page_id || ''}
+                        onChange={(e) => setConfig({...config, facebook_page_id: e.target.value})}
+                        placeholder="123456789012345" 
+                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Page Access Token</label>
+                      <div className="relative">
+                        <input 
+                          type={showToken ? 'text' : 'password'}
+                          value={config.access_token || ''} 
+                          onChange={(e) => setConfig({...config, access_token: e.target.value})}
+                          placeholder="EAAB..." 
+                          className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowToken(!showToken)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Webhook Info for Meta Dashboard */}
+                  <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-primary" />
+                      <h3 className="text-xs font-bold text-foreground">Webhook Configuration (Meta Dashboard)</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Callback URL</span>
+                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
+                          {import.meta.env.VITE_API_URL}/webhooks/facebook
+                        </code>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Verify Token</span>
+                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
+                          xentraldesk_verify_token
+                        </code>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+                      Copy these values into your Meta App's Facebook Webhook settings.
+                    </p>
                   </div>
                 </div>
               )}
@@ -171,11 +584,33 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                 </div>
               )}
 
-              {(type === 'telegram' || type === 'slack') && (
+              {(type === 'telegram' || type === 'discord' || type === 'slack') && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Bot Token / Webhook URL</label>
-                    <input type="text" placeholder={type === 'telegram' ? "123456789:ABCdefGHI..." : "https://hooks.slack.com/services/..."} className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">
+                      {type === 'telegram' || type === 'discord' || type === 'slack' ? 'Bot Token' : 'Webhook URL'}
+                    </label>
+                    <div className="relative">
+                      <input 
+                        type={type === 'telegram' || type === 'discord' || type === 'slack' ? (showToken ? 'text' : 'password') : 'text'}
+                        value={type === 'telegram' || type === 'discord' ? (config.token || '') : type === 'slack' ? (config.bot_token || '') : (config.webhook_url || '')}
+                        onChange={(e) => {
+                          const key = type === 'telegram' || type === 'discord' ? 'token' : type === 'slack' ? 'bot_token' : 'webhook_url';
+                          setConfig({...config, [key]: e.target.value});
+                        }}
+                        placeholder={type === 'telegram' ? "123456789:ABCdefGHI..." : type === 'discord' ? "MTE2..." : type === 'slack' ? "xoxb-..." : "https://hooks.slack.com/services/..."} 
+                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                      />
+                      {(type === 'telegram' || type === 'discord' || type === 'slack') && (
+                        <button
+                          type="button"
+                          onClick={() => setShowToken(!showToken)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <button className="text-xs font-bold text-primary hover:underline flex items-center gap-1">
                     <ExternalLink className="w-3 h-3" />
@@ -207,9 +642,45 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                 </div>
               )}
 
-              <div className="pt-4 flex justify-end">
-                <button className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all btn-press shadow-lg shadow-primary/20">
-                  <Save className="w-4 h-4" />
+              <div className="pt-4 flex items-center justify-between border-t border-border/50">
+                <div className="flex items-center gap-2">
+                  {channelId && isConnected && (
+                    <>
+                      <button 
+                        onClick={handleVerify}
+                        disabled={isVerifying || isSyncing}
+                        className="flex items-center gap-2 px-4 py-2 bg-accent/50 text-foreground border border-border rounded-xl text-xs font-bold hover:bg-accent transition-all cursor-pointer"
+                      >
+                        {isVerifying ? <RefreshCw className="w-3 h-3 animate-spin" /> : <ShieldCheck className="w-3 h-3" />}
+                        Test Connection
+                      </button>
+                      {(type === 'telegram' || type === 'email' || type === 'whatsapp' || type === 'instagram' || type === 'facebook') && (
+                        <button 
+                          onClick={handleSync}
+                          disabled={isSyncing || isVerifying}
+                          className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground border border-border rounded-xl text-xs font-bold hover:bg-primary/90 transition-all cursor-pointer"
+                        >
+                          {isSyncing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                          Sync Messages
+                        </button>
+                      )}
+                    </>
+                  )}
+                  {verificationResult && (
+                    <span className={cn(
+                      "text-[10px] font-bold",
+                      verificationResult.success ? "text-emerald-500" : "text-red-500"
+                    )}>
+                      {verificationResult.detail}
+                    </span>
+                  )}
+                </div>
+                <button 
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all btn-press shadow-lg shadow-primary/20 disabled:opacity-50"
+                >
+                  {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   Save Settings
                 </button>
               </div>
@@ -232,11 +703,11 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                       onClick={() => toggleSetting(item.id)}
                       className={cn(
                         "w-10 h-5 rounded-full relative transition-all duration-300 cursor-pointer flex items-center px-1",
-                        item.enabled ? "bg-primary shadow-[0_0_10px_rgba(59,130,246,0.3)]" : "bg-muted"
+                        config[item.id] ? "bg-primary shadow-[0_0_10px_rgba(59,130,246,0.3)]" : "bg-muted"
                       )}
                     >
                       <motion.div 
-                        animate={{ x: item.enabled ? 20 : 0 }}
+                        animate={{ x: config[item.id] ? 20 : 0 }}
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                         className="w-3 h-3 rounded-full bg-white shadow-sm"
                       />
@@ -274,26 +745,26 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                 <BarChart3 className="w-4 h-4 text-primary" />
                 Channel Health
               </h3>
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
-                    <span className="text-muted-foreground">Uptime</span>
-                    <span className="text-emerald-500">99.9%</span>
+                <div className="space-y-4">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+                      <span className="text-muted-foreground">Uptime</span>
+                      <span className="text-emerald-500">{isConnected ? '99.9%' : '0%'}</span>
+                    </div>
+                    <div className="h-1.5 bg-accent rounded-full overflow-hidden">
+                      <div className={cn("h-full bg-emerald-500", isConnected ? "w-[99.9%]" : "w-0")} />
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-accent rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 w-[99.9%]" />
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
+                      <span className="text-muted-foreground">API Latency</span>
+                      <span className="text-emerald-500">{isConnected ? '124ms' : 'N/A'}</span>
+                    </div>
+                    <div className="h-1.5 bg-accent rounded-full overflow-hidden">
+                      <div className={cn("h-full bg-emerald-500", isConnected ? "w-[85%]" : "w-0")} />
+                    </div>
                   </div>
                 </div>
-                <div className="space-y-1">
-                  <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
-                    <span className="text-muted-foreground">API Latency</span>
-                    <span className="text-emerald-500">124ms</span>
-                  </div>
-                  <div className="h-1.5 bg-accent rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 w-[85%]" />
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>

@@ -1,12 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Bot, Mail, Lock, User, Github, Chrome, Eye, EyeOff, Check, X } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Bot, Mail, Lock, User, Github, Chrome, Eye, EyeOff, Check, X, Zap } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 import { api } from '@/src/lib/api';
 
 export const SignUp = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const selectedPlan = searchParams.get('plan');
+  
   const [formData, setFormData] = React.useState({
     fullName: '',
     email: '',
@@ -89,7 +92,16 @@ export const SignUp = () => {
               <Bot className="text-primary-foreground w-6 h-6" />
             </div>
             <h1 className="text-xl font-bold text-white tracking-tight">Create your account</h1>
-            <p className="text-neutral-400 text-xs mt-1">Start your 14-day free trial today.</p>
+            {selectedPlan ? (
+              <div className="mt-2 flex items-center gap-2 bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">
+                <Zap className="w-3 h-3 text-primary" />
+                <span className="text-[10px] font-bold text-white uppercase tracking-widest">
+                  Selected Plan: {selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1)}
+                </span>
+              </div>
+            ) : (
+              <p className="text-neutral-400 text-xs mt-1">Start your 14-day free trial today.</p>
+            )}
           </div>
 
           {error && (

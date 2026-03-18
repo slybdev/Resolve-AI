@@ -33,9 +33,9 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'surveys' | 'sentiment'>('overview');
 
   return (
-    <div className="h-full flex flex-col bg-background overflow-hidden">
+    <div className="h-full flex flex-col bg-transparent overflow-hidden gap-2 p-2">
       {/* Header */}
-      <div className="p-6 border-b border-border flex items-center justify-between bg-card/50 backdrop-blur-sm">
+      <div className="p-6 border border-border flex items-center justify-between bg-card rounded-2xl shadow-sm">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Star className="w-6 h-6 text-primary" />
@@ -56,7 +56,7 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Tabs */}
-      <div className="px-6 border-b border-border bg-card/30 flex items-center justify-between">
+      <div className="px-6 border border-border bg-card flex items-center justify-between rounded-2xl shadow-sm shrink-0">
         <div className="flex items-center gap-8">
           {[
             { id: 'overview', label: 'Overview', icon: BarChart3 },
@@ -81,7 +81,7 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6 no-scrollbar">
+      <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-card border border-border rounded-2xl shadow-sm">
         {activeTab === 'overview' && (
           <div className="space-y-8">
             {/* Top Stats */}

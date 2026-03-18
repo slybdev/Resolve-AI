@@ -49,7 +49,7 @@ export const OnboardingFlow = () => {
     useCase: ''
   });
   const [aiData, setAiData] = useState({
-    name: 'ResolveAI Assistant',
+    name: 'XentralDesk Assistant',
     personality: 'Professional'
   });
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
@@ -61,12 +61,18 @@ export const OnboardingFlow = () => {
     if (currentStep === 2) {
       setIsLoading(true);
       try {
-        await api.onboarding.setup({
+        const res = await api.onboarding.setup({
           workspace_name: workspaceData.name,
           industry: workspaceData.useCase,
           ai_agent_name: aiData.name,
           ai_tone: aiData.personality.toLowerCase()
         });
+        
+        // Store the real organization/workspace ID in completedTasks or a new state
+        if (res.workspace?.id || res.id) {
+          setCompletedTasks(prev => [...prev, `id:${res.workspace?.id || res.id}`, 'workspace_ready']);
+        }
+        
         setCurrentStep(3);
       } catch (err: any) {
         toast('Error', err.message || 'Failed to save onboarding data', 'error');
@@ -110,9 +116,9 @@ export const OnboardingFlow = () => {
           initial={{ scale: 0.95, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
-          className="bg-card border border-border w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
+          className="bg-neutral-900 border border-white/10 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden"
         >
-          <div className="p-6 border-b border-border flex items-center justify-between">
+          <div className="p-6 border-b border-white/10 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={cn("p-2 rounded-xl", task.color)}>
                 <task.icon className="w-5 h-5" />
@@ -124,21 +130,28 @@ export const OnboardingFlow = () => {
             </div>
             <button 
               onClick={() => setActiveTask(null)}
-              className="p-2 hover:bg-accent rounded-full transition-colors"
+              className="p-2 hover:bg-white/10 rounded-full transition-colors"
             >
-              <X className="w-5 h-5 text-muted-foreground" />
+              <X className="w-5 h-5 text-neutral-400" />
             </button>
           </div>
 
           <div className="p-8">
             {activeTask === 'chat' && (
               <div className="space-y-6">
-                <div className="bg-accent/50 rounded-xl p-4 font-mono text-xs text-muted-foreground break-all border border-border relative group">
+                <div className="bg-white/5 rounded-xl p-4 font-mono text-xs text-neutral-400 break-all border border-white/10 relative group">
                   <code>
-                    {`<script src="https://cdn.resolveai.io/widget.js" data-id="RAI-${workspaceData.name.toLowerCase().replace(/\s+/g, '-')}" async></script>`}
+                    {`<script src="${import.meta.env.VITE_WIDGET_URL || 'https://cdn.xentraldesk.io/widget.js'}" data-id="${completedTasks.includes('workspace_ready') ? completedTasks.find(t => t.startsWith('id:'))?.split(':')[1] || 'PENDING' : 'XDK-' + workspaceData.name.toLowerCase().replace(/\s+/g, '-')}" async></script>`}
                   </code>
-                  <button className="absolute top-2 right-2 p-2 bg-card border border-border rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent">
-                    <Copy className="w-4 h-4" />
+                  <button 
+                    onClick={() => {
+                      const snippet = `<script src="${import.meta.env.VITE_WIDGET_URL || 'https://cdn.xentraldesk.io/widget.js'}" data-id="${completedTasks.find(t => t.startsWith('id:'))?.split(':')[1] || 'XDK-' + workspaceData.name.toLowerCase().replace(/\s+/g, '-')}" async></script>`;
+                      navigator.clipboard.writeText(snippet);
+                      toast('Success', 'Snippet copied to clipboard', 'success');
+                    }}
+                    className="absolute top-2 right-2 p-2 bg-neutral-900 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/10"
+                  >
+                    <Copy className="w-4 h-4 text-white" />
                   </button>
                 </div>
                 <div className="space-y-4">
@@ -285,7 +298,7 @@ export const OnboardingFlow = () => {
       exit={{ opacity: 0, x: -20 }}
       className="w-full max-w-xl"
     >
-      <div className="bg-card border border-border rounded-3xl p-8 shadow-2xl">
+      <div className="bg-neutral-900/50 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">Set up your workspace</h1>
           <p className="text-muted-foreground">This helps us personalize your AI support platform.</p>
@@ -372,7 +385,7 @@ export const OnboardingFlow = () => {
       exit={{ opacity: 0, x: -20 }}
       className="w-full max-w-xl"
     >
-      <div className="bg-card border border-border rounded-3xl p-8 shadow-2xl">
+      <div className="bg-neutral-900/50 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground tracking-tight mb-2">Configure your AI Agent</h1>
           <p className="text-muted-foreground">Give your AI a name and personality.</p>
@@ -385,7 +398,7 @@ export const OnboardingFlow = () => {
               <Bot className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
-                placeholder="ResolveAI Assistant"
+                placeholder="XentralDesk Assistant"
                 value={aiData.name}
                 onChange={e => setAiData({ ...aiData, name: e.target.value })}
                 className="w-full bg-accent/50 border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
@@ -490,8 +503,8 @@ export const OnboardingFlow = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               className={cn(
-                "bg-card border border-border rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all",
-                isCompleted && "bg-accent/30"
+                "bg-neutral-900/50 border border-white/10 rounded-2xl p-5 flex items-center justify-between group hover:border-primary/30 transition-all",
+                isCompleted && "bg-white/5"
               )}
             >
               <div className="flex items-center gap-5">
@@ -544,28 +557,28 @@ export const OnboardingFlow = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="dark min-h-screen bg-black flex flex-col text-white">
       {/* Header */}
-      <header className="h-16 border-b border-border flex items-center justify-between px-8 bg-card/50 backdrop-blur-md sticky top-0 z-50">
+      <header className="h-16 border-b border-white/10 flex items-center justify-between px-8 bg-black/50 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="bg-primary p-2 rounded-lg">
             <Bot className="text-primary-foreground w-5 h-5" />
           </div>
-          <span className="font-bold tracking-tight text-foreground">ResolveAI</span>
-          <div className="h-4 w-px bg-border mx-2" />
-          <span className="text-sm text-muted-foreground font-medium">
+          <span className="font-bold tracking-tight text-white">XentralDesk</span>
+          <div className="h-4 w-px bg-white/10 mx-2" />
+          <span className="text-sm text-neutral-400 font-medium">
             {workspaceData.name || 'New Workspace'}
           </span>
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex items-center gap-2 bg-accent px-3 py-1.5 rounded-full">
+          <div className="hidden md:flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full">
             <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
               Step {currentStep} of {steps.length}
             </span>
           </div>
-          <div className="w-8 h-8 rounded-full bg-accent border border-border flex items-center justify-center overflow-hidden">
+          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
             <img src="https://i.pravatar.cc/150?u=me" alt="Profile" className="w-full h-full object-cover" />
           </div>
         </div>
@@ -573,32 +586,32 @@ export const OnboardingFlow = () => {
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar Preview (Disabled) */}
-        <div className="hidden lg:flex w-64 border-r border-border bg-card/30 flex-col p-4 opacity-20 pointer-events-none">
+        <div className="hidden lg:flex w-64 border-r border-white/10 bg-white/5 flex-col p-4 opacity-20 pointer-events-none">
           <div className="space-y-6">
             <div className="space-y-2">
-              <div className="h-2 w-12 bg-muted rounded" />
+              <div className="h-2 w-12 bg-neutral-800 rounded" />
               <div className="space-y-1">
                 {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="h-8 w-full bg-accent rounded-lg" />
+                  <div key={i} className="h-8 w-full bg-white/5 rounded-lg" />
                 ))}
               </div>
             </div>
             <div className="space-y-2">
-              <div className="h-2 w-16 bg-muted rounded" />
+              <div className="h-2 w-16 bg-neutral-800 rounded" />
               <div className="space-y-1">
                 {[1, 2, 3].map(i => (
-                  <div key={i} className="h-8 w-full bg-accent rounded-lg" />
+                  <div key={i} className="h-8 w-full bg-white/5 rounded-lg" />
                 ))}
               </div>
             </div>
           </div>
         </div>
 
-        <main className="flex-1 flex items-center justify-center p-8 relative overflow-hidden">
+        <main className="flex-1 flex items-center justify-center p-8 relative overflow-hidden bg-black">
           {/* Background Elements */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-[100px]" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px]" />
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[120px]" />
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[120px]" />
           </div>
 
           <AnimatePresence mode="wait">
@@ -614,7 +627,7 @@ export const OnboardingFlow = () => {
       </AnimatePresence>
 
       {/* Progress Bar */}
-      <div className="fixed bottom-0 left-0 right-0 h-1 bg-accent">
+      <div className="fixed bottom-0 left-0 right-0 h-1 bg-white/5">
         <motion.div 
           className="h-full bg-primary"
           initial={{ width: '0%' }}

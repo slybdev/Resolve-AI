@@ -65,10 +65,10 @@ export function Footer() {
 						<div className="bg-white/10 p-1.5 rounded-full">
 							<Bot className="text-white size-6" />
 						</div>
-						<span className="text-white font-bold tracking-tight text-xl">ResolveAI</span>
+						<span className="text-white font-bold tracking-tight text-xl">XentralDesk</span>
 					</div>
 					<p className="text-white/50 mt-8 text-sm md:mt-0">
-						© {new Date().getFullYear()} ResolveAI. All rights reserved.
+						© {new Date().getFullYear()} XentralDesk. All rights reserved.
 					</p>
 				</AnimatedContainer>
 

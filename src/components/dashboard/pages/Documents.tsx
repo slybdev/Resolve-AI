@@ -54,8 +54,9 @@ export const Documents = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-background p-8 overflow-y-auto no-scrollbar">
-      <div className="max-w-6xl w-full mx-auto space-y-8">
+    <div className="flex flex-col h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="flex-1 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl p-8 shadow-sm">
+        <div className="max-w-6xl w-full mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Documents</h1>
           <p className="text-muted-foreground">Upload and manage documents for AI knowledge.</p>
@@ -137,6 +138,7 @@ export const Documents = () => {
             </table>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

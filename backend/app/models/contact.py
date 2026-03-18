@@ -5,7 +5,7 @@ Contact model — individual person in the CRM.
 import uuid
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import ForeignKey, String, Uuid
+from sqlalchemy import ForeignKey, String, Uuid, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -29,6 +29,7 @@ class Contact(Base):
     company_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         Uuid, ForeignKey("companies.id"), nullable=True
     )
+    channel_data: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
 
     # Relationships
     workspace: Mapped["Workspace"] = relationship("Workspace", lazy="selectin")

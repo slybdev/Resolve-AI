@@ -45,10 +45,10 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="flex h-full w-full bg-background overflow-hidden">
+    <div className="flex h-full w-full bg-transparent overflow-hidden gap-2 p-2">
       {/* Left Panel: Chat Simulator */}
-      <div className="flex-1 flex flex-col min-w-0 border-r border-border">
-        <div className="h-16 border-b border-border flex items-center justify-between px-8 shrink-0 bg-accent/30">
+      <div className="flex-1 flex flex-col min-w-0 border border-border bg-card rounded-2xl overflow-hidden shadow-sm">
+        <div className="h-16 border-b border-border flex items-center justify-between px-8 shrink-0 bg-card">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-center">
               <Play className="w-4 h-4 text-primary" />
@@ -99,8 +99,8 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Right Panel: Debug Info */}
-      <div className="w-96 flex flex-col shrink-0 bg-accent/10">
-        <div className="h-16 border-b border-border flex items-center px-6 shrink-0">
+      <div className="w-96 flex flex-col shrink-0 bg-card border border-border rounded-2xl overflow-hidden shadow-sm">
+        <div className="h-16 border-b border-border flex items-center px-6 shrink-0 bg-card">
           <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Response Debugger</h3>
         </div>
         
