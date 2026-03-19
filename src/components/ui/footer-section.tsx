@@ -61,12 +61,14 @@ export function Footer() {
 
 			<div className="grid w-full gap-8 xl:grid-cols-3 xl:gap-8">
 				<AnimatedContainer className="space-y-4">
-					<div className="flex items-center gap-2">
-						<div className="bg-white/10 p-1.5 rounded-full">
-							<Bot className="text-white size-6" />
-						</div>
-						<span className="text-white font-bold tracking-tight text-xl">XentralDesk</span>
-					</div>
+					              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
+                  <div className="w-4 h-4 rounded-sm bg-primary/20" />
+                </div>
+                <h2 className="text-2xl font-black tracking-tighter text-foreground">
+                  <span className="text-primary">X</span>entralDesk
+                </h2>
+              </div>
 					<p className="text-white/50 mt-8 text-sm md:mt-0">
 						© {new Date().getFullYear()} XentralDesk. All rights reserved.
 					</p>

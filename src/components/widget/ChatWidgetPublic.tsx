@@ -276,7 +276,11 @@ export const ChatWidgetPublic = ({
                         "w-7 h-7 rounded-full flex items-center justify-center",
                         theme === 'dark' ? "bg-slate-800" : "bg-slate-200"
                       )}>
-                        {msg.sender_type === 'ai' ? <Bot className="w-4 h-4 text-slate-500" /> : <User className="w-4 h-4 text-slate-500" />}
+                        {msg.sender_type === 'ai' ? (
+                          <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
+                      <div className="w-3 h-3 rounded-[2px] bg-primary/30" />
+                    </div>
+                        ) : <User className="w-4 h-4 text-slate-500" />}
                       </div>
                     </div>
                   )}
@@ -317,11 +321,8 @@ export const ChatWidgetPublic = ({
                   animate={{ opacity: 1 }}
                   className="flex items-center gap-2 mb-4"
                 >
-                  <div className={cn(
-                    "w-7 h-7 rounded-full flex items-center justify-center",
-                    theme === 'dark' ? "bg-slate-800" : "bg-slate-200"
-                  )}>
-                    <Bot className="w-4 h-4 text-slate-500" />
+                  <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
+                    <div className="w-3 h-3 rounded-[2px] bg-primary/30" />
                   </div>
                   <div className={cn(
                     "px-3 py-2 rounded-2xl rounded-bl-none border flex gap-1",

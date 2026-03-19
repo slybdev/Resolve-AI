@@ -356,8 +356,8 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                       
                       <div className="flex items-center gap-1.5 shrink-0">
                         {chat.isAI && (
-                          <div className="p-1 rounded bg-blue-500/10" title="AI Managed">
-                            <Bot className="w-3 h-3 text-blue-500" />
+                          <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0" title="AI Managed">
+                            <div className="w-2 h-2 rounded-[1px] bg-primary/20" />
                           </div>
                         )}
                         {(chat as any).unreadCount > 0 && (
@@ -527,9 +527,13 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                         ) : (
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-lg",
-                            msg.sender === 'ai' ? "bg-primary shadow-primary/20" : "bg-blue-600 shadow-blue-600/20"
+                            msg.sender === 'ai' ? "bg-white border border-border overflow-hidden" : "bg-blue-600 shadow-blue-600/20"
                           )}>
-                            {msg.sender === 'ai' ? <Bot className="w-5 h-5 text-primary-foreground" /> : <User className="w-5 h-5 text-white" />}
+                            {msg.sender === 'ai' ? (
+                              <div className="w-full h-full rounded-full flex items-center justify-center bg-primary/10 border border-primary/20">
+                                <div className="w-3 h-3 rounded-[2px] bg-primary/30" />
+                              </div>
+                            ) : <User className="w-5 h-5 text-white" />}
                           </div>
                         )}
                         <div className={cn(

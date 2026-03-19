@@ -191,9 +191,9 @@ export const AIAutomations = ({ workspaceId }: { workspaceId: string }) => {
                       >
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
-                              <Bot className="w-4 h-4 text-primary" />
-                            </div>
+                                <div className="w-4 h-4 rounded-sm bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                                  <div className="w-1.5 h-1.5 rounded-[1px] bg-primary/30" />
+                                </div>
                             <span className="text-sm font-bold text-foreground">{a.name}</span>
                           </div>
                         </td>
@@ -241,8 +241,8 @@ export const AIAutomations = ({ workspaceId }: { workspaceId: string }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {templates.map((t) => (
               <div key={t.id} className="bg-card border border-border p-6 rounded-3xl space-y-4 hover:border-primary/20 transition-all group flex flex-col shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center border border-border group-hover:bg-accent/80 transition-all">
-                  <Bot className="w-5 h-5 text-primary" />
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                  <div className="w-5 h-5 rounded-md bg-primary/20" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-sm font-bold text-foreground mb-1">{t.name}</h3>
@@ -408,8 +408,8 @@ export const AIAutomations = ({ workspaceId }: { workspaceId: string }) => {
               {/* Modal Header */}
               <div className="p-6 border-b border-border flex items-center justify-between shrink-0 bg-accent/50">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
-                    <Bot className="w-5 h-5 text-primary" />
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                    <div className="w-5 h-5 rounded-md bg-primary/30" />
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-foreground">Create New Automation</h2>

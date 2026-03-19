@@ -64,12 +64,16 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
         <div className="flex-1 overflow-y-auto p-8 space-y-8 no-scrollbar">
           {messages.map((msg) => (
             <div key={msg.id} className={cn("flex gap-4 max-w-[85%]", msg.role === 'ai' ? "ml-0" : "ml-auto flex-row-reverse")}>
-              <div className={cn(
-                "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                msg.role === 'ai' ? "bg-primary" : "bg-accent border border-border"
-              )}>
-                {msg.role === 'ai' ? <Bot className="w-5 h-5 text-primary-foreground" /> : <User className="w-5 h-5 text-muted-foreground" />}
-              </div>
+                <div className={cn(
+                  "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
+                  msg.role === 'ai' ? "bg-primary/10 border border-primary/20" : "bg-accent border border-border"
+                )}>
+                  {msg.role === 'ai' ? (
+                    <div className="w-full h-full rounded-lg flex items-center justify-center bg-primary/10 border border-primary/20">
+                      <div className="w-4 h-4 rounded-sm bg-primary/30" />
+                    </div>
+                  ) : <User className="w-5 h-5 text-muted-foreground" />}
+                </div>
               <div className={cn("space-y-2", msg.role === 'user' && "text-right")}>
                 <div className={cn(
                   "p-4 rounded-2xl text-sm leading-relaxed shadow-sm",

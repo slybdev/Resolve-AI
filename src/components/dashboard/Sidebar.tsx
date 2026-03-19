@@ -155,17 +155,33 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
       isCollapsed ? "w-16" : "w-80"
     )}>
       <div className={cn("mb-6 w-full", isCollapsed && "flex flex-col items-center")}>
-        <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          onClick={onToggle}
-          className={cn(
-            "bg-foreground rounded-2xl flex items-center justify-center shadow-xl shadow-foreground/5 transition-all duration-300 cursor-pointer",
-            isCollapsed ? "w-12 h-12 mb-4" : "w-12 h-12 mb-6 mx-4"
-          )}
-        >
-          <Bot className="text-background w-7 h-7" />
-        </motion.div>
+        <div className={cn("flex items-center", isCollapsed ? "justify-center" : "px-4")}>
+          <AnimatePresence mode="wait">
+            {isCollapsed ? (
+              <motion.div 
+                key="collapsed-logo"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                onClick={onToggle}
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 cursor-pointer overflow-hidden border shadow-sm shrink-0 bg-primary/10 border-primary/20 mb-4"
+              >
+                <Bot className="w-5 h-5 text-primary" />
+              </motion.div>
+            ) : (
+              <motion.span 
+                key="expanded-logo"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                onClick={onToggle}
+                className="text-xl font-black tracking-tight text-foreground mb-6 cursor-pointer hover:opacity-80 transition-opacity"
+              >
+                <span className="text-primary">X</span>entralDesk
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </div>
         
         <SidebarSection title="Inbox" icon={Inbox} isCollapsed={isCollapsed} onToggle={onToggle} defaultOpen={true}>
           <NavItem icon={Inbox} label="All Conversations" active={currentView === 'all-conversations'} onClick={() => onViewChange('all-conversations')} isCollapsed={isCollapsed} />

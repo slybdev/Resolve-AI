@@ -24,10 +24,11 @@ export const LandingPage = () => {
       <div className="fixed top-0 left-0 right-0 z-[201] p-4 md:p-6 flex items-center justify-between w-full pointer-events-none">
         {/* Brand */}
         <div className="flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-lg py-2 px-3 md:px-4 rounded-full pointer-events-auto shadow-lg transition-all hover:bg-white/10 group cursor-pointer">
-          <div className="bg-white/10 p-1 rounded-full group-hover:scale-110 transition-transform">
-            <Bot className="text-white w-4 h-4 md:w-5 md:h-5" />
-          </div>
-          <span className="text-white font-bold tracking-tight text-sm md:text-base">XentralDesk</span>
+            <div className="flex items-center">
+              <span className="text-xl font-black tracking-tighter text-white">
+                <span className="text-primary">X</span>entralDesk
+              </span>
+            </div>
         </div>
 
         {/* Auth */}

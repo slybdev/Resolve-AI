@@ -49,8 +49,8 @@ export const Login = () => {
         <div className="bg-neutral-900/50 border border-white/10 backdrop-blur-xl rounded-3xl p-8 shadow-2xl">
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
-            <div className="bg-primary p-3 rounded-2xl mb-4 shadow-lg shadow-primary/20">
-              <Bot className="text-primary-foreground w-8 h-8" />
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 mx-auto shadow-sm">
+                <div className="w-5 h-5 rounded-md bg-primary/20" />
             </div>
             <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back</h1>
             <p className="text-neutral-400 text-sm mt-2">Enter your credentials to access your dashboard.</p>

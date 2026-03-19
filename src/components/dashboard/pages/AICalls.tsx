@@ -395,10 +395,10 @@ export const AICalls = () => {
               <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">AI Insights</h3>
               <div className="space-y-3">
                 <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Bot className="w-3 h-3 text-primary" />
-                    <span className="text-[10px] font-bold text-primary uppercase">Intent Detected</span>
+                  <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                    <div className="w-2 h-2 rounded-[1px] bg-primary/20" />
                   </div>
+                  <span className="text-[10px] font-bold text-primary uppercase">Intent Detected</span>
                   <p className="text-sm text-foreground">Customer is inquiring about a refund for order #12345 due to delayed shipping.</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -419,8 +419,8 @@ export const AICalls = () => {
               <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Transcript</h3>
               <div className="space-y-4">
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                    <Bot className="w-3 h-3 text-primary" />
+                  <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                    <div className="w-2 h-2 rounded-[1px] bg-primary/30" />
                   </div>
                   <div className="space-y-1">
                     <p className="text-[10px] font-bold text-muted-foreground">AI Assistant • 0:05</p>
@@ -437,8 +437,8 @@ export const AICalls = () => {
                   </div>
                 </div>
                 <div className="flex gap-3">
-                  <div className="w-6 h-6 rounded-lg bg-accent flex items-center justify-center shrink-0">
-                    <Bot className="w-3 h-3 text-primary" />
+                  <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                    <div className="w-2 h-2 rounded-[1px] bg-primary/30" />
                   </div>
                   <div className="space-y-1">
                     <p className="text-[10px] font-bold text-muted-foreground">AI Assistant • 0:20</p>
@@ -515,17 +515,19 @@ export const AICalls = () => {
                     </div>
                     <div className="h-64 bg-accent/30 border border-border rounded-2xl p-4 overflow-y-auto no-scrollbar space-y-4">
                       {!isSimulating ? (
-                        <div className="h-full flex flex-col items-center justify-center text-center space-y-3">
-                          <Bot className="w-8 h-8 text-muted-foreground opacity-20" />
+                        <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
+                  <div className="w-20 h-20 rounded-3xl bg-primary/10 flex items-center justify-center border border-primary/20 mb-6 group-hover:scale-105 transition-transform duration-500 shadow-lg shadow-primary/5">
+                    <div className="w-10 h-10 rounded-lg bg-primary/20" />
+                  </div>
                           <p className="text-xs text-muted-foreground">Click "Start Simulation" to begin the test call.</p>
                         </div>
                       ) : (
                         <AnimatePresence mode="popLayout">
                           {simulationStep >= 1 && (
-                            <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex gap-2">
-                              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                                <Bot className="w-3 h-3 text-primary" />
-                              </div>
+                             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex gap-2">
+                                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                          <div className="w-3 h-3 rounded-[2px] bg-primary/30" />
+                        </div>
                               <p className="text-xs text-foreground bg-primary/5 p-2 rounded-lg rounded-tl-none border border-primary/10">
                                 Hello! This is your AI assistant. How can I help you today?
                               </p>
@@ -543,9 +545,9 @@ export const AICalls = () => {
                           )}
                           {simulationStep >= 3 && (
                             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="flex gap-2">
-                              <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                                <Bot className="w-3 h-3 text-primary" />
-                              </div>
+                                <div className="w-6 h-6 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                                  <div className="w-2 h-2 rounded-[1px] bg-primary/30" />
+                                </div>
                               <p className="text-xs text-foreground bg-primary/5 p-2 rounded-lg rounded-tl-none border border-primary/10">
                                 Searching... I see order #9988 is currently in transit and expected to arrive by tomorrow evening.
                               </p>

@@ -59,10 +59,10 @@ export const Unassigned = ({ workspaceId }: { workspaceId: string }) => {
 
               <div className="flex-1 space-y-4">
                 <div className="bg-accent/30 border border-border/50 p-4 rounded-xl">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Bot className="w-4 h-4 text-blue-500" />
+                    <div className="w-5 h-5 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
+                      <div className="w-2 h-2 rounded-[1px] bg-primary/20" />
+                    </div>
                     <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">AI Summary</span>
-                  </div>
                   <p className="text-sm text-foreground/80 italic leading-relaxed">
                     "{ticket.aiSummary}"
                   </p>

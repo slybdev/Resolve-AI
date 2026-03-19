@@ -88,8 +88,8 @@ export const SignUp = () => {
         <div className="bg-neutral-900/50 border border-white/10 backdrop-blur-xl rounded-3xl p-6 shadow-2xl">
           {/* Logo */}
           <div className="flex flex-col items-center mb-6">
-            <div className="bg-primary p-2.5 rounded-2xl mb-3 shadow-lg shadow-primary/20">
-              <Bot className="text-primary-foreground w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4 mx-auto shadow-sm">
+                <div className="w-5 h-5 rounded-md bg-primary/20" />
             </div>
             <h1 className="text-xl font-bold text-white tracking-tight">Create your account</h1>
             {selectedPlan ? (

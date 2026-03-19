@@ -37,6 +37,7 @@ services:
       MYSQL_DATABASE: xentraldesk
       MYSQL_USER: xentraldesk
       MYSQL_PASSWORD: xentraldesk_dev
+    command: --default-authentication-plugin=mysql_native_password
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
