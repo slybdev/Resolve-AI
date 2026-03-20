@@ -204,15 +204,22 @@ async def verify_channel(
         
         result = await telegram_service.verify_connection(token)
         if result:
-            bot_info = result["bot"]
-            webhook_info = result["webhook"]
-            background_tasks.add_task(telegram_service.sync_messages, db, channel)
+            bot_info = result.get("bot_info", {})
             
             detail = f"Connected as @{bot_info.get('username')}"
-            if webhook_info.get("url"):
+            if result.get("url"):
                 detail += " (Webhook Active)"
             else:
                 detail += " (Webhook Pending)"
+            
+            if result.get("pending_updates", 0) > 0:
+                detail += f" - {result['pending_updates']} pending"
+            
+            if result.get("last_error"):
+                detail += f" - Error: {result['last_error']}"
+
+            # Only sync if it's a fresh connection or requested
+            background_tasks.add_task(telegram_service.sync_messages, db, channel)
 
             return ChannelVerifyResponse(
                 success=True, 

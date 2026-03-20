@@ -45,12 +45,14 @@ class TelegramService:
             return False
 
         logger.info(f"Matched Telegram channel: {target_channel.id} (Workspace: {target_channel.workspace_id})")
-        # 2. Extract message or edited_message
-        tg_message = payload.get("message")
-        if not tg_message:
+        # 2. Process update
+        # Telegram can send 'message' (private/group) or 'channel_post' (channels)
+        message = payload.get("message") or payload.get("channel_post")
+        if not message:
+            logger.info(f"Ignored non-message update: {list(payload.keys())}")
             return True
 
-        await self._process_update(db, target_channel, tg_message)
+        await self._process_update(db, target_channel, message)
         
         await db.commit()
         return True
@@ -63,12 +65,16 @@ class TelegramService:
             return
 
         chat = tg_message.get("chat", {})
-        from_user = tg_message.get("from", {})
+        # In 'channel_post', from_user is usually missing. Use 'chat' info instead.
+        from_user = tg_message.get("from") or {}
         
-        external_contact_id = str(from_user.get("id"))
-        contact_name = from_user.get("first_name", "Telegram User")
-        if from_user.get("last_name"):
-            contact_name += f" {from_user.get('last_name')}"
+        external_contact_id = str(from_user.get("id") or chat.get("id"))
+        first_name = from_user.get("first_name") or chat.get("title") or "Telegram User"
+        last_name = from_user.get("last_name") or ""
+
+        contact_name = first_name
+        if last_name:
+            contact_name += f" {last_name}"
             
         message_text = tg_message.get("text")
         external_message_id = str(tg_message.get("message_id"))
