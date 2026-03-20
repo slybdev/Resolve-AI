@@ -194,16 +194,39 @@ class APIClient {
       }),
   };
 
+  // Uploads
+  uploads = {
+    file: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const response = await fetch(`${API_BASE_URL}/uploads`, {
+        method: 'POST',
+        headers: {
+          ...(this.accessToken ? { 'Authorization': `Bearer ${this.accessToken}` } : {}),
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
+        throw new Error(error.detail || response.statusText);
+      }
+
+      return response.json();
+    }
+  };
+
   // Conversations
   conversations = {
     list: (workspace_id: string, status?: string) => 
       this.request(`/conversations/?workspace_id=${workspace_id}${status ? `&status=${status}` : ''}`),
     getMessages: (conversation_id: string) => 
       this.request(`/conversations/${conversation_id}/messages`),
-    sendMessage: (conversation_id: string, body: string, is_internal: boolean = false) => 
+    sendMessage: (conversation_id: string, body: string, is_internal: boolean = false, message_type: string = "text") => 
       this.request(`/conversations/${conversation_id}/messages`, {
         method: 'POST',
-        body: JSON.stringify({ body, is_internal }),
+        body: JSON.stringify({ body, is_internal, message_type }),
       }),
     markAsRead: (conversation_id: string) => 
       this.request(`/conversations/${conversation_id}/read`, {

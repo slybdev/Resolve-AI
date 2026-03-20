@@ -5,6 +5,7 @@ from datetime import datetime
 
 class MessageCreate(BaseModel):
     body: str
+    message_type: str = "text"
     is_internal: bool = False
 
 class MessageRead(BaseModel):

@@ -123,6 +123,7 @@ async def telegram_webhook(
     if not success:
         return {"status": "error", "message": "Channel not found"}
         
+    await db.commit()
     return {"status": "ok"}
 
 @router.post("/discord")

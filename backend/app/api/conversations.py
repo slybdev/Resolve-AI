@@ -109,7 +109,7 @@ async def send_message(
         sender_id=current_user.id,
         sender_type="agent",
         body=payload.body,
-        message_type="text" if not payload.is_internal else "note"
+        message_type=payload.message_type if not payload.is_internal else "note"
     )
     db.add(message)
     
@@ -157,7 +157,7 @@ async def send_message(
                 # Use the telegram_id from channel_data
                 chat_id = contact.channel_data.get("telegram_id")
                 if chat_id:
-                    await telegram_service.send_message(token, chat_id, payload.body)
+                    await telegram_service.send_message(token, chat_id, payload.body, payload.message_type)
 
     return {"status": "sent"}
 

@@ -590,16 +590,41 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                 </button>
               </div>
               <PromptInputBox 
-                onSend={async (msg) => {
+                onSend={async (msg, files) => {
                   if (!selectedId) return;
                   
                   try {
-                    await api.conversations.sendMessage(selectedId, msg, activeTab === 'note');
+                    let finalBody = msg;
+                    let messageType = "text";
+
+                    if (files && files.length > 0) {
+                      const file = files[0];
+                      // Show loading state if possible or just wait
+                      const uploadRes = await api.uploads.file(file);
+                      finalBody = uploadRes.url;
+                      
+                      if (file.type.startsWith("image/")) {
+                        messageType = "image";
+                      } else if (file.type.startsWith("audio/")) {
+                        messageType = "voice";
+                      } else {
+                        messageType = "file";
+                      }
+                    }
+
+                    await api.conversations.sendMessage(
+                      selectedId, 
+                      finalBody, 
+                      activeTab === 'note',
+                      messageType
+                    );
                     fetchMessages(selectedId);
                   } catch (err) {
                     toast('Error', 'Failed to send message', 'error');
+                    console.error(err);
                   }
                 }}
+                isLoading={isLoading}
                 placeholder={activeTab === 'reply' ? "Type a message or use / for commands..." : "Type an internal note (only visible to teammates)..."}
               />
             </div>

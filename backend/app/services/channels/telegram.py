@@ -68,29 +68,111 @@ class TelegramService:
         # In 'channel_post', from_user is usually missing. Use 'chat' info instead.
         from_user = tg_message.get("from") or {}
         
-        external_contact_id = str(from_user.get("id") or chat.get("id"))
-        first_name = from_user.get("first_name") or chat.get("title") or "Telegram User"
-        last_name = from_user.get("last_name") or ""
+        from_user = tg_message.get("from") or {} # In 'channel_post', from_user is usually missing. Use 'chat' info instead.
 
-        contact_name = first_name
-        if last_name:
-            contact_name += f" {last_name}"
-            
-        message_text = tg_message.get("text")
+        external_contact_id = str(from_user.get("id") or chat.get("id"))
         external_message_id = str(tg_message.get("message_id"))
+        
+        first_name = from_user.get("first_name", "Telegram User")
+        last_name = from_user.get("last_name", "")
+
+        # --- Attachment Handling ---
+        message_text = tg_message.get("text") or tg_message.get("caption") or ""
+        message_type = "text"
+        attachment_url = None
+
+        # Check for different types of media
+        file_id = None
+        if "photo" in tg_message:
+            # photo is a list of PhotoSize, take the largest one (last)
+            file_id = tg_message["photo"][-1]["file_id"]
+            message_type = "image"
+        elif "document" in tg_message:
+            file_id = tg_message["document"]["file_id"]
+            message_type = "file"
+        elif "voice" in tg_message:
+            file_id = tg_message["voice"]["file_id"]
+            message_type = "file" # or "voice" if frontend supports it
+        elif "video" in tg_message:
+            file_id = tg_message["video"]["file_id"]
+            message_type = "file" # or "video"
+
+        if file_id:
+            token = channel.config.get("token")
+            file_path = await self._download_telegram_file(file_id, token)
+            if file_path:
+                from app.core.config import get_settings
+                settings = get_settings()
+                attachment_url = f"{settings.BASE_URL}/{file_path}"
+                # If there's no text, use the URL as the body (or keep it as caption)
+                if not message_text:
+                    message_text = attachment_url
+                else:
+                    message_text = f"{message_text}\n\n{attachment_url}"
 
         # Route to conversation
         await routing_service.route_incoming_message(
             db=db,
-            channel_id=channel.id,
+            channel=channel,
             external_contact_id=external_contact_id,
-            contact_name=contact_name,
+            external_message_id=external_message_id,
             message_text=message_text,
-            external_message_id=external_message_id
+            first_name=first_name,
+            last_name=last_name,
+            message_type=message_type
         )
         
-        await db.commit()
+        # db.commit() is handled by the handle_webhook caller
         return True
+
+    async def _download_telegram_file(self, file_id: str, token: str) -> Optional[str]:
+        """
+        Downloads a file from Telegram and saves it to local storage.
+        Returns the relative path to the file.
+        """
+        import os
+        import uuid
+        import httpx
+        
+        # 1. Get file path from Telegram
+        get_file_url = f"https://api.telegram.org/bot{token}/getFile"
+        async with httpx.AsyncClient() as client:
+            try:
+                resp = await client.get(get_file_url, params={"file_id": file_id}, timeout=10.0)
+                if resp.status_code != 200:
+                    logger.error(f"Failed to get file info from Telegram: {resp.text}")
+                    return None
+                    
+                file_info = resp.json().get("result", {})
+                tg_file_path = file_info.get("file_path")
+                if not tg_file_path:
+                    return None
+                
+                # 2. Download the actual file
+                download_url = f"https://api.telegram.org/file/bot{token}/{tg_file_path}"
+                file_resp = await client.get(download_url, timeout=30.0)
+                if file_resp.status_code != 200:
+                    logger.error(f"Failed to download file from Telegram: {file_resp.status_code}")
+                    return None
+                
+                # 3. Save to local disk
+                upload_dir = "/app/uploads"
+                if not os.path.exists(upload_dir):
+                    os.makedirs(upload_dir, exist_ok=True)
+                
+                # Generate unique filename keeping extension if possible
+                ext = os.path.splitext(tg_file_path)[1]
+                filename = f"{uuid.uuid4()}{ext}"
+                local_path = os.path.join(upload_dir, filename)
+                
+                with open(local_path, "wb") as f:
+                    f.write(file_resp.content)
+                
+                return f"uploads/{filename}"
+                
+            except Exception as e:
+                logger.error(f"Error downloading Telegram file: {e}")
+                return None
 
     async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str):
         """
@@ -226,25 +308,39 @@ class TelegramService:
         
         return count
 
-    async def send_message(self, token: str, chat_id: str, text: str):
+    async def send_message(self, token: str, chat_id: str, text: str, message_type: str = "text"):
         """
-        Sends a message to a Telegram chat.
+        Sends a message to Telegram. Supports different message types.
         """
-        url = f"https://api.telegram.org/bot{token}/sendMessage"
-        payload = {
-            "chat_id": chat_id,
-            "text": text
-        }
+        import httpx
+        
+        # Determine the method based on message_type
+        method = "sendMessage"
+        params = {"chat_id": chat_id}
+        
+        if message_type == "image":
+            method = "sendPhoto"
+            params["photo"] = text # text should contain the URL if it's an image
+            # If there's a caption, we could handle it, but for now we use the main body as the media source
+        elif message_type == "file":
+            method = "sendDocument"
+            params["document"] = text
+        elif message_type == "voice":
+            method = "sendVoice"
+            params["voice"] = text
+        else:
+            params["text"] = text
+
+        url = f"https://api.telegram.org/bot{token}/{method}"
+        
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, json=payload, timeout=10.0)
-                if response.status_code == 200:
-                    logger.info(f"Successfully sent Telegram message to {chat_id}")
-                    return True
-                else:
-                    logger.error(f"Failed to send Telegram message: {response.text}")
+                resp = await client.post(url, json=params)
+                if resp.status_code != 200:
+                    logger.error(f"Failed to send Telegram message: {resp.text}")
+                return resp.json()
             except Exception as e:
                 logger.error(f"Error sending Telegram message: {e}")
-        return False
+                return None
 
 telegram_service = TelegramService()

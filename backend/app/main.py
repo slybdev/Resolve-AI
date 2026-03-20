@@ -66,32 +66,47 @@ def create_app() -> FastAPI:
     from app.api.workspaces import router as workspaces_router
 
     app.include_router(auth_router)
-    app.include_router(workspaces_router)
-    app.include_router(onboarding_router)
-    # Engineer B routers:
-    from app.api.companies import router as companies_router
-    from app.api.contacts import router as contacts_router
-    from app.api.tags import router as tags_router
-    from app.api.team import router as team_router
-    from app.api.settings import router as settings_router
-    from app.api.api_keys import router as api_keys_router
-    from app.api.channels import router as channels_router
+    from app.api import (
+        auth,
+        onboarding,
+        workspaces,
+        companies,
+        contacts,
+        tags,
+        team,
+        settings as api_settings, # Renamed to avoid conflict with app settings
+        api_keys,
+        channels,
+        webhooks,
+        widget,
+        conversations,
+        websocket,
+        uploads
+    )
 
-    app.include_router(contacts_router)
-    app.include_router(companies_router)
-    app.include_router(tags_router)
-    app.include_router(team_router)
-    app.include_router(settings_router)
-    app.include_router(api_keys_router)
-    app.include_router(channels_router)
-    from app.api.webhooks import router as webhooks_router
-    app.include_router(webhooks_router)
-    from app.api.widget import router as widget_router
-    app.include_router(widget_router)
-    from app.api.conversations import router as conversations_router
-    app.include_router(conversations_router)
-    from app.api.websocket import router as websocket_router
-    app.include_router(websocket_router)
+    app.include_router(auth.router)
+    app.include_router(onboarding.router)
+    app.include_router(workspaces.router)
+    app.include_router(companies.router)
+    app.include_router(contacts.router)
+    app.include_router(tags.router)
+    app.include_router(team.router)
+    app.include_router(api_settings.router)
+    app.include_router(api_keys.router)
+    app.include_router(channels.router)
+    app.include_router(webhooks.router)
+    app.include_router(widget.router)
+    app.include_router(conversations.router)
+    app.include_router(websocket.router)
+    app.include_router(uploads.router)
+
+    # ── Static files for uploads ──
+    from fastapi.staticfiles import StaticFiles
+    import os
+    upload_dir = "/app/uploads"
+    if not os.path.exists(upload_dir):
+        os.makedirs(upload_dir, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=upload_dir), name="uploads")
 
     return app
 

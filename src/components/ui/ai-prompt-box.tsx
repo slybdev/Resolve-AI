@@ -456,6 +456,8 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const [showThink, setShowThink] = React.useState(false);
   const [showCanvas, setShowCanvas] = React.useState(false);
   const uploadInputRef = React.useRef<HTMLInputElement>(null);
+  const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+  const audioChunksRef = React.useRef<Blob[]>([]);
   const promptBoxRef = React.useRef<HTMLDivElement>(null);
 
   const handleToggleChange = (value: string) => {
@@ -473,18 +475,18 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
   const isImageFile = (file: File) => file.type.startsWith("image/");
 
   const processFile = (file: File) => {
-    if (!isImageFile(file)) {
-      console.log("Only image files are allowed");
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      console.log("File too large (max 10MB)");
+    if (file.size > 20 * 1024 * 1024) {
+      console.log("File too large (max 20MB)");
       return;
     }
     setFiles([file]);
-    const reader = new FileReader();
-    reader.onload = (e) => setFilePreviews({ [file.name]: e.target?.result as string });
-    reader.readAsDataURL(file);
+    if (isImageFile(file)) {
+      const reader = new FileReader();
+      reader.onload = (e) => setFilePreviews({ [file.name]: e.target?.result as string });
+      reader.readAsDataURL(file);
+    } else {
+      setFilePreviews({ [file.name]: "file-icon" });
+    }
   };
 
   const handleDragOver = React.useCallback((e: React.DragEvent) => {
@@ -547,12 +549,39 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     }
   };
 
-  const handleStartRecording = () => console.log("Started recording");
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const file = new File([audioBlob], `voice-note-${Date.now()}.webm`, { type: 'audio/webm' });
+        onSend?.("", [file]);
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      console.log("Started recording");
+    } catch (err) {
+      console.error("Failed to start recording", err);
+    }
+  };
 
   const handleStopRecording = (duration: number) => {
     console.log(`Stopped recording after ${duration} seconds`);
     setIsRecording(false);
-    onSend(`[Voice message - ${duration} seconds]`, []);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
   };
 
   const hasContent = input.trim() !== "" || files.length > 0;
@@ -579,7 +608,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
           <div className="flex flex-wrap gap-2 p-0 pb-1 transition-all duration-300">
             {files.map((file, index) => (
               <div key={index} className="relative group">
-                {file.type.startsWith("image/") && filePreviews[file.name] && (
+                {file.type.startsWith("image/") && filePreviews[file.name] ? (
                   <div
                     className="w-16 h-16 rounded-xl overflow-hidden cursor-pointer transition-all duration-300"
                     onClick={() => openImageModal(filePreviews[file.name])}
@@ -597,6 +626,20 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                       className="absolute top-1 right-1 rounded-full bg-black/70 p-0.5 opacity-100 transition-opacity"
                     >
                       <X className="h-3 w-3 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 bg-accent/50 p-2 rounded-xl border border-border pr-8 relative">
+                    <FolderCode className="w-5 h-5 text-primary" />
+                    <span className="text-xs font-medium truncate max-w-[100px]">{file.name}</span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveFile(index);
+                      }}
+                      className="absolute top-1 right-1 rounded-full bg-black/10 p-0.5 hover:bg-black/20 transition-all"
+                    >
+                      <X className="h-3 w-3 text-foreground" />
                     </button>
                   </div>
                 )}
@@ -640,7 +683,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
               isRecording ? "opacity-0 invisible h-0" : "opacity-100 visible"
             )}
           >
-            <PromptInputAction tooltip="Upload image">
+            <PromptInputAction tooltip="Upload file">
               <button
                 onClick={() => uploadInputRef.current?.click()}
                 className="flex h-8 w-8 text-muted-foreground cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-accent hover:text-foreground"
@@ -655,7 +698,6 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                     if (e.target.files && e.target.files.length > 0) processFile(e.target.files[0]);
                     if (e.target) e.target.value = "";
                   }}
-                  accept="image/*"
                 />
               </button>
             </PromptInputAction>
