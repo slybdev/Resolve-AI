@@ -616,6 +616,29 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                     <ExternalLink className="w-3 h-3" />
                     How to get your {type} credentials
                   </button>
+
+                  {/* Webhook Info for Discord/Telegram */}
+                  {(type === 'telegram' || type === 'discord') && channelId && (
+                    <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-4 h-4 text-primary" />
+                        <h3 className="text-xs font-bold text-foreground">Webhook Configuration</h3>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[9px] font-bold text-muted-foreground uppercase">Callback URL</span>
+                          <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all overflow-x-auto whitespace-nowrap">
+                            {import.meta.env.VITE_API_URL}/webhooks/{type}/{config.token || config.bot_token || 'YOUR_TOKEN'}
+                          </code>
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground leading-relaxed italic">
+                        {type === 'telegram' 
+                          ? 'This is automatically set when you save. Use it for manual debug if needed.' 
+                          : 'Copy this URL into your Discord middleware or bot forwarder.'}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 

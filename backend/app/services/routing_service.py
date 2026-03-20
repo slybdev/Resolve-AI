@@ -18,27 +18,11 @@ class RoutingService:
     async def route_incoming_message(
         self,
         db: AsyncSession,
-        channel_id: uuid.UUID,
-        external_contact_id: str,
-        contact_name: str,
-        message_text: str,
-        external_message_id: Optional[str] = None,
-    ) -> Message:
-        """
-        Routes an incoming message from an external channel to a XentralDesk conversation.
-        1. Identifies the channel and workspace.
-        2. Finds or creates a contact based on external ID.
-        3. Finds or creates an active conversation.
-        4. Saves the message.
-        """
-    async def route_incoming_message(
-        self,
-        db: AsyncSession,
         channel: Channel,
         external_contact_id: str,
         external_message_id: str,
         message_text: str,
-        first_name: str = "Telegram User",
+        first_name: str = "User",
         last_name: str = "",
         message_type: str = "text"
     ) -> Message:
@@ -72,7 +56,7 @@ class RoutingService:
 
         if not contact:
             contact = Contact(
-                name=f"{first_name} {last_name}".strip() or "Telegram User",
+                name=f"{first_name} {last_name}".strip() or f"{channel_type.capitalize()} User",
                 workspace_id=workspace_id,
                 channel_data={search_key: external_contact_id}
             )

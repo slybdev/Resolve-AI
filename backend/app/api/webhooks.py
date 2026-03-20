@@ -10,6 +10,8 @@ import logging
 
 from app.services.channels.instagram import instagram_service
 from app.services.channels.facebook import facebook_service
+from app.models.channel import Channel, ChannelType
+from sqlalchemy import select
 
 logger = logging.getLogger(__name__)
 
@@ -126,12 +128,51 @@ async def telegram_webhook(
     await db.commit()
     return {"status": "ok"}
 
+@router.post("/discord/{token}")
+async def discord_webhook_token(
+    token: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    """Ingest webhooks from Discord using a specific channel token."""
+    payload = await request.json()
+    logger.info(f"Received Discord webhook with token: {payload}")
+    
+    from app.services.channels.discord import discord_service
+    # Step 1: Find channel by token
+    result = await db.execute(
+        select(Channel).where(
+            Channel.type == ChannelType.DISCORD,
+            Channel.is_active == True
+        )
+    )
+    channels = result.scalars().all()
+    target_channel = None
+    for c in channels:
+        if c.config.get("token") == token or c.config.get("bot_token") == token:
+            target_channel = c
+            break
+            
+    if not target_channel:
+        # Fallback to guild_id if token doesn't match a config but it's a valid guild
+        success = await discord_service.handle_webhook(db, payload)
+        if not success:
+            return {"status": "error", "message": "Channel not found"}
+    else:
+        # We have the channel, use it directly
+        success = await discord_service.handle_incoming_from_channel(db, target_channel, payload)
+        if not success:
+            return {"status": "error", "message": "Processing failed"}
+
+    await db.commit()
+    return {"status": "ok"}
+
 @router.post("/discord")
 async def discord_webhook(
     request: Request,
     db: AsyncSession = Depends(get_db)
 ):
-    """Ingest webhooks from Discord."""
+    """Ingest webhooks from Discord (Legacy/General)."""
     payload = await request.json()
     logger.info(f"Received Discord webhook: {payload}")
     
@@ -141,6 +182,7 @@ async def discord_webhook(
     if not success:
         return {"status": "error", "message": "Channel not found"}
         
+    await db.commit()
     return {"status": "ok"}
 
 @router.post("/slack")
