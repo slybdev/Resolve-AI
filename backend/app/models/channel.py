@@ -30,10 +30,7 @@ class Channel(Base):
     __tablename__ = "channels"
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    type: Mapped[ChannelType] = mapped_column(
-        SQLEnum(ChannelType, values_callable=lambda x: [e.value for e in x]), 
-        nullable=False
-    )
+    type: Mapped[ChannelType] = mapped_column(SQLEnum(ChannelType), nullable=False)
     config: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 

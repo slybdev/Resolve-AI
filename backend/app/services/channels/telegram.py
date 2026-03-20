@@ -23,9 +23,10 @@ class TelegramService:
         # 1. Identify channel by token in config
         # In a real app, we might want a better way to look up channels by token
         # For now, we'll scan or use the token passed in URL (if we stored it that way)
+        from sqlalchemy import cast, String
         result = await db.execute(
             select(Channel).where(
-                Channel.type == "telegram",
+                cast(Channel.type, String) == "telegram",
                 Channel.is_active == True
             )
         )
