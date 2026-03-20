@@ -130,11 +130,21 @@ class TelegramService:
                 wh_resp = await client.get(f"https://api.telegram.org/bot{token}/getWebhookInfo", timeout=5.0)
                 webhook_info = {}
                 if wh_resp.status_code == 200 and wh_resp.json().get("ok"):
-                    webhook_info = wh_resp.json().get("result")
+                    webhook_info = wh_resp.json().get("result", {})
+                logger.info(f"Telegram Webhook Info: {webhook_info}")
+                
+                pending = webhook_info.get("pending_update_count", 0)
+                error_msg = webhook_info.get("last_error_message")
+                if error_msg:
+                    logger.error(f"Telegram Webhook Error: {error_msg}")
 
                 return {
-                    "bot": bot_info,
-                    "webhook": webhook_info
+                    "status": "connected",
+                    "webhook_active": True,
+                    "bot_info": bot_info,
+                    "pending_updates": pending,
+                    "last_error": error_msg,
+                    "url": webhook_info.get("url")
                 }
             except Exception as e:
                 logger.error(f"Error verifying Telegram token or webhook: {e}")
