@@ -61,13 +61,34 @@ interface Message {
   id: string;
   sender: 'customer' | 'ai' | 'human' | 'agent' | 'system';
   text: string;
+  attachmentUrl?: string;
   type?: string;
   time: string;
   avatar?: string;
   isInternal?: boolean;
 }
 
-const VoiceMessage = ({ url, sender }: { url: string; sender: string }) => {
+const formatTime = (date: Date) => {
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
+};
+
+const VideoMessage = ({ url, sender }: { url: string; sender: string }) => {
+  return (
+    <div className={cn(
+      "relative rounded-2xl overflow-hidden min-w-[200px] max-w-sm shadow-lg border group",
+      sender === 'customer' ? "border-border" : "border-primary/20"
+    )}>
+      <video src={url} className="w-full h-auto" controls />
+      <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+          <div className="ml-1 border-y-[8px] border-y-transparent border-l-[14px] border-l-white" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const VoiceMessage = ({ url, sender, time }: { url: string; sender: string; time: string }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -96,16 +117,10 @@ const VoiceMessage = ({ url, sender }: { url: string; sender: string }) => {
     }
   };
 
-  const formatTime = (time: number) => {
-    const mins = Math.floor(time / 60);
-    const secs = Math.floor(time % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   return (
     <div className={cn(
-      "flex items-center gap-3 p-3 rounded-2xl min-w-[240px] shadow-sm border",
-      sender === 'customer' ? "bg-card border-border" : "bg-primary/5 border-primary/20"
+      "flex flex-col gap-1 p-3 rounded-2xl min-w-[260px] shadow-sm border relative overflow-hidden",
+      sender === 'customer' ? "bg-[#202c33] border-[#222e35] text-white" : "bg-[#005c4b] border-[#005c4b] text-[#e9edef]"
     )}>
       <audio 
         ref={audioRef} 
@@ -115,48 +130,67 @@ const VoiceMessage = ({ url, sender }: { url: string; sender: string }) => {
         onEnded={() => setIsPlaying(false)}
       />
       
-      <button 
-        type="button"
-        onClick={togglePlay}
-        className={cn(
-          "w-10 h-10 rounded-full flex items-center justify-center transition-all btn-press shrink-0",
-          sender === 'customer' ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
-        )}
-      >
-        {isPlaying ? (
-          <div className="flex gap-1 items-center">
-            <div className="w-1.5 h-4 bg-current rounded-full" />
-            <div className="w-1.5 h-4 bg-current rounded-full" />
-          </div>
-        ) : (
-          <div className="ml-1 border-y-[7px] border-y-transparent border-l-[12px] border-l-current" />
-        )}
-      </button>
+      <div className="flex items-center gap-3">
+        <button 
+          type="button"
+          onClick={togglePlay}
+          className="w-11 h-11 flex items-center justify-center transition-all btn-press shrink-0 text-white/90 hover:text-white"
+        >
+          {isPlaying ? (
+            <div className="flex gap-[3px] items-center">
+              <div className="w-1 h-4 bg-current rounded-full" />
+              <div className="w-1 h-4 bg-current rounded-full" />
+            </div>
+          ) : (
+            <div className="ml-1 border-y-[8px] border-y-transparent border-l-[14px] border-l-current" />
+          )}
+        </button>
 
-      <div className="flex-1 space-y-1.5">
-        <div className="flex items-center gap-[2px] h-6 overflow-hidden">
-          {[...Array(30)].map((_, i) => (
-            <div 
-              key={i} 
-              className={cn(
-                "w-[2px] rounded-full transition-all shrink-0",
-                (i / 30) < (currentTime / duration) 
-                  ? "bg-primary"
-                  : "bg-muted-foreground/30"
-              )}
-              style={{ 
-                height: `${30 + Math.sin(i * 0.5) * 40 + Math.random() * 30}%`
-              }}
-            />
-          ))}
+        <div className="flex-1 space-y-2">
+          <div className="flex items-end gap-[1.5px] h-7 overflow-hidden">
+            {[...Array(35)].map((_, i) => (
+              <div 
+                key={i} 
+                className={cn(
+                  "w-[2px] rounded-full transition-all shrink-0",
+                  (i / 35) < (currentTime / duration) 
+                    ? "bg-[#34b7f1]"
+                    : "bg-[#8696a0]"
+                )}
+                style={{ 
+                  height: `${25 + Math.sin(i * 0.4) * 35 + Math.random() * 25}%`
+                }}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
-          <span>{formatTime(currentTime)}</span>
-          <span>{formatTime(duration)}</span>
+        
+        <div className="relative shrink-0">
+          <User className="w-10 h-10 text-[#8696a0]" />
+          <div className="absolute -bottom-1 -right-1 bg-[#005c4b] rounded-full p-0.5 border border-[#005c4b]">
+            <Mic className="w-3 h-3 text-[#34b7f1]" />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center mt-1 px-1">
+        <span className="text-[10px] text-[#8696a0] font-medium">
+          {isPlaying ? formatTimeSeconds(currentTime) : formatTimeSeconds(duration)}
+        </span>
+        <div className="flex items-center gap-1">
+          <span className="text-[10px] text-[#8696a0]">{time}</span>
+          {sender !== 'customer' && <CheckCircle2 className="w-3 h-3 text-[#34b7f1]" />}
         </div>
       </div>
     </div>
   );
+};
+
+const formatTimeSeconds = (time: number) => {
+  if (isNaN(time)) return "0:00";
+  const mins = Math.floor(time / 60);
+  const secs = Math.floor(time % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
 const CollapsibleNote = ({ msg }: { msg: Message }) => {
@@ -310,14 +344,31 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
     try {
       const data = await api.conversations.getMessages(id);
       const mappedMessages: Message[] = data.map((m: any) => {
-        // Ensure created_at is treated as UTC if it's not already
         const dateStr = m.created_at.endsWith('Z') || m.created_at.includes('+') ? m.created_at : `${m.created_at}Z`;
+        
+        // Handle media messages that might have captions in the body
+        let text = m.body;
+        let attachmentUrl = "";
+        
+        if (m.message_type !== 'text' && m.message_type !== 'note') {
+          // Find the last URL (or /uploads/ path) in the body
+          const urlMatch = m.body.match(/(https?:\/\/[^\s]+)$|(\/uploads\/[^\s]+)$/);
+          if (urlMatch) {
+            attachmentUrl = urlMatch[0];
+            text = m.body.replace(attachmentUrl, "").trim().replace(/\n+$/, "");
+          } else {
+            attachmentUrl = m.body;
+            text = "";
+          }
+        }
+
         return {
           id: m.id,
           sender: m.sender_type === 'agent' ? 'human' : m.sender_type,
-          text: m.body,
+          text: text,
+          attachmentUrl: attachmentUrl,
           type: m.message_type,
-          time: new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          time: new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase(),
           avatar: m.sender_type === 'customer' ? conversationsList.find(c => c.id === id)?.avatar : undefined,
           isInternal: m.message_type === 'note'
         };
@@ -635,25 +686,55 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                           (msg.sender === 'ai' || msg.sender === 'human') && "text-right"
                         )}>
                           <div className={cn(
-                            "p-3 rounded-2xl text-sm text-foreground shadow-sm border",
-                            msg.sender === 'customer' ? "bg-card border-border rounded-tl-none" : "bg-primary/10 border-primary/20 rounded-tr-none"
+                            "rounded-2xl text-sm text-foreground shadow-sm border overflow-hidden",
+                            msg.sender === 'customer' ? "bg-[#202c33] border-[#222e35] rounded-tl-none text-[#e9edef]" : "bg-[#005c4b] border-[#005c4b] rounded-tr-none text-[#e9edef]",
+                            (msg.type === 'image' || msg.type === 'video') && "p-1.5"
                           )}>
                             {msg.type === 'image' ? (
-                              <div className="space-y-2">
-                                <img src={msg.text} className="max-w-full rounded-lg cursor-pointer hover:opacity-95 transition-opacity" alt="Sent image" onClick={() => window.open(msg.text, '_blank')} />
+                              <div className="relative">
+                                {msg.text && <p className="p-3 pb-1">{msg.text}</p>}
+                                <img 
+                                  src={msg.attachmentUrl || msg.text} 
+                                  className="max-w-full rounded-xl cursor-pointer hover:opacity-95 transition-all shadow-inner" 
+                                  alt="Sent image" 
+                                  onClick={() => window.open(msg.attachmentUrl || msg.text, '_blank')} 
+                                />
+                                <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                                  <span className="text-[10px] text-white/90 font-medium">{msg.time}</span>
+                                  {msg.sender !== 'customer' && <CheckCircle2 className="w-3 h-3 text-[#34b7f1]" />}
+                                </div>
+                              </div>
+                            ) : msg.type === 'video' ? (
+                              <div className="relative">
+                                {msg.text && <p className="p-3 pb-1">{msg.text}</p>}
+                                <VideoMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} />
                               </div>
                             ) : msg.type === 'voice' ? (
-                              <VoiceMessage url={msg.text} sender={msg.sender} />
+                              <VoiceMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} time={msg.time} />
                             ) : msg.type === 'file' ? (
-                              <div className="flex items-center gap-2 p-2 bg-accent/30 rounded-lg border border-border">
-                                <FileText className="w-5 h-5 text-primary" />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-[10px] font-bold truncate">Attachment</p>
-                                  <a href={msg.text} target="_blank" rel="noopener noreferrer" className="text-[9px] text-primary hover:underline font-bold uppercase tracking-widest">Download</a>
+                              <div className="p-3">
+                                {msg.text && <p className="mb-2">{msg.text}</p>}
+                                <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer" onClick={() => window.open(msg.attachmentUrl || msg.text, '_blank')}>
+                                  <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
+                                    <FileText className="w-6 h-6 text-red-500" />
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-bold truncate text-[#e9edef]">Attachment</p>
+                                    <p className="text-[10px] text-[#8696a0] font-medium uppercase tracking-widest">Click to Download</p>
+                                  </div>
                                 </div>
                               </div>
                             ) : (
-                              msg.text
+                              <div className="p-3">
+                                {msg.text}
+                                <div className={cn(
+                                  "flex items-center gap-1 text-[10px] text-[#8696a0] mt-1.5",
+                                  (msg.sender === 'ai' || msg.sender === 'human') ? "justify-end" : "justify-start"
+                                )}>
+                                  <span>{msg.time}</span>
+                                  {msg.sender !== 'customer' && <CheckCircle2 className="w-3 h-3 text-[#34b7f1]" />}
+                                </div>
+                              </div>
                             )}
                           </div>
                           <div className={cn(
@@ -713,12 +794,14 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                       const uploadRes = await api.uploads.file(file);
                       finalBody = uploadRes.url;
                       
-                      if (file.type.startsWith("image/")) {
-                        messageType = "image";
-                      } else if (file.type.startsWith("audio/")) {
-                        messageType = "voice";
+                      if (file.type.startsWith('image/')) {
+                        messageType = 'image';
+                      } else if (file.type.startsWith('video/')) {
+                        messageType = 'video';
+                      } else if (file.type.startsWith('audio/') || file.type.includes('webm')) {
+                        messageType = 'voice';
                       } else {
-                        messageType = "file";
+                        messageType = 'file';
                       }
                     }
 

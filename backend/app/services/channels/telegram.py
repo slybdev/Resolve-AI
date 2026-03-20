@@ -180,7 +180,7 @@ class TelegramService:
                 logger.error(f"Error downloading Telegram file: {e}")
                 return None
 
-    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str):
+    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str, message_type: str = "text"):
         """
         Sends a message back to Telegram.
         """
@@ -193,16 +193,26 @@ class TelegramService:
         if not token:
             raise ValueError("Telegram token not configured")
 
-        url = f"https://api.telegram.org/bot{token}/sendMessage"
-        payload = {
-            "chat_id": external_contact_id,
-            "text": text
-        }
-
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, json=payload)
+            if message_type == "text":
+                url = f"https://api.telegram.org/bot{token}/sendMessage"
+                payload = {"chat_id": external_contact_id, "text": text}
+                response = await client.post(url, json=payload)
+            elif message_type == "image":
+                url = f"https://api.telegram.org/bot{token}/sendPhoto"
+                payload = {"chat_id": external_contact_id, "photo": text}
+                response = await client.post(url, json=payload)
+            elif message_type == "voice":
+                url = f"https://api.telegram.org/bot{token}/sendVoice"
+                payload = {"chat_id": external_contact_id, "voice": text}
+                response = await client.post(url, json=payload)
+            else: # file
+                url = f"https://api.telegram.org/bot{token}/sendDocument"
+                payload = {"chat_id": external_contact_id, "document": text}
+                response = await client.post(url, json=payload)
+
             if response.status_code != 200:
-                logger.error(f"Failed to send Telegram message: {response.text}")
+                logger.error(f"Failed to send Telegram {message_type}: {response.text}")
                 return False
             return True
 

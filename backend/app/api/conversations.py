@@ -150,14 +150,12 @@ async def send_message(
                     })
 
         elif channel and channel.type.value == "telegram":
-            from app.services.channels.telegram import telegram_service
-            token = channel.config.get("token")
-            contact = conversation.contact
-            if token and contact:
+            if contact:
                 # Use the telegram_id from channel_data
                 chat_id = contact.channel_data.get("telegram_id")
                 if chat_id:
-                    await telegram_service.send_message(token, chat_id, payload.body, payload.message_type)
+                    from app.services.channels.telegram import telegram_service
+                    await telegram_service.send_message(db, channel.id, chat_id, payload.body, payload.message_type)
 
     return {"status": "sent"}
 
