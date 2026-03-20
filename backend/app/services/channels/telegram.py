@@ -226,4 +226,25 @@ class TelegramService:
         
         return count
 
+    async def send_message(self, token: str, chat_id: str, text: str):
+        """
+        Sends a message to a Telegram chat.
+        """
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        payload = {
+            "chat_id": chat_id,
+            "text": text
+        }
+        async with httpx.AsyncClient() as client:
+            try:
+                response = await client.post(url, json=payload, timeout=10.0)
+                if response.status_code == 200:
+                    logger.info(f"Successfully sent Telegram message to {chat_id}")
+                    return True
+                else:
+                    logger.error(f"Failed to send Telegram message: {response.text}")
+            except Exception as e:
+                logger.error(f"Error sending Telegram message: {e}")
+        return False
+
 telegram_service = TelegramService()
