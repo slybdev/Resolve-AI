@@ -119,8 +119,10 @@ const VoiceMessage = ({ url, sender, time }: { url: string; sender: string; time
 
   return (
     <div className={cn(
-      "flex flex-col gap-1 p-3 rounded-2xl min-w-[260px] shadow-sm border relative overflow-hidden",
-      sender === 'customer' ? "bg-[#202c33] border-[#222e35] text-white" : "bg-[#005c4b] border-[#005c4b] text-[#e9edef]"
+      "flex flex-col gap-1 p-3 rounded-2xl min-w-[260px] shadow-lg border relative overflow-hidden backdrop-blur-md",
+      sender === 'customer' 
+        ? "bg-blue-500/40 border-blue-400/20 text-white" 
+        : "bg-black/60 border-white/10 text-[#e9edef]"
     )}>
       <audio 
         ref={audioRef} 
@@ -165,22 +167,13 @@ const VoiceMessage = ({ url, sender, time }: { url: string; sender: string; time
           </div>
         </div>
         
-        <div className="relative shrink-0">
-          <User className="w-10 h-10 text-[#8696a0]" />
-          <div className="absolute -bottom-1 -right-1 bg-[#005c4b] rounded-full p-0.5 border border-[#005c4b]">
-            <Mic className="w-3 h-3 text-[#34b7f1]" />
-          </div>
-        </div>
+        {/* Removed human icon from VN */}
       </div>
 
       <div className="flex justify-between items-center mt-1 px-1">
-        <span className="text-[10px] text-[#8696a0] font-medium">
+        <span className="text-[10px] text-white/50 font-medium whitespace-nowrap">
           {isPlaying ? formatTimeSeconds(currentTime) : formatTimeSeconds(duration)}
         </span>
-        <div className="flex items-center gap-1">
-          <span className="text-[10px] text-[#8696a0]">{time}</span>
-          {sender !== 'customer' && <CheckCircle2 className="w-3 h-3 text-[#34b7f1]" />}
-        </div>
       </div>
     </div>
   );
@@ -686,23 +679,22 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                           (msg.sender === 'ai' || msg.sender === 'human') && "text-right"
                         )}>
                           <div className={cn(
-                            "rounded-2xl text-sm text-foreground shadow-sm border overflow-hidden",
-                            msg.sender === 'customer' ? "bg-[#202c33] border-[#222e35] rounded-tl-none text-[#e9edef]" : "bg-[#005c4b] border-[#005c4b] rounded-tr-none text-[#e9edef]",
-                            (msg.type === 'image' || msg.type === 'video') && "p-1.5"
+                            "rounded-2xl text-sm text-foreground shadow-lg border overflow-hidden backdrop-blur-md",
+                            msg.sender === 'customer' 
+                              ? "bg-blue-500/40 border-blue-400/20 text-[#e9edef] rounded-tl-none" 
+                              : "bg-black/60 border-white/10 text-[#e9edef] rounded-tr-none",
+                            (msg.type === 'image' || msg.type === 'video') && "p-1"
                           )}>
                             {msg.type === 'image' ? (
                               <div className="relative">
                                 {msg.text && <p className="p-3 pb-1">{msg.text}</p>}
                                 <img 
                                   src={msg.attachmentUrl || msg.text} 
-                                  className="max-w-full rounded-xl cursor-pointer hover:opacity-95 transition-all shadow-inner" 
+                                  className="max-w-full max-h-[350px] object-contain rounded-xl cursor-pointer hover:opacity-95 transition-all" 
                                   alt="Sent image" 
                                   onClick={() => window.open(msg.attachmentUrl || msg.text, '_blank')} 
                                 />
-                                <div className="absolute bottom-2 right-2 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                                  <span className="text-[10px] text-white/90 font-medium">{msg.time}</span>
-                                  {msg.sender !== 'customer' && <CheckCircle2 className="w-3 h-3 text-[#34b7f1]" />}
-                                </div>
+                                {/* removed inner timestamp */}
                               </div>
                             ) : msg.type === 'video' ? (
                               <div className="relative">
@@ -727,13 +719,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                             ) : (
                               <div className="p-3">
                                 {msg.text}
-                                <div className={cn(
-                                  "flex items-center gap-1 text-[10px] text-[#8696a0] mt-1.5",
-                                  (msg.sender === 'ai' || msg.sender === 'human') ? "justify-end" : "justify-start"
-                                )}>
-                                  <span>{msg.time}</span>
-                                  {msg.sender !== 'customer' && <CheckCircle2 className="w-3 h-3 text-[#34b7f1]" />}
-                                </div>
+                                {/* removed inner timestamp */}
                               </div>
                             )}
                           </div>

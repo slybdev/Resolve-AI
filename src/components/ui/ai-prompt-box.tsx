@@ -162,52 +162,34 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-// VoiceRecorder Component
+// VoiceRecorder Component — purely visual (timer + waveform)
 interface VoiceRecorderProps {
   isRecording: boolean;
-  onStartRecording: () => void;
-  onStopRecording: (duration: number) => void;
   visualizerBars?: number;
 }
 const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   isRecording,
-  onStartRecording,
-  onStopRecording,
   visualizerBars = 32,
 }) => {
   const [time, setTime] = React.useState(0);
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
-  const timeRef = React.useRef(0);
-  const hasStartedRef = React.useRef(false);
 
   React.useEffect(() => {
     if (isRecording) {
-      if (!hasStartedRef.current) {
-        hasStartedRef.current = true;
-        onStartRecording();
-      }
       setTime(0);
-      timeRef.current = 0;
       timerRef.current = setInterval(() => {
-        timeRef.current += 1;
-        setTime(timeRef.current);
+        setTime((t) => t + 1);
       }, 1000);
     } else {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      if (hasStartedRef.current) {
-        hasStartedRef.current = false;
-        onStopRecording(timeRef.current);
-      }
       setTime(0);
-      timeRef.current = 0;
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRecording]);
 
   const formatTime = (seconds: number) => {
@@ -216,13 +198,10 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
+  if (!isRecording) return null;
+
   return (
-    <div
-      className={cn(
-        "flex flex-col items-center justify-center w-full transition-all duration-300 py-3",
-        isRecording ? "opacity-100" : "opacity-0 h-0"
-      )}
-    >
+    <div className="flex flex-col items-center justify-center w-full transition-all duration-300 py-3">
       <div className="flex items-center gap-2 mb-3">
         <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
         <span className="font-mono text-sm text-muted-foreground">{formatTime(time)}</span>
@@ -564,38 +543,61 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
     }
   };
 
+  // Use a ref for onSend so the onstop closure always has the latest version
+  const onSendRef = React.useRef(onSend);
+  React.useEffect(() => { onSendRef.current = onSend; }, [onSend]);
+
   const handleStartRecording = async () => {
+    console.log('[VoiceRecord] handleStartRecording called');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('[VoiceRecord] Got microphone stream');
+      
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
       mediaRecorder.ondataavailable = (event) => {
+        console.log('[VoiceRecord] ondataavailable:', event.data.size, 'bytes');
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
       mediaRecorder.onstop = () => {
+        console.log('[VoiceRecord] onstop fired, chunks:', audioChunksRef.current.length);
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        console.log('[VoiceRecord] Created blob:', audioBlob.size, 'bytes');
         const file = new File([audioBlob], `voice-note-${Date.now()}.webm`, { type: 'audio/webm' });
-        onSend?.("", [file]);
+        console.log('[VoiceRecord] Created file:', file.name, file.type, file.size);
+        
+        // Use ref to get latest onSend
+        if (onSendRef.current) {
+          console.log('[VoiceRecord] Calling onSend with voice file');
+          onSendRef.current("", [file]);
+        } else {
+          console.error('[VoiceRecord] onSend is null/undefined!');
+        }
+        
         stream.getTracks().forEach(track => track.stop());
+        console.log('[VoiceRecord] Stopped microphone stream');
       };
 
       mediaRecorder.start();
-      console.log("Started recording");
+      console.log('[VoiceRecord] MediaRecorder started, state:', mediaRecorder.state);
     } catch (err) {
-      console.error("Failed to start recording", err);
+      console.error('[VoiceRecord] Failed to start recording:', err);
+      setIsRecording(false);
     }
   };
 
   const handleStopRecording = (duration: number) => {
-    console.log(`Stopped recording after ${duration} seconds`);
-    setIsRecording(false);
+    console.log('[VoiceRecord] handleStopRecording called, duration:', duration);
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      console.log('[VoiceRecord] Stopping MediaRecorder, state:', mediaRecorderRef.current.state);
       mediaRecorderRef.current.stop();
+    } else {
+      console.warn('[VoiceRecord] MediaRecorder not active, state:', mediaRecorderRef.current?.state);
     }
   };
 
@@ -686,8 +688,6 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
         {isRecording && (
           <VoiceRecorder
             isRecording={isRecording}
-            onStartRecording={handleStartRecording}
-            onStopRecording={handleStopRecording}
           />
         )}
 
@@ -848,10 +848,16 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   ? "bg-primary text-primary-foreground hover:opacity-90"
                   : "bg-transparent hover:bg-accent text-muted-foreground hover:text-foreground"
               )}
-              onClick={() => {
-                if (isRecording) setIsRecording(false);
-                else if (hasContent) handleSubmit();
-                else setIsRecording(true);
+              onClick={async () => {
+                if (isRecording) {
+                  handleStopRecording(0);
+                  setIsRecording(false);
+                } else if (hasContent) {
+                  handleSubmit();
+                } else {
+                  setIsRecording(true);
+                  await handleStartRecording();
+                }
               }}
               disabled={isLoading && !hasContent}
             >
