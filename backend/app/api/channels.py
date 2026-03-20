@@ -202,13 +202,22 @@ async def verify_channel(
         if not token:
              return ChannelVerifyResponse(success=False, detail="Token not configured")
         
-        bot_info = await telegram_service.verify_connection(token)
-        if bot_info:
+        result = await telegram_service.verify_connection(token)
+        if result:
+            bot_info = result["bot"]
+            webhook_info = result["webhook"]
             background_tasks.add_task(telegram_service.sync_messages, db, channel)
+            
+            detail = f"Connected as @{bot_info.get('username')}"
+            if webhook_info.get("url"):
+                detail += " (Webhook Active)"
+            else:
+                detail += " (Webhook Pending)"
+
             return ChannelVerifyResponse(
                 success=True, 
-                detail=f"Connected as @{bot_info.get('username')}",
-                info=bot_info
+                detail=detail,
+                info=result
             )
         else:
             return ChannelVerifyResponse(success=False, detail="Invalid token or Telegram API unreachable")

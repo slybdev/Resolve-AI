@@ -108,19 +108,30 @@ class TelegramService:
 
     async def verify_connection(self, token: str) -> Optional[dict]:
         """
-        Verifies if a token is valid via getMe.
-        Returns bot info if valid, else None.
+        Verifies if a token is valid via getMe and checks webhook status.
+        Returns bot info and webhook status if valid, else None.
         """
-        url = f"https://api.telegram.org/bot{token}/getMe"
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.get(url, timeout=5.0)
-                if response.status_code == 200:
-                    data = response.json()
-                    if data.get("ok"):
-                        return data.get("result")
+                # 1. Get Bot Info
+                me_resp = await client.get(f"https://api.telegram.org/bot{token}/getMe", timeout=5.0)
+                if me_resp.status_code != 200 or not me_resp.json().get("ok"):
+                    return None
+                
+                bot_info = me_resp.json().get("result")
+
+                # 2. Get Webhook Info
+                wh_resp = await client.get(f"https://api.telegram.org/bot{token}/getWebhookInfo", timeout=5.0)
+                webhook_info = {}
+                if wh_resp.status_code == 200 and wh_resp.json().get("ok"):
+                    webhook_info = wh_resp.json().get("result")
+
+                return {
+                    "bot": bot_info,
+                    "webhook": webhook_info
+                }
             except Exception as e:
-                logger.error(f"Error verifying Telegram token: {e}")
+                logger.error(f"Error verifying Telegram token or webhook: {e}")
         return None
 
     async def set_webhook(self, token: str, base_url: str):
