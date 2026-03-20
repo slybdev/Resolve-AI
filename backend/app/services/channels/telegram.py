@@ -19,6 +19,7 @@ class TelegramService:
         """
         Processes an incoming Telegram webhook.
         """
+        logger.info(f"TelegramService handling webhook for token: {token[:10]}...")
         # 1. Identify channel by token in config
         # In a real app, we might want a better way to look up channels by token
         # For now, we'll scan or use the token passed in URL (if we stored it that way)
@@ -37,9 +38,11 @@ class TelegramService:
                 break
         
         if not target_channel:
-            logger.error(f"No active Telegram channel found for token: {token}")
+            logger.error(f"No active Telegram channel found for token suffix: ...{token[-5:]}")
             return False
 
+        logger.info(f"Matched Telegram channel: {target_channel.id} (Workspace: {target_channel.workspace_id})")
+        # 2. Extract message or edited_message
         tg_message = payload.get("message")
         if not tg_message:
             return True

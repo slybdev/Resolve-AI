@@ -43,27 +43,19 @@ class RoutingService:
 
         # 2. Find or Create Contact
         # Check if we have a contact with this external ID for this workspace
-        # We use a more robust approach for JSON lookup in MySQL/MariaDB
-        from sqlalchemy import func
+        # We search for both raw string and quoted string (MySQL JSON varies)
+        from sqlalchemy import func, or_
         search_path = f"$.{search_key}"
         result = await db.execute(
             select(Contact).where(
                 Contact.workspace_id == workspace_id,
-                func.json_extract(Contact.channel_data, search_path) == external_contact_id
+                or_(
+                    func.json_extract(Contact.channel_data, search_path) == external_contact_id,
+                    func.json_extract(Contact.channel_data, search_path) == f'"{external_contact_id}"'
+                )
             )
         )
         contact = result.scalar_one_or_none()
-
-        # Fallback for some MySQL versions that return quoted strings from json_extract
-        if not contact:
-            quoted_id = f'"{external_contact_id}"'
-            result = await db.execute(
-                select(Contact).where(
-                    Contact.workspace_id == workspace_id,
-                    func.json_extract(Contact.channel_data, search_path) == quoted_id
-                )
-            )
-            contact = result.scalar_one_or_none()
 
         if not contact:
             contact = Contact(
@@ -83,6 +75,11 @@ class RoutingService:
             ).order_by(Conversation.created_at.desc())
         )
         conversation = result.scalar_one_or_none()
+
+        if conversation:
+            # Touch! Update updated_at so it moves to top of list
+            from sqlalchemy import func
+            conversation.updated_at = func.now()
 
         if not conversation:
             conversation = Conversation(
