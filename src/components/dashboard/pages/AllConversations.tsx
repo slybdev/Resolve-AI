@@ -788,23 +788,39 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                     let finalBody = msg;
                     let messageType = "text";
 
+                    console.log('[SendMessage] onSend called:', { msg: msg?.substring(0, 50), filesCount: files?.length, fileTypes: files?.map(f => f.type) });
+
                     if (files && files.length > 0) {
                       const file = files[0];
-                      // Show loading state if possible or just wait
-                      const uploadRes = await api.uploads.file(file);
-                      finalBody = uploadRes.url;
+                      console.log('[SendMessage] Uploading file:', { name: file.name, type: file.type, size: file.size });
                       
-                      if (file.type.startsWith('image/')) {
-                        messageType = 'image';
-                      } else if (file.type.startsWith('video/')) {
-                        messageType = 'video';
-                      } else if (file.type.startsWith('audio/') || file.type.includes('webm')) {
-                        messageType = 'voice';
-                      } else {
-                        messageType = 'file';
+                      try {
+                        const uploadRes = await api.uploads.file(file);
+                        console.log('[SendMessage] Upload success:', uploadRes);
+                        finalBody = uploadRes.url;
+                        
+                        if (file.type.startsWith('image/')) {
+                          messageType = 'image';
+                        } else if (file.type.startsWith('video/')) {
+                          messageType = 'video';
+                        } else if (file.type.startsWith('audio/') || file.type.includes('webm')) {
+                          messageType = 'voice';
+                        } else {
+                          messageType = 'file';
+                        }
+                      } catch (uploadErr) {
+                        console.error('[SendMessage] Upload FAILED:', uploadErr);
+                        toast('Error', 'File upload failed', 'error');
+                        return;
                       }
                     }
 
+                    if (!finalBody || !finalBody.trim()) {
+                      console.warn('[SendMessage] Empty body, skipping send');
+                      return;
+                    }
+
+                    console.log('[SendMessage] Sending:', { finalBody: finalBody?.substring(0, 80), messageType });
                     await api.conversations.sendMessage(
                       selectedId, 
                       finalBody, 
@@ -814,7 +830,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                     fetchMessages(selectedId);
                   } catch (err) {
                     toast('Error', 'Failed to send message', 'error');
-                    console.error(err);
+                    console.error('[SendMessage] Error:', err);
                   }
                 }}
                 isLoading={isLoading}
