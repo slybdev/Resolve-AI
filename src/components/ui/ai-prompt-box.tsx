@@ -177,23 +177,38 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
 }) => {
   const [time, setTime] = React.useState(0);
   const timerRef = React.useRef<NodeJS.Timeout | null>(null);
+  const timeRef = React.useRef(0);
+  const hasStartedRef = React.useRef(false);
 
   React.useEffect(() => {
     if (isRecording) {
-      onStartRecording();
-      timerRef.current = setInterval(() => setTime((t) => t + 1), 1000);
+      if (!hasStartedRef.current) {
+        hasStartedRef.current = true;
+        onStartRecording();
+      }
+      setTime(0);
+      timeRef.current = 0;
+      timerRef.current = setInterval(() => {
+        timeRef.current += 1;
+        setTime(timeRef.current);
+      }, 1000);
     } else {
       if (timerRef.current) {
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      onStopRecording(time);
+      if (hasStartedRef.current) {
+        hasStartedRef.current = false;
+        onStopRecording(timeRef.current);
+      }
       setTime(0);
+      timeRef.current = 0;
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [isRecording, time, onStartRecording, onStopRecording]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRecording]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

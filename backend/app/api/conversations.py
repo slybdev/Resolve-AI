@@ -97,6 +97,10 @@ async def send_message(
     current_user: User = Depends(get_current_user),
 ):
     """Send a reply from an agent (dashboard)."""
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.info(f"send_message called: body={payload.body[:50] if payload.body else 'EMPTY'}... message_type={payload.message_type} is_internal={payload.is_internal}")
+    
     # 1. Verify conversation exists
     result = await db.execute(select(Conversation).where(Conversation.id == conversation_id))
     conversation = result.scalar_one_or_none()
