@@ -150,6 +150,7 @@ async def send_message(
                     })
 
         elif channel and channel.type.value == "telegram":
+            contact = conversation.contact
             if contact:
                 # Use the telegram_id from channel_data
                 chat_id = contact.channel_data.get("telegram_id")
