@@ -13,6 +13,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):  # noqa: ARG001

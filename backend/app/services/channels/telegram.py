@@ -25,7 +25,7 @@ class TelegramService:
         # For now, we'll scan or use the token passed in URL (if we stored it that way)
         result = await db.execute(
             select(Channel).where(
-                Channel.type == ChannelType.TELEGRAM,
+                Channel.type == "telegram",
                 Channel.is_active == True
             )
         )
@@ -33,7 +33,9 @@ class TelegramService:
         
         target_channel = None
         for c in channels:
-            if c.config.get("token") == token:
+            chan_token = c.config.get("token")
+            logger.info(f"Checking channel {c.id}: token suffix ...{str(chan_token)[-5:] if chan_token else 'NONE'}")
+            if chan_token == token:
                 target_channel = c
                 break
         

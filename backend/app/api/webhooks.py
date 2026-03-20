@@ -115,6 +115,7 @@ async def telegram_webhook(
 ):
     """Ingest webhooks from Telegram."""
     payload = await request.json()
+    print(f"DEBUG: Received Telegram webhook payload: {payload}")
     logger.info(f"Received Telegram webhook payload: {payload}")
     
     from app.services.channels.telegram import telegram_service

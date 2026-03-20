@@ -43,16 +43,28 @@ class RoutingService:
 
         # 2. Find or Create Contact
         # Check if we have a contact with this external ID for this workspace
-        # We search for both raw string and quoted string (MySQL JSON varies)
-        from sqlalchemy import func, or_
+        # MySQL JSON lookup: handles raw string, quoted string, and numeric IDs (for Telegram)
+        from sqlalchemy import func, or_, cast, String
         search_path = f"$.{search_key}"
+        
+        # Determine if external_contact_id is numeric (like Telegram IDs)
+        is_numeric = external_contact_id.isdigit()
+        
+        conditions = [
+            func.json_extract(Contact.channel_data, search_path) == external_contact_id,
+            func.json_extract(Contact.channel_data, search_path) == f'"{external_contact_id}"'
+        ]
+        
+        if is_numeric:
+            # Also try numeric match
+            conditions.append(func.json_extract(Contact.channel_data, search_path) == int(external_contact_id))
+            # And cast match
+            conditions.append(func.json_unquote(func.json_extract(Contact.channel_data, search_path)) == external_contact_id)
+
         result = await db.execute(
             select(Contact).where(
                 Contact.workspace_id == workspace_id,
-                or_(
-                    func.json_extract(Contact.channel_data, search_path) == external_contact_id,
-                    func.json_extract(Contact.channel_data, search_path) == f'"{external_contact_id}"'
-                )
+                or_(*conditions)
             )
         )
         contact = result.scalar_one_or_none()
