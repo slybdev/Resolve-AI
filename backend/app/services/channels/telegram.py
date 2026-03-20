@@ -163,8 +163,7 @@ class TelegramService:
                 
                 # 3. Save to local disk
                 upload_dir = "/app/uploads"
-                if not os.path.exists(upload_dir):
-                    os.makedirs(upload_dir, exist_ok=True)
+                os.makedirs(upload_dir, mode=0o777, exist_ok=True)
                 
                 # Generate unique filename keeping extension if possible
                 ext = os.path.splitext(tg_file_path)[1]
@@ -173,7 +172,9 @@ class TelegramService:
                 
                 with open(local_path, "wb") as f:
                     f.write(file_resp.content)
+                os.chmod(local_path, 0o644)
                 
+                logger.info(f"Saved Telegram file to {local_path}")
                 return f"uploads/{filename}"
                 
             except Exception as e:
@@ -184,6 +185,8 @@ class TelegramService:
         """
         Sends a message back to Telegram.
         """
+        logger.info(f"TelegramService.send_message called: type={message_type}, text={text[:80] if text else 'EMPTY'}...")
+        
         result = await db.execute(select(Channel).where(Channel.id == channel_id))
         channel = result.scalar_one_or_none()
         if not channel or not channel.is_active:
@@ -193,28 +196,50 @@ class TelegramService:
         if not token:
             raise ValueError("Telegram token not configured")
 
+        # Auto-detect message type from URL if type is "text" but body looks like a media URL
+        if message_type == "text" and text:
+            lower = text.lower().strip()
+            if any(lower.endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp']):
+                message_type = "image"
+                logger.info(f"Auto-detected message_type as 'image' from URL extension")
+            elif any(lower.endswith(ext) for ext in ['.mp4', '.mov', '.avi', '.mkv']):
+                message_type = "video"
+                logger.info(f"Auto-detected message_type as 'video' from URL extension")
+            elif any(lower.endswith(ext) for ext in ['.ogg', '.oga', '.webm', '.mp3', '.wav', '.m4a']):
+                message_type = "voice"
+                logger.info(f"Auto-detected message_type as 'voice' from URL extension")
+
         async with httpx.AsyncClient() as client:
-            if message_type == "text":
-                url = f"https://api.telegram.org/bot{token}/sendMessage"
-                payload = {"chat_id": external_contact_id, "text": text}
-                response = await client.post(url, json=payload)
-            elif message_type == "image":
+            if message_type == "image":
                 url = f"https://api.telegram.org/bot{token}/sendPhoto"
                 payload = {"chat_id": external_contact_id, "photo": text}
+                response = await client.post(url, json=payload)
+            elif message_type == "video":
+                url = f"https://api.telegram.org/bot{token}/sendVideo"
+                payload = {"chat_id": external_contact_id, "video": text}
                 response = await client.post(url, json=payload)
             elif message_type == "voice":
                 url = f"https://api.telegram.org/bot{token}/sendVoice"
                 payload = {"chat_id": external_contact_id, "voice": text}
                 response = await client.post(url, json=payload)
-            else: # file
+            elif message_type == "file":
                 url = f"https://api.telegram.org/bot{token}/sendDocument"
                 payload = {"chat_id": external_contact_id, "document": text}
+                response = await client.post(url, json=payload)
+            else:  # text
+                if not text or not text.strip():
+                    logger.error("Cannot send empty text message to Telegram, skipping")
+                    return False
+                url = f"https://api.telegram.org/bot{token}/sendMessage"
+                payload = {"chat_id": external_contact_id, "text": text}
                 response = await client.post(url, json=payload)
 
             if response.status_code != 200:
                 logger.error(f"Failed to send Telegram {message_type}: {response.text}")
                 return False
+            logger.info(f"Successfully sent Telegram {message_type} message")
             return True
+
 
     async def verify_connection(self, token: str) -> Optional[dict]:
         """
