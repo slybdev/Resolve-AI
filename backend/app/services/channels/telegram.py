@@ -324,39 +324,5 @@ class TelegramService:
         
         return count
 
-    async def send_message(self, token: str, chat_id: str, text: str, message_type: str = "text"):
-        """
-        Sends a message to Telegram. Supports different message types.
-        """
-        import httpx
-        
-        # Determine the method based on message_type
-        method = "sendMessage"
-        params = {"chat_id": chat_id}
-        
-        if message_type == "image":
-            method = "sendPhoto"
-            params["photo"] = text # text should contain the URL if it's an image
-            # If there's a caption, we could handle it, but for now we use the main body as the media source
-        elif message_type == "file":
-            method = "sendDocument"
-            params["document"] = text
-        elif message_type == "voice":
-            method = "sendVoice"
-            params["voice"] = text
-        else:
-            params["text"] = text
-
-        url = f"https://api.telegram.org/bot{token}/{method}"
-        
-        async with httpx.AsyncClient() as client:
-            try:
-                resp = await client.post(url, json=params)
-                if resp.status_code != 200:
-                    logger.error(f"Failed to send Telegram message: {resp.text}")
-                return resp.json()
-            except Exception as e:
-                logger.error(f"Error sending Telegram message: {e}")
-                return None
 
 telegram_service = TelegramService()
