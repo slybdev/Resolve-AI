@@ -61,10 +61,103 @@ interface Message {
   id: string;
   sender: 'customer' | 'ai' | 'human' | 'agent' | 'system';
   text: string;
+  type?: string;
   time: string;
   avatar?: string;
   isInternal?: boolean;
 }
+
+const VoiceMessage = ({ url, sender }: { url: string; sender: string }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+    }
+  };
+
+  const formatTime = (time: number) => {
+    const mins = Math.floor(time / 60);
+    const secs = Math.floor(time % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className={cn(
+      "flex items-center gap-3 p-3 rounded-2xl min-w-[240px] shadow-sm border",
+      sender === 'customer' ? "bg-card border-border" : "bg-primary/5 border-primary/20"
+    )}>
+      <audio 
+        ref={audioRef} 
+        src={url} 
+        onTimeUpdate={handleTimeUpdate} 
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={() => setIsPlaying(false)}
+      />
+      
+      <button 
+        type="button"
+        onClick={togglePlay}
+        className={cn(
+          "w-10 h-10 rounded-full flex items-center justify-center transition-all btn-press shrink-0",
+          sender === 'customer' ? "bg-accent text-accent-foreground" : "bg-primary text-primary-foreground"
+        )}
+      >
+        {isPlaying ? (
+          <div className="flex gap-1 items-center">
+            <div className="w-1.5 h-4 bg-current rounded-full" />
+            <div className="w-1.5 h-4 bg-current rounded-full" />
+          </div>
+        ) : (
+          <div className="ml-1 border-y-[7px] border-y-transparent border-l-[12px] border-l-current" />
+        )}
+      </button>
+
+      <div className="flex-1 space-y-1.5">
+        <div className="flex items-center gap-[2px] h-6 overflow-hidden">
+          {[...Array(30)].map((_, i) => (
+            <div 
+              key={i} 
+              className={cn(
+                "w-[2px] rounded-full transition-all shrink-0",
+                (i / 30) < (currentTime / duration) 
+                  ? "bg-primary"
+                  : "bg-muted-foreground/30"
+              )}
+              style={{ 
+                height: `${30 + Math.sin(i * 0.5) * 40 + Math.random() * 30}%`
+              }}
+            />
+          ))}
+        </div>
+        <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground uppercase tracking-widest">
+          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(duration)}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const CollapsibleNote = ({ msg }: { msg: Message }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -223,6 +316,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
           id: m.id,
           sender: m.sender_type === 'agent' ? 'human' : m.sender_type,
           text: m.body,
+          type: m.message_type,
           time: new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           avatar: m.sender_type === 'customer' ? conversationsList.find(c => c.id === id)?.avatar : undefined,
           isInternal: m.message_type === 'note'
@@ -544,7 +638,23 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                             "p-3 rounded-2xl text-sm text-foreground shadow-sm border",
                             msg.sender === 'customer' ? "bg-card border-border rounded-tl-none" : "bg-primary/10 border-primary/20 rounded-tr-none"
                           )}>
-                            {msg.text}
+                            {msg.type === 'image' ? (
+                              <div className="space-y-2">
+                                <img src={msg.text} className="max-w-full rounded-lg cursor-pointer hover:opacity-95 transition-opacity" alt="Sent image" onClick={() => window.open(msg.text, '_blank')} />
+                              </div>
+                            ) : msg.type === 'voice' ? (
+                              <VoiceMessage url={msg.text} sender={msg.sender} />
+                            ) : msg.type === 'file' ? (
+                              <div className="flex items-center gap-2 p-2 bg-accent/30 rounded-lg border border-border">
+                                <FileText className="w-5 h-5 text-primary" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[10px] font-bold truncate">Attachment</p>
+                                  <a href={msg.text} target="_blank" rel="noopener noreferrer" className="text-[9px] text-primary hover:underline font-bold uppercase tracking-widest">Download</a>
+                                </div>
+                              </div>
+                            ) : (
+                              msg.text
+                            )}
                           </div>
                           <div className={cn(
                             "flex items-center gap-1 text-[10px] text-muted-foreground",

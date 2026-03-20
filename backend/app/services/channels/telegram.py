@@ -61,8 +61,13 @@ class TelegramService:
         """
         Internal method to process a single Telegram message update.
         """
-        if "text" not in tg_message:
+        # Check if it has text or any media
+        media_fields = ["photo", "document", "voice", "video", "audio", "sticker"]
+        has_media = any(field in tg_message for field in media_fields)
+        if "text" not in tg_message and not has_media:
+            logger.info("Ignored update with no text and no media")
             return
+        logger.info(f"Processing Telegram message (has_media: {has_media})")
 
         chat = tg_message.get("chat", {})
         # In 'channel_post', from_user is usually missing. Use 'chat' info instead.
@@ -92,7 +97,7 @@ class TelegramService:
             message_type = "file"
         elif "voice" in tg_message:
             file_id = tg_message["voice"]["file_id"]
-            message_type = "file" # or "voice" if frontend supports it
+            message_type = "voice"
         elif "video" in tg_message:
             file_id = tg_message["video"]["file_id"]
             message_type = "file" # or "video"
@@ -142,6 +147,7 @@ class TelegramService:
                 if resp.status_code != 200:
                     logger.error(f"Failed to get file info from Telegram: {resp.text}")
                     return None
+                logger.info(f"Got Telegram file info for {file_id}")
                     
                 file_info = resp.json().get("result", {})
                 tg_file_path = file_info.get("file_path")
