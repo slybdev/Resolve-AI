@@ -66,7 +66,7 @@ class RoutingService:
                 or_(*conditions)
             )
         )
-        contact = result.scalar_one_or_none()
+        contact = result.scalars().first()
 
         if not contact:
             # Prefer passed contact_name over first/last or default
@@ -87,7 +87,7 @@ class RoutingService:
                 Conversation.status == "open"
             )
         )
-        conversation = result.scalar_one_or_none()
+        conversation = result.scalars().first()
 
         if conversation:
             conversation.updated_at = func.now()
