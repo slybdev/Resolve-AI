@@ -47,6 +47,42 @@ import { useToast } from '@/src/components/ui/Toast';
 import { CallOverlay } from '../ui/CallOverlay';
 import { api } from '@/src/lib/api';
 
+const renderMessageText = (text: string) => {
+  if (!text) return null;
+  const regex = /\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)|(https?:\/\/[^\s\)]+)/g;
+  
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+
+    if (match[1] && match[2]) {
+      parts.push(
+        <a key={match.index} href={match[2]} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline hover:text-blue-300">
+          {match[1].length > 50 ? 'Link' : match[1]}
+        </a>
+      );
+    } else if (match[3]) {
+      parts.push(
+        <a key={match.index} href={match[3]} target="_blank" rel="noopener noreferrer" className="text-blue-400 underline hover:text-blue-300">
+          Link
+        </a>
+      );
+    }
+    lastIndex = regex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : text;
+};
+
 interface Conversation {
   id: string;
   customerName: string;
@@ -740,10 +776,8 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 </div>
                               </div>
                             ) : (
-                              <div className="p-3 whitespace-pre-wrap break-words text-sm [&_a]:text-blue-400 [&_a]:underline hover:[&_a]:text-blue-300 [&_p]:mb-2 last:[&_p]:mb-0">
-                                <ReactMarkdown>
-                                  {msg.text}
-                                </ReactMarkdown>
+                              <div className="p-3 whitespace-pre-wrap break-words break-all text-sm">
+                                {renderMessageText(msg.text)}
                               </div>
                             )}
                           </div>
