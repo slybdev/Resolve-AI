@@ -15,5 +15,8 @@ RUN npm install
 
 COPY . .
 
-# Using tsx to run the service directly without a separate build step for simplicity
-CMD ["npx", "tsx", "index.ts"]
+# Use tsx directly from node_modules for better stability
+CMD ["./node_modules/.bin/tsx", "index.ts"]
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3001/health || exit 1

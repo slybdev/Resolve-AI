@@ -23,11 +23,23 @@ async def get_whatsapp_qr(current_user: User = Depends(get_current_user)):
             if response.status_code == 200:
                 return response.json()
             else:
-                logger.error(f"WhatsApp bridge returned error: {response.text}")
-                return {"status": "error", "message": "Failed to fetch QR code from bridge"}
+                logger.error(f"WhatsApp bridge returned status {response.status_code}: {response.text}")
+                return {
+                    "status": "error", 
+                    "message": "The bridge is up but returned an error. Try resetting the bridge."
+                }
+        except (httpx.ConnectError, httpx.ConnectTimeout) as e:
+            logger.warning(f"WhatsApp bridge unreachable: {str(e)}")
+            return {
+                "status": "waiting", 
+                "message": "WhatsApp bridge is still starting or is currently offline. Please wait a few moments."
+            }
         except Exception as e:
-            logger.error(f"Error connecting to WhatsApp bridge: {str(e)}")
-            return {"status": "waiting", "message": "WhatsApp bridge is starting or unreachable"}
+            logger.error(f"Unexpected error connecting to WhatsApp bridge: {str(e)}")
+            return {
+                "status": "error", 
+                "message": f"Connection error: {type(e).__name__}"
+            }
 
 @router.get("/status")
 async def get_whatsapp_status(current_user: User = Depends(get_current_user)):
