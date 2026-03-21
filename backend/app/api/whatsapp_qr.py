@@ -54,3 +54,16 @@ async def logout_whatsapp(current_user: User = Depends(get_current_user)):
         except Exception as e:
             logger.error(f"Error logging out WhatsApp: {str(e)}")
             raise HTTPException(status_code=500, detail="Failed to communicate with WhatsApp bridge")
+
+@router.post("/clear")
+async def clear_whatsapp_session(current_user: User = Depends(get_current_user)):
+    """
+    Clears the WhatsApp session files and restarts the bridge connection.
+    """
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(f"{BRIDGE_URL}/clear-session", timeout=10.0)
+            return response.json()
+        except Exception as e:
+            logger.error(f"Error clearing WhatsApp session: {str(e)}")
+            raise HTTPException(status_code=500, detail="Failed to communicate with WhatsApp bridge")

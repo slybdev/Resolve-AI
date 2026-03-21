@@ -146,6 +146,15 @@ async def delete_channel(
         if token:
             await discord_bot_manager.stop_bot(token)
 
+    # ── Nullify messages associated with this channel ──
+    from app.models.message import Message
+    from sqlalchemy import update
+    await db.execute(
+        update(Message)
+        .where(Message.channel_id == channel_id)
+        .values(channel_id=None)
+    )
+
     await db.delete(channel)
     await db.commit()
     return None
