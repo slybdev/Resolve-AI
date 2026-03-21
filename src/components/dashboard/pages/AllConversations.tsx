@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { 
   Search, 
   MoreHorizontal, 
@@ -739,9 +740,10 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 </div>
                               </div>
                             ) : (
-                              <div className="p-3 whitespace-pre-wrap break-words">
-                                {msg.text}
-                                {/* removed inner timestamp */}
+                              <div className="p-3 whitespace-pre-wrap break-words text-sm [&_a]:text-blue-400 [&_a]:underline hover:[&_a]:text-blue-300 [&_p]:mb-2 last:[&_p]:mb-0">
+                                <ReactMarkdown>
+                                  {msg.text}
+                                </ReactMarkdown>
                               </div>
                             )}
                           </div>
