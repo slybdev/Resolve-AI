@@ -34,73 +34,111 @@ let qrCode: string | null = null;
 let connectionState: 'connecting' | 'open' | 'close' | 'refused' = 'close';
 
 async function connectToWhatsApp() {
-    const { state, saveCreds } = await useMultiFileAuthState(AUTH_PATH);
-    const { version } = await fetchLatestBaileysVersion();
+    try {
+        const { state, saveCreds } = await useMultiFileAuthState(AUTH_PATH);
+        const { version } = await fetchLatestBaileysVersion().catch(() => ({ version: [2, 3000, 1015901307] }));
 
-    sock = makeWASocket({
-        version,
-        printQRInTerminal: true,
-        auth: {
-            creds: state.creds,
-            keys: makeCacheableSignalKeyStore(state.keys, logger),
-        },
-        generateHighQualityQR: true,
-        browser: ['Ubuntu', 'Chrome', '20.0.04']
-    });
+        sock = makeWASocket({
+            version,
+            printQRInTerminal: false,
+            auth: {
+                creds: state.creds,
+                keys: makeCacheableSignalKeyStore(state.keys, logger),
+            },
+            generateHighQualityQR: true,
+            browser: ['Ubuntu', 'Chrome', '20.0.04']
+        });
 
-    sock.ev.on('connection.update', async (update: any) => {
-        const { connection, lastDisconnect, qr } = update;
-        
-        if (qr) {
-            qrCode = await QRCode.toDataURL(qr);
-            logger.info('New QR code generated');
-        }
-
-        if (connection === 'close') {
-            const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-            logger.info(`Connection closed due to ${lastDisconnect?.error}, reconnecting ${shouldReconnect}`);
-            qrCode = null;
-            connectionState = 'close';
-            if (shouldReconnect) {
-                connectToWhatsApp();
+        sock.ev.on('connection.update', async (update: any) => {
+            const { connection, lastDisconnect, qr } = update;
+            
+            if (qr) {
+                qrCode = await QRCode.toDataURL(qr);
+                logger.info('New QR code generated');
             }
-        } else if (connection === 'open') {
-            logger.info('WhatsApp connection opened');
-            qrCode = null;
-            connectionState = 'open';
-        }
-    });
 
-    sock.ev.on('creds.update', saveCreds);
+            if (connection === 'close') {
+                const statusCode = (lastDisconnect?.error as Boom)?.output?.statusCode;
+                const errorMsg = lastDisconnect?.error?.message || 'Unknown Error';
+                
+                logger.info({ statusCode, errorMsg }, `Connection closed`);
 
-    sock.ev.on('messages.upsert', async (m: any) => {
-        if (m.type === 'notify') {
-            for (const msg of m.messages) {
-                if (!msg.key.fromMe && !isJidBroadcast(msg.key.remoteJid)) {
-                    logger.info(`Received WhatsApp message from: ${msg.key.remoteJid}`);
-                    
-                    // Prepare simplified payload for backend
-                    const payload = {
-                        remoteJid: msg.key.remoteJid,
-                        pushName: msg.pushName || 'WhatsApp User',
-                        message: {
-                            text: msg.message?.conversation || msg.message?.extendedTextMessage?.text || '',
-                            type: msg.message?.imageMessage ? 'image' : msg.message?.videoMessage ? 'video' : 'text',
-                            timestamp: msg.messageTimestamp,
-                            id: msg.key.id
-                        },
-                        raw: msg
-                    };
+                connectionState = 'close';
+                qrCode = null;
 
-                    try {
-                        await axios.post(BACKEND_URL, payload);
-                    } catch (err) {
-                        logger.error(`Failed to relay message to backend: ${err}`);
+                // Logic to determine if we should reconnect or clear session
+                let shouldReconnect = true;
+                let shouldClearSession = false;
+
+                if (statusCode === DisconnectReason.loggedOut) {
+                    logger.error('Logged out from device. Will not reconnect automatically.');
+                    shouldReconnect = false;
+                    shouldClearSession = true; // Clear session so we can get a new QR
+                } else if (statusCode === DisconnectReason.badSession || statusCode === 401) {
+                    logger.error('Bad session or Unauthorized. Clearing session...');
+                    shouldClearSession = true;
+                } else if (errorMsg.includes('Connection Failure') || statusCode === DisconnectReason.connectionClosed) {
+                    logger.warn('Transient connection failure. Retrying in 5s...');
+                    setTimeout(() => connectToWhatsApp(), 5000);
+                    return;
+                }
+
+                if (shouldClearSession) {
+                    if (fs.existsSync(AUTH_PATH)) {
+                        fs.rmSync(AUTH_PATH, { recursive: true, force: true });
+                        fs.mkdirSync(AUTH_PATH, { recursive: true });
+                    }
+                }
+
+                if (shouldReconnect) {
+                    logger.info('Attempting to reconnect...');
+                    connectToWhatsApp();
+                }
+            } else if (connection === 'open') {
+                logger.info('WhatsApp connection opened');
+                qrCode = null;
+                connectionState = 'open';
+            } else if (connection === 'connecting') {
+                connectionState = 'connecting';
+                logger.info('WhatsApp connecting...');
+            }
+        });
+
+        sock.ev.on('creds.update', saveCreds);
+
+        sock.ev.on('messages.upsert', async (m: any) => {
+            if (m.type === 'notify') {
+                for (const msg of m.messages) {
+                    if (!msg.key.fromMe && !isJidBroadcast(msg.key.remoteJid)) {
+                        logger.info(`Received WhatsApp message from: ${msg.key.remoteJid}`);
+                        
+                        // Prepare simplified payload for backend
+                        const payload = {
+                            remoteJid: msg.key.remoteJid,
+                            pushName: msg.pushName || 'WhatsApp User',
+                            message: {
+                                text: msg.message?.conversation || msg.message?.extendedTextMessage?.text || '',
+                                type: msg.message?.imageMessage ? 'image' : msg.message?.videoMessage ? 'video' : 'text',
+                                timestamp: msg.messageTimestamp,
+                                id: msg.key.id
+                            },
+                            raw: msg
+                        };
+
+                        try {
+                            await axios.post(BACKEND_URL, payload);
+                        } catch (err) {
+                            logger.error(`Failed to relay message to backend: ${err}`);
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    } catch (err) {
+        logger.error(`Failed to connect to WhatsApp: ${err}`);
+        // Retry in 10s if initialization fails
+        setTimeout(() => connectToWhatsApp(), 10000);
+    }
 }
 
 // API Endpoints
