@@ -489,17 +489,16 @@ async def google_oauth_login(
         redirect_uri=redirect_uri
     )
 
+    # Encode channel_id into state so we know which channel to update on callback
+    # We pass this to Google so it comes back to us
     auth_url, state = flow.authorization_url(
         access_type='offline',
         prompt='consent',
-        include_granted_scopes='true'
+        include_granted_scopes='true',
+        state=f"v1|{channel_id}"
     )
 
-    # Encode channel_id into state so we know which channel to update on callback
-    combined_state = f"{state}|{channel_id}"
-    
-    # Normally we'd redirect, but frontends often prefer the URL returned to pop it up
-    return {"auth_url": auth_url, "state": combined_state}
+    return {"auth_url": auth_url, "state": state}
 
 
 @router.get("/google/callback")
@@ -515,9 +514,12 @@ async def google_oauth_callback(
     settings = get_settings()
 
     try:
-        original_state, channel_id_str = state.split("|")
+        # We prefixed it with v1| to be safe and identifiable
+        if "|" not in state:
+            raise ValueError("Invalid state format")
+        _, channel_id_str = state.split("|", 1)
         channel_id = uuid.UUID(channel_id_str)
-    except ValueError:
+    except (ValueError, TypeError):
         raise HTTPException(status_code=400, detail="Invalid state parameter.")
 
     client_config = {
