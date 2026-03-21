@@ -939,6 +939,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                 }}
                 isLoading={isLoading}
                 placeholder={activeTab === 'reply' ? "Type a message or use / for commands..." : "Type an internal note (only visible to teammates)..."}
+                disableVoice={conversationsList.find(c => c.id === selectedId)?.channel === 'email'}
               />
             </div>
           </>

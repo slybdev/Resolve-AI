@@ -438,9 +438,10 @@ interface PromptInputBoxProps {
   isLoading?: boolean;
   placeholder?: string;
   className?: string;
+  disableVoice?: boolean;
 }
 export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref: React.Ref<HTMLDivElement>) => {
-  const { onSend = () => {}, isLoading = false, placeholder = "Type your message here...", className } = props;
+  const { onSend = () => {}, isLoading = false, placeholder = "Type your message here...", className, disableVoice = false } = props;
   const [input, setInput] = React.useState("");
   const [files, setFiles] = React.useState<File[]>([]);
   const [filePreviews, setFilePreviews] = React.useState<{ [key: string]: string }>({});
@@ -854,7 +855,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   setIsRecording(false);
                 } else if (hasContent) {
                   handleSubmit();
-                } else {
+                } else if (!disableVoice) {
                   setIsRecording(true);
                   await handleStartRecording();
                 }
@@ -865,7 +866,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                 <Spinner size="sm" />
               ) : isRecording ? (
                 <StopCircle className="h-5 w-5 text-red-500" />
-              ) : hasContent ? (
+              ) : (hasContent || disableVoice) ? (
                 <ArrowUp className="h-4 w-4 text-primary-foreground" />
               ) : (
                 <Mic className="h-5 w-5 text-inherit transition-colors" />
