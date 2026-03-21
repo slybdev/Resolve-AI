@@ -46,7 +46,10 @@ import { CommandPalette } from './dashboard/CommandPalette';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [currentView, setCurrentView] = useState('all-conversations');
+  const [currentView, setCurrentView] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') || 'all-conversations';
+  });
   const [viewHistory, setViewHistory] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
@@ -61,6 +64,15 @@ const Dashboard = () => {
       }
     };
     window.addEventListener('keydown', handleKeyDown);
+
+    // Handle OAuth success redirects
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get('status');
+    if (status === 'success') {
+      const view = params.get('view') || 'all-conversations';
+      window.history.replaceState({}, document.title, window.location.pathname + "?view=" + view);
+    }
+
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 

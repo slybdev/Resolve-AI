@@ -569,7 +569,7 @@ async def google_oauth_callback(
         # Fallback if background_tasks is not available
         await email_service.sync_messages(db, channel)
 
-    # Redirect back to the Channels page in the frontend
+    # Redirect back to the Dashboard with the email view open
     from fastapi.responses import RedirectResponse
-    frontend_url = f"{settings.FRONTEND_URL}/dashboard/channels/email?status=success"
+    frontend_url = f"{settings.FRONTEND_URL}/dashboard?view=email&status=success"
     return RedirectResponse(url=frontend_url)

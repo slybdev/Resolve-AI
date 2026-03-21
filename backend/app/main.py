@@ -40,13 +40,40 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
         except Exception as e:
             logger.error(f"LIFESPAN: Failed to start Discord bots: {e}")
 
+    async def _poll_emails_task():
+        from app.models.channel import Channel, ChannelType
+        from sqlalchemy import select
+        from app.services.channels.email import email_service
+        logger.info("LIFESPAN: Starting Background Email Polling (every 60s)...")
+        while True:
+            try:
+                await asyncio.sleep(60)
+                async with async_session_factory() as db:
+                    result = await db.execute(
+                        select(Channel).where(Channel.type == ChannelType.email, Channel.is_active == True)
+                    )
+                    channels = result.scalars().all()
+                    for channel in channels:
+                        await email_service.sync_messages(db, channel)
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error in email polling task: {e}")
+
     import asyncio
     asyncio.create_task(_start_bots_task())
+    email_polling_task = asyncio.create_task(_poll_emails_task())
     
     yield
     # ── Shutdown ──
     from app.services.channels.discord_manager import discord_bot_manager
     await discord_bot_manager.stop_all()
+    
+    email_polling_task.cancel()
+    try:
+        await email_polling_task
+    except asyncio.CancelledError:
+        pass
     
     from app.db.session import engine
 

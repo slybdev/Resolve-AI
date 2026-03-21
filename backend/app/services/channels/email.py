@@ -142,22 +142,58 @@ class EmailService:
                 subject = next((h['value'] for h in headers if h['name'].lower() == 'subject'), "No Subject")
                 from_header = next((h['value'] for h in headers if h['name'].lower() == 'from'), "Unknown")
                 
-                # Simple body extraction
-                body = ""
-                if 'parts' in payload:
-                    for part in payload['parts']:
-                        if part['mimeType'] == 'text/plain':
-                            data = part['body'].get('data')
+                import email.utils
+                from_name, from_email = email.utils.parseaddr(from_header)
+                if not from_email:
+                    from_email = from_header
+                if not from_name:
+                    from_name = from_email
+                
+                # Robust body extraction
+                text_body = ""
+                html_body = ""
+                
+                def get_body_recursive(parts):
+                    nonlocal text_body, html_body
+                    for part in parts:
+                        mime_type = part.get('mimeType')
+                        if mime_type == 'text/plain' and not text_body:
+                            data = part.get('body', {}).get('data')
                             if data:
-                                body = base64.urlsafe_b64decode(data).decode('utf-8')
-                            break
+                                text_body = base64.urlsafe_b64decode(data).decode('utf-8', errors='ignore')
+                        elif mime_type == 'text/html' and not html_body:
+                            data = part.get('body', {}).get('data')
+                            if data:
+                                html_body = base64.urlsafe_b64decode(data).decode('utf-8', errors='ignore')
+                        elif 'parts' in part:
+                            get_body_recursive(part['parts'])
+                
+                if 'parts' in payload:
+                    get_body_recursive(payload['parts'])
                 else:
+                    mime_type = payload.get('mimeType')
                     data = payload.get('body', {}).get('data')
                     if data:
-                        body = base64.urlsafe_b64decode(data).decode('utf-8')
+                        decoded = base64.urlsafe_b64decode(data).decode('utf-8', errors='ignore')
+                        if mime_type == 'text/plain':
+                            text_body = decoded
+                        else:
+                            html_body = decoded
+                            
+                body = text_body
+                if not body and html_body:
+                    import re, html
+                    # Strip HTML safely
+                    clean = re.sub(r'<(style|script)[^>]*>.*?</\1>', '', html_body, flags=re.IGNORECASE | re.DOTALL)
+                    clean = re.sub(r'<[^>]+>', '\n', clean)
+                    clean = html.unescape(clean)
+                    body = re.sub(r'\n\s*\n', '\n\n', clean).strip()
+
+                if not body:
+                    body = "[Empty Message]"
 
                 await self.handle_incoming_email(
-                    db, channel.id, from_header, from_header, subject, body, msg['id']
+                    db, channel.id, from_email, from_name, subject, body, msg['id']
                 )
                 
                 # Mark as read (remove UNREAD label)

@@ -69,8 +69,10 @@ class RoutingService:
         contact = result.scalar_one_or_none()
 
         if not contact:
+            # Prefer passed contact_name over first/last or default
+            new_name = contact_name or f"{first_name} {last_name}".strip() or f"{channel_type.capitalize()} User"
             contact = Contact(
-                name=f"{first_name} {last_name}".strip() or f"{channel_type.capitalize()} User",
+                name=new_name,
                 workspace_id=workspace_id,
                 channel_data={search_key: external_contact_id}
             )

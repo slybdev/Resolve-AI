@@ -226,6 +226,18 @@ async def send_message(
                 if slack_user_id:
                     from app.services.channels.slack import slack_service
                     await slack_service.send_message(db, channel.id, slack_user_id, payload.body)
+                    
+        # Email
+        elif channel and channel.type.value == "email":
+            contact = conversation.contact
+            if contact:
+                email_address = contact.channel_data.get("email_id")
+                if email_address:
+                    from app.services.channels.email import email_service
+                    # Adding a default reply subject. Ideally, we track message history, but this suffices.
+                    await email_service.send_email(
+                        db, channel.id, email_address, "Re: Support Request", payload.body
+                    )
 
     return {"status": "sent"}
 
