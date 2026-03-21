@@ -71,12 +71,13 @@ async function connectToWhatsApp() {
                 let shouldClearSession = false;
 
                 if (statusCode === DisconnectReason.loggedOut) {
-                    logger.error('Logged out from device. Will not reconnect automatically.');
-                    shouldReconnect = false;
-                    shouldClearSession = true; // Clear session so we can get a new QR
-                } else if (statusCode === DisconnectReason.badSession || statusCode === 401) {
-                    logger.error('Bad session or Unauthorized. Clearing session...');
+                    logger.warn('Logged out from device. Clearing session and preparing for new QR...');
                     shouldClearSession = true;
+                    shouldReconnect = true; 
+                } else if (statusCode === DisconnectReason.badSession || statusCode === 401) {
+                    logger.error('Bad session or Unauthorized. Clearing session and retrying...');
+                    shouldClearSession = true;
+                    shouldReconnect = true;
                 } else if (errorMsg.includes('Connection Failure') || statusCode === DisconnectReason.connectionClosed) {
                     logger.warn('Transient connection failure. Retrying in 5s...');
                     setTimeout(() => connectToWhatsApp(), 5000);
