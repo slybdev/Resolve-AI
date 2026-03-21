@@ -45,7 +45,7 @@ async function connectToWhatsApp() {
             keys: makeCacheableSignalKeyStore(state.keys, logger),
         },
         generateHighQualityQR: true,
-        browser: ['XentralDesk', 'Chrome', '1.0.0']
+        browser: ['Ubuntu', 'Chrome', '20.0.04']
     });
 
     sock.ev.on('connection.update', async (update: any) => {
@@ -137,11 +137,39 @@ app.post('/send', async (req, res) => {
 
 app.post('/logout', async (req, res) => {
     if (sock) {
-        await sock.logout();
+        await sock.logout().catch(() => {});
         res.json({ success: true });
     } else {
         res.status(400).json({ error: 'Not connected' });
     }
+});
+
+app.post('/clear-session', async (req, res) => {
+    try {
+        if (sock) {
+            await sock.logout().catch(() => {});
+            sock = null;
+        }
+        // Delete session files
+        if (fs.existsSync(AUTH_PATH)) {
+            fs.rmSync(AUTH_PATH, { recursive: true, force: true });
+            fs.mkdirSync(AUTH_PATH, { recursive: true });
+        }
+        qrCode = null;
+        connectionState = 'close';
+        
+        // Re-initialize
+        connectToWhatsApp();
+        
+        res.json({ success: true });
+    } catch (err) {
+        logger.error(`Failed to clear session: ${err}`);
+        res.status(500).json({ error: 'Failed to clear session' });
+    }
+});
+
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', connection: connectionState });
 });
 
 app.listen(PORT, () => {

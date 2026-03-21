@@ -239,6 +239,7 @@ class APIClient {
     getQr: () => this.request('/whatsapp-qr/qr'),
     getStatus: () => this.request('/whatsapp-qr/status'),
     logout: () => this.request('/whatsapp-qr/logout', { method: 'POST' }),
+    clearSession: () => this.request('/whatsapp-qr/clear', { method: 'POST' }),
   };
 }
 

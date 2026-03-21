@@ -89,11 +89,29 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
     try {
         await api.whatsappQr.logout();
         setQrStatus(null);
+        setIsConnected(false); // Reset local state
         startQrPolling();
         toast('Success', 'WhatsApp logged out', 'success');
     } catch (err) {
         console.error('Logout failed:', err);
         toast('Error', 'Logout failed', 'error');
+    }
+  };
+
+  const handleClearWaSession = async () => {
+    if (!confirm('This will completely clear your WhatsApp session and restart the bridge. Proceed?')) return;
+    setIsSaving(true);
+    try {
+        await api.whatsappQr.clearSession();
+        setQrStatus(null);
+        setIsConnected(false);
+        startQrPolling();
+        toast('Success', 'WhatsApp session cleared and restarted. Please wait for a new QR code.', 'success');
+    } catch (err) {
+        console.error('Clear session failed:', err);
+        toast('Error', 'Failed to clear session', 'error');
+    } finally {
+        setIsSaving(false);
     }
   };
 
@@ -497,11 +515,28 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                             ))}
                           </ul>
                           {qrStatus?.status === 'authenticated' && (
+                            <div className="flex items-center gap-4">
+                              <button 
+                                onClick={handleLogoutWa}
+                                className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+                              >
+                                Disconnect Session
+                              </button>
+                              <button 
+                                onClick={handleClearWaSession}
+                                className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+                              >
+                                Reset Bridge
+                              </button>
+                            </div>
+                          )}
+                          {qrStatus?.status === 'qr' && (
                             <button 
-                              onClick={handleLogoutWa}
-                              className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+                              onClick={handleClearWaSession}
+                              className="text-[10px] font-bold text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
                             >
-                              Disconnect Session
+                              <RefreshCw className="w-3 h-3" />
+                              Not working? Reset Bridge
                             </button>
                           )}
                         </div>
