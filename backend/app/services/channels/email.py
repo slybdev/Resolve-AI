@@ -188,7 +188,7 @@ class EmailService:
                 if html_body:
                     import re, html
                     clean = re.sub(r'<(style|script)[^>]*>.*?</\1>', '', html_body, flags=re.IGNORECASE | re.DOTALL)
-                    clean = re.sub(r'<a\s+(?:[^>]*?\s+)?href=["\'](https?://[^"\']+)["\'][^>]*>(.*?)</a>', r'\2 (\1)', clean, flags=re.IGNORECASE)
+                    clean = re.sub(r'<a\s+(?:[^>]*?\s+)?href=["\'](https?://[^"\']+)["\'][^>]*>(.*?)</a>', lambda m: f"{m.group(2)} ({m.group(1)})" if len(m.group(1)) < 150 else m.group(2), clean, flags=re.IGNORECASE)
                     clean = re.sub(r'<br\s*/?>', '\n', clean, flags=re.IGNORECASE)
                     clean = re.sub(r'</(p|div|h[1-6]|tr|li)>', '\n\n', clean, flags=re.IGNORECASE)
                     clean = re.sub(r'<[^>]+>', ' ', clean)
