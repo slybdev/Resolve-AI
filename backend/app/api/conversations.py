@@ -234,9 +234,20 @@ async def send_message(
                 email_address = contact.channel_data.get("email_id")
                 if email_address:
                     from app.services.channels.email import email_service
-                    # Adding a default reply subject. Ideally, we track message history, but this suffices.
+                    
+                    thread_id = last_incoming.external_id if last_incoming else None
+                    subject = "Re: Support Request"
+                    if last_incoming and last_incoming.body:
+                        first_line = last_incoming.body.split('\n')[0]
+                        if first_line.startswith("Subject: "):
+                            original_subject = first_line.replace("Subject: ", "").strip()
+                            if not original_subject.lower().startswith("re:"):
+                                subject = f"Re: {original_subject}"
+                            else:
+                                subject = original_subject
+
                     await email_service.send_email(
-                        db, channel.id, email_address, "Re: Support Request", payload.body
+                        db, channel.id, email_address, subject, payload.body, thread_id=thread_id
                     )
 
     return {"status": "sent"}

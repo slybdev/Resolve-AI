@@ -739,7 +739,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 </div>
                               </div>
                             ) : (
-                              <div className="p-3">
+                              <div className="p-3 whitespace-pre-wrap break-words">
                                 {msg.text}
                                 {/* removed inner timestamp */}
                               </div>

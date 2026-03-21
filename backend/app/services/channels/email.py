@@ -53,7 +53,7 @@ class EmailService:
             
         return creds
 
-    async def send_email(self, db: AsyncSession, channel_id: uuid.UUID, to_email: str, subject: str, body: str):
+    async def send_email(self, db: AsyncSession, channel_id: uuid.UUID, to_email: str, subject: str, body: str, thread_id: Optional[str] = None):
         """
         Sends an email via Gmail API using OAuth tokens.
         """
@@ -77,9 +77,13 @@ class EmailService:
             
             raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
             
+            body_payload = {'raw': raw_message}
+            if thread_id:
+                body_payload['threadId'] = thread_id
+            
             service.users().messages().send(
                 userId='me',
-                body={'raw': raw_message}
+                body=body_payload
             ).execute()
             
             return True
@@ -193,7 +197,7 @@ class EmailService:
                     body = "[Empty Message]"
 
                 await self.handle_incoming_email(
-                    db, channel.id, from_email, from_name, subject, body, msg['id']
+                    db, channel.id, from_email, from_name, subject, text_body or html_body, msg['threadId']
                 )
                 
                 # Mark as read (remove UNREAD label)

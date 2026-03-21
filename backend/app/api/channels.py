@@ -344,12 +344,13 @@ async def verify_channel(
             
     elif channel.type == ChannelType.EMAIL:
         from app.services.channels.email import email_service
-        result = await email_service.verify_connection(channel.config)
+        # Must pass `db` and `channel` to match email_service signature
+        result = await email_service.verify_connection(db, channel)
         if result:
             background_tasks.add_task(email_service.sync_messages, db, channel)
-            return ChannelVerifyResponse(success=True, detail=result["detail"])
+            return ChannelVerifyResponse(success=True, detail=result.get("detail", "Connected successfully"))
         else:
-            return ChannelVerifyResponse(success=False, detail="Invalid email configuration or API unreachable")
+            return ChannelVerifyResponse(success=False, detail="Invalid token or Gmail API unreachable")
             
     elif channel.type == ChannelType.WHATSAPP:
         from app.services.channels.whatsapp import whatsapp_service

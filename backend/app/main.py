@@ -44,10 +44,10 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
         from app.models.channel import Channel, ChannelType
         from sqlalchemy import select
         from app.services.channels.email import email_service
-        logger.info("LIFESPAN: Starting Background Email Polling (every 60s)...")
+        logger.info("LIFESPAN: Starting Background Email Polling (every 15s)...")
         while True:
             try:
-                await asyncio.sleep(60)
+                await asyncio.sleep(15)
                 async with async_session_factory() as db:
                     result = await db.execute(
                         select(Channel).where(Channel.type == ChannelType.email, Channel.is_active == True)
