@@ -217,6 +217,15 @@ async def send_message(
                 if discord_channel_id:
                     from app.services.channels.discord import discord_service
                     await discord_service.send_message(db, channel.id, discord_channel_id, payload.body, payload.message_type)
+        
+        # Slack
+        elif channel and channel.type.value == "slack":
+            contact = conversation.contact
+            if contact:
+                slack_user_id = contact.channel_data.get("slack_id")
+                if slack_user_id:
+                    from app.services.channels.slack import slack_service
+                    await slack_service.send_message(db, channel.id, slack_user_id, payload.body)
 
     return {"status": "sent"}
 

@@ -608,7 +608,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                           const key = type === 'telegram' || type === 'discord' ? 'token' : type === 'slack' ? 'bot_token' : 'webhook_url';
                           setConfig({...config, [key]: e.target.value});
                         }}
-                        placeholder={type === 'telegram' ? "123456789:ABCdefGHI..." : type === 'discord' ? "MTE2..." : type === 'slack' ? "xoxb-..." : "https://hooks.slack.com/services/..."} 
+                        placeholder={type === 'telegram' ? "123456789:ABCdefGHI..." : type === 'discord' ? "MTE2..." : type === 'slack' ? "xoxb-your-bot-token" : "https://hooks.slack.com/services/..."} 
                         className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
                       />
                       {(type === 'telegram' || type === 'discord' || type === 'slack') && (
@@ -627,8 +627,8 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                     How to get your {type} credentials
                   </button>
 
-                  {/* Webhook Info for Discord/Telegram */}
-                  {(type === 'telegram' || type === 'discord') && channelId && (
+                  {/* Webhook Info for Slack/Discord/Telegram */}
+                  {(type === 'telegram' || type === 'discord' || type === 'slack') && channelId && (
                     <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl space-y-3">
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4 text-primary" />
@@ -645,6 +645,8 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
                       <p className="text-[10px] text-muted-foreground leading-relaxed italic">
                         {type === 'telegram' 
                           ? 'This is automatically set when you save. Use it for manual debug if needed.' 
+                          : type === 'slack'
+                          ? 'Copy this URL into Slack "Event Subscriptions" -> "Request URL".'
                           : 'Copy this URL into your Discord middleware or bot forwarder.'}
                       </p>
                     </div>

@@ -22,6 +22,7 @@ from app.schemas.channel import ChannelCreate, ChannelResponse, ChannelUpdate, C
 router = APIRouter(prefix="/api/v1/channels", tags=["Channels"])
 
 import logging
+import httpx
 logger = logging.getLogger(__name__)
 
 
@@ -285,10 +286,57 @@ async def verify_channel(
         
         bot_info = await slack_service.verify_connection(token)
         if bot_info:
+            # Critical: Update channel config with team_id for webhook routing
+            new_config = dict(channel.config) if channel.config else {}
+            new_config["team_id"] = bot_info.get("team_id")
+            new_config["bot_user_id"] = bot_info.get("user_id")
+            new_config["team_name"] = bot_info.get("team")
+            channel.config = new_config
+            db.add(channel)
+            await db.commit()
+
+            # 2. Send a test message to the verifying user (Synchronous for immediate feedback)
+            logger.info(f"Slack: Sending test message to user {bot_info.get('user_id')}")
+            test_text = "✅ *XentralDesk: Connection Successful!*\nYour Slack bot is now connected to the dashboard and ready to handle messages."
+            success, error = await slack_service.send_message(db, channel.id, bot_info.get("user_id"), test_text)
+            
+            # 3. Test Read Scopes (Attempt to list conversations)
+            # This must match sync_messages parameters to catch missing scopes
+            logger.info("Slack: Testing read scopes via conversations.list with sync params")
+            sync_success = True
+            sync_error = None
+            try:
+                headers = {"Authorization": f"Bearer {token}"}
+                async with httpx.AsyncClient() as client:
+                    # Using the exact same types as sync_messages
+                    test_sync_url = "https://slack.com/api/conversations.list?limit=1&types=public_channel,private_channel,im,mpim"
+                    res = await client.get(test_sync_url, headers=headers)
+                    sync_data = res.json()
+                    if not sync_data.get("ok"):
+                        sync_success = False
+                        sync_error = sync_data.get("error")
+                        logger.error(f"Slack: Sync check failed with error: {sync_error}")
+            except Exception as e:
+                logger.error(f"Slack: Sync check exception: {str(e)}")
+                sync_success = False
+                sync_error = str(e)
+
             background_tasks.add_task(slack_service.sync_messages, db, channel)
+            
+            if not success or not sync_success:
+                errors = []
+                if not success: errors.append(f"Message send failed: {error}")
+                if not sync_success: errors.append(f"Channel sync failed: {sync_error}")
+                
+                return ChannelVerifyResponse(
+                    success=False, # Make it a failure so the user fixes it
+                    detail=f"Auth worked, but permissions are missing: {', '.join(errors)}. Please check your Slack App scopes and Re-install it.",
+                    info=bot_info
+                )
+
             return ChannelVerifyResponse(
                 success=True, 
-                detail=f"Connected to team: {bot_info.get('team')} as {bot_info.get('user')}",
+                detail=f"Connected to team: {bot_info.get('team')} as {bot_info.get('user')}. Test message and sync check passed!",
                 info=bot_info
             )
         else:
@@ -533,9 +581,10 @@ async def google_oauth_callback(
     if background_tasks:
         background_tasks.add_task(email_service.sync_messages, db, channel)
     else:
-        # Fallback if background_tasks is not available (though it should be in FastAPI)
+        # Fallback if background_tasks is not available
         await email_service.sync_messages(db, channel)
 
-    # Redirect to frontend integration page or show success message
-    # In a real app we'd redirect to a frontend deep link
-    return {"status": "success", "detail": f"Successfully connected Google account: {email_address}", "close_window": True}
+    # Redirect back to the Channels page in the frontend
+    from fastapi.responses import RedirectResponse
+    frontend_url = f"{settings.FRONTEND_URL}/dashboard/channels/email?status=success"
+    return RedirectResponse(url=frontend_url)

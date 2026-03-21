@@ -52,10 +52,33 @@ class SlackService:
         # 2. Extract message data
         external_contact_id = str(event.get("user"))
         contact_name = "Slack User" # Slack doesn't always send the name in the event
-        message_text = event.get("text")
+        message_text = event.get("text") or ""
         external_message_id = str(event.get("ts"))
+        message_type = "text"
+        
+        # 2b. Handle Files/Attachments
+        files = event.get("files", [])
+        if files:
+            first_file = files[0]
+            mime = first_file.get("mimetype", "")
+            # Map mime to XentralDesk types
+            if "image" in mime:
+                message_type = "photo"
+            elif "video" in mime:
+                message_type = "video"
+            elif "audio" in mime:
+                message_type = "audio"
+            else:
+                message_type = "file"
+            
+            # Use permalink or url_private as the body for the link
+            file_url = first_file.get("url_private") or first_file.get("permalink")
+            if not message_text:
+                message_text = file_url
+            else:
+                message_text = f"{message_text}\n\n📎 {file_url}"
 
-        if not message_text:
+        if not message_text and not files:
             return True
 
         # 3. Route to conversation
@@ -65,7 +88,8 @@ class SlackService:
             external_contact_id=external_contact_id,
             contact_name=contact_name,
             message_text=message_text,
-            external_message_id=external_message_id
+            external_message_id=external_message_id,
+            message_type=message_type
         )
         
         await db.commit()
@@ -95,9 +119,10 @@ class SlackService:
             response = await client.post(url, headers=headers, json=payload)
             data = response.json()
             if not data.get("ok"):
-                logger.error(f"Failed to send Slack message: {data.get('error')}")
-                return False
-            return True
+                error = data.get('error', 'unknown_error')
+                logger.error(f"Failed to send Slack message: {error}")
+                return False, error
+            return True, None
 
     async def verify_connection(self, token: str) -> Optional[dict]:
         """
@@ -167,11 +192,30 @@ class SlackService:
                         if msg.get("bot_id") or msg.get("subtype") == "bot_message":
                             continue
                             
-                        message_text = msg.get("text")
+                        message_text = msg.get("text") or ""
                         external_message_id = str(msg.get("ts"))
                         sender_id = str(msg.get("user"))
                         
-                        if not message_text or not sender_id:
+                        if not sender_id:
+                            continue
+                            
+                        message_type = "text"
+                        files = msg.get("files", [])
+                        if files:
+                            first_file = files[0]
+                            mime = first_file.get("mimetype", "")
+                            if "image" in mime: message_type = "photo"
+                            elif "video" in mime: message_type = "video"
+                            elif "audio" in mime: message_type = "audio"
+                            else: message_type = "file"
+                            
+                            file_url = first_file.get("url_private") or first_file.get("permalink")
+                            if not message_text:
+                                message_text = file_url
+                            else:
+                                message_text = f"{message_text}\n\n📎 {file_url}"
+                                
+                        if not message_text and not files:
                             continue
 
                         # 3. Route
@@ -181,7 +225,8 @@ class SlackService:
                             external_contact_id=sender_id,
                             contact_name=f"Slack User: {sender_id}",
                             message_text=message_text,
-                            external_message_id=external_message_id
+                            external_message_id=external_message_id,
+                            message_type=message_type
                         )
                         count += 1
                 

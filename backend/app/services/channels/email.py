@@ -22,8 +22,9 @@ from app.services.routing_service import routing_service
 logger = logging.getLogger(__name__)
 
 class EmailService:
-    def _get_credentials(self, config: Dict[str, Any]) -> Optional[Credentials]:
-        """Helper to create Google OAuth2 credentials from config."""
+    async def _get_credentials(self, db: AsyncSession, channel: Channel) -> Optional[Credentials]:
+        """Helper to create Google OAuth2 credentials from config and refresh if needed."""
+        config = channel.config or {}
         refresh_token = config.get("google_refresh_token")
         if not refresh_token:
             return None
@@ -44,7 +45,11 @@ class EmailService:
         # Refresh if expired
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
-            # Note: In a production app, we should save the new access_token back to the DB here.
+            # Save new token back to DB
+            new_config = dict(channel.config)
+            new_config["google_access_token"] = creds.token
+            channel.config = new_config
+            await db.commit()
             
         return creds
 
@@ -57,7 +62,7 @@ class EmailService:
         if not channel or not channel.is_active:
             raise ValueError("Channel not found or inactive")
 
-        creds = self._get_credentials(channel.config)
+        creds = await self._get_credentials(db, channel)
         if not creds:
             raise ValueError("Gmail OAuth not configured for this channel")
 
@@ -95,11 +100,11 @@ class EmailService:
         await db.commit()
         return True
 
-    async def verify_connection(self, config: dict) -> Optional[dict]:
+    async def verify_connection(self, db: AsyncSession, channel: Channel) -> Optional[dict]:
         """
         Verifies Gmail API connection by fetching the user profile.
         """
-        creds = self._get_credentials(config)
+        creds = await self._get_credentials(db, channel)
         if not creds:
             return None
 
@@ -118,7 +123,7 @@ class EmailService:
         """
         Pulls recent messages via Gmail API.
         """
-        creds = self._get_credentials(channel.config)
+        creds = await self._get_credentials(db, channel)
         if not creds:
             return 0
             
