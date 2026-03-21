@@ -265,8 +265,8 @@ async def send_message(
             if contact:
                 phone_number = contact.channel_data.get("phone_number")
                 if not phone_number:
-                    # Fallback to external_contact_id if not in channel_data
-                    phone_number = contact.external_contact_id
+                    # Fallback to whatsapp_id (the JID)
+                    phone_number = contact.channel_data.get("whatsapp_id")
                 
                 if phone_number:
                     from app.services.channels.whatsapp import whatsapp_service

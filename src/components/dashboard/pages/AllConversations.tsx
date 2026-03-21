@@ -826,7 +826,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 )}
                                 <VideoMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} />
                               </div>
-                            ) : msg.type === 'voice' ? (
+                            ) : (msg.type === 'voice' || msg.type === 'audio') ? (
                               <VoiceMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} time={msg.time} />
                             ) : msg.type === 'file' ? (
                               <div className="p-3">
