@@ -457,46 +457,28 @@ async def google_oauth_login(
     current_user: User = Depends(get_current_user),
 ):
     """Generate Google OAuth URL to connect an Email channel."""
-    from google_auth_oauthlib.flow import Flow
     from app.core.config import get_settings
+    import urllib.parse
     settings = get_settings()
 
     if not settings.GOOGLE_CLIENT_ID or not settings.GOOGLE_CLIENT_SECRET:
         raise HTTPException(status_code=500, detail="Google Client ID/Secret not configured.")
 
-    client_config = {
-        "web": {
-            "client_id": settings.GOOGLE_CLIENT_ID,
-            "project_id": "xentraldesk",
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-            "client_secret": settings.GOOGLE_CLIENT_SECRET,
-        }
-    }
-
-    scopes = [
-        "https://www.googleapis.com/auth/gmail.readonly",
-        "https://www.googleapis.com/auth/gmail.send",
-        "https://www.googleapis.com/auth/userinfo.email"
-    ]
-
     redirect_uri = f"{settings.BASE_URL}/api/v1/channels/google/callback"
+    state = f"v1|{channel_id}"
     
-    flow = Flow.from_client_config(
-        client_config,
-        scopes=scopes,
-        redirect_uri=redirect_uri
-    )
-
-    # Encode channel_id into state so we know which channel to update on callback
-    # We pass this to Google so it comes back to us
-    auth_url, state = flow.authorization_url(
-        access_type='offline',
-        prompt='consent',
-        include_granted_scopes='true',
-        state=f"v1|{channel_id}"
-    )
+    params = {
+        "client_id": settings.GOOGLE_CLIENT_ID,
+        "redirect_uri": redirect_uri,
+        "response_type": "code",
+        "scope": "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/userinfo.email",
+        "access_type": "offline",
+        "prompt": "consent",
+        "state": state,
+        "include_granted_scopes": "true"
+    }
+    
+    auth_url = "https://accounts.google.com/o/oauth2/v2/auth?" + urllib.parse.urlencode(params)
 
     return {"auth_url": auth_url, "state": state}
 
@@ -522,32 +504,33 @@ async def google_oauth_callback(
     except (ValueError, TypeError):
         raise HTTPException(status_code=400, detail="Invalid state parameter.")
 
-    client_config = {
-        "web": {
-            "client_id": settings.GOOGLE_CLIENT_ID,
-            "client_secret": settings.GOOGLE_CLIENT_SECRET,
-            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-            "token_uri": "https://oauth2.googleapis.com/token",
-        }
-    }
-
-    # Reconstruct flow
-    flow = Flow.from_client_config(
-        client_config,
-        scopes=[
-            "https://www.googleapis.com/auth/gmail.readonly",
-            "https://www.googleapis.com/auth/gmail.send",
-            "https://www.googleapis.com/auth/userinfo.email"
-        ],
-        redirect_uri=f"{settings.BASE_URL}/api/v1/channels/google/callback",
-        state=state
-    )
-
+    import httpx
     try:
-        flow.fetch_token(code=code)
-        credentials = flow.credentials
+        async with httpx.AsyncClient() as client:
+            token_response = await client.post(
+                "https://oauth2.googleapis.com/token",
+                data={
+                    "client_id": settings.GOOGLE_CLIENT_ID,
+                    "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                    "code": code,
+                    "grant_type": "authorization_code",
+                    "redirect_uri": f"{settings.BASE_URL}/api/v1/channels/google/callback"
+                }
+            )
+            token_response.raise_for_status()
+            token_data = token_response.json()
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to fetch token: {str(e)}")
+
+    from google.oauth2.credentials import Credentials
+    credentials = Credentials(
+        token=token_data.get("access_token"),
+        refresh_token=token_data.get("refresh_token"),
+        token_uri="https://oauth2.googleapis.com/token",
+        client_id=settings.GOOGLE_CLIENT_ID,
+        client_secret=settings.GOOGLE_CLIENT_SECRET,
+        scopes=["https://www.googleapis.com/auth/gmail.readonly", "https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/userinfo.email"]
+    )
 
     # Get email address
     from googleapiclient.discovery import build
