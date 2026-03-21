@@ -185,19 +185,43 @@ class EmailService:
                             html_body = decoded
                             
                 body = text_body
-                if not body and html_body:
+                if html_body:
                     import re, html
-                    # Strip HTML safely
+                    # Try to preserve line breaks
                     clean = re.sub(r'<(style|script)[^>]*>.*?</\1>', '', html_body, flags=re.IGNORECASE | re.DOTALL)
-                    clean = re.sub(r'<[^>]+>', '\n', clean)
+                    clean = re.sub(r'<br\s*/?>', '\n', clean, flags=re.IGNORECASE)
+                    clean = re.sub(r'</(p|div|h[1-6]|tr|li)>', '\n\n', clean, flags=re.IGNORECASE)
+                    clean = re.sub(r'<[^>]+>', ' ', clean)
                     clean = html.unescape(clean)
-                    body = re.sub(r'\n\s*\n', '\n\n', clean).strip()
+                    clean = re.sub(r' +', ' ', clean)
+                    clean = re.sub(r'\n\s*\n', '\n\n', clean).strip()
+                    if not body or len(clean) > len(body):
+                        body = clean
 
                 if not body:
                     body = "[Empty Message]"
 
+                # Strip threaded email quotes
+                import re
+                quote_patterns = [
+                    r'(?mi)^On\s+.*wrote:\s*$',
+                    r'(?m)^-----Original Message-----\s*$',
+                    r'(?m)^_+\s*$',
+                    r'(?mi)^\s*On\s+.+<\S+@\S+>\s*wrote:\s*$',
+                    r'(?i)\bOn\s+[A-Z][a-z]{2},\s+[A-Z][a-z]{2}\s+\d{1,2},\s+\d{4}\s+at\s+\d{1,2}:\d{2}\s+(AM|PM)\s+.*wrote:'
+                ]
+                
+                for pattern in quote_patterns:
+                    match = re.search(pattern, body)
+                    if match:
+                        body = body[:match.start()].strip()
+                        break
+                
+                # Remove loose quoted lines at the bottom or intermixed if typical
+                body = re.sub(r'(?m)^>.*$\n?', '', body).strip()
+
                 await self.handle_incoming_email(
-                    db, channel.id, from_email, from_name, subject, text_body or html_body, msg['threadId']
+                    db, channel.id, from_email, from_name, subject, body, msg['threadId']
                 )
                 
                 # Mark as read (remove UNREAD label)

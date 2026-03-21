@@ -50,7 +50,7 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
                 await asyncio.sleep(15)
                 async with async_session_factory() as db:
                     result = await db.execute(
-                        select(Channel).where(Channel.type == ChannelType.email, Channel.is_active == True)
+                        select(Channel).where(Channel.type == ChannelType.EMAIL, Channel.is_active == True)
                     )
                     channels = result.scalars().all()
                     for channel in channels:
