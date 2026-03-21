@@ -701,7 +701,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
             <PromptInputAction tooltip="Upload file">
               <button
                 onClick={() => uploadInputRef.current?.click()}
-                className="flex h-8 w-8 text-muted-foreground cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-accent hover:text-foreground"
+                className="flex h-8 w-8 text-zinc-500 dark:text-muted-foreground cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-accent hover:text-foreground"
                 disabled={isRecording}
               >
                 <Paperclip className="h-5 w-5 transition-colors" />
@@ -725,7 +725,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
                   showSearch
                     ? "bg-blue-500/15 border-blue-500 text-blue-500"
-                    : "bg-transparent border-transparent text-muted-foreground hover:text-foreground"
+                    : "bg-transparent border-transparent text-zinc-500 dark:text-muted-foreground hover:text-foreground"
                 )}
               >
                 <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -761,7 +761,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
                   showThink
                     ? "bg-purple-500/15 border-purple-500 text-purple-500"
-                    : "bg-transparent border-transparent text-muted-foreground hover:text-foreground"
+                    : "bg-transparent border-transparent text-zinc-500 dark:text-muted-foreground hover:text-foreground"
                 )}
               >
                 <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -797,7 +797,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   "rounded-full transition-all flex items-center gap-1 px-2 py-1 border h-8",
                   showCanvas
                     ? "bg-orange-500/15 border-orange-500 text-orange-500"
-                    : "bg-transparent border-transparent text-muted-foreground hover:text-foreground"
+                    : "bg-transparent border-transparent text-zinc-500 dark:text-muted-foreground hover:text-foreground"
                 )}
               >
                 <div className="w-5 h-5 flex items-center justify-center flex-shrink-0">
@@ -846,7 +846,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                   ? "bg-transparent hover:bg-accent text-red-500 hover:text-red-400"
                   : hasContent
                   ? "bg-primary text-primary-foreground hover:opacity-90"
-                  : "bg-transparent hover:bg-accent text-muted-foreground hover:text-foreground"
+                  : "bg-transparent hover:bg-accent text-zinc-500 dark:text-muted-foreground hover:text-foreground"
               )}
               onClick={async () => {
                 if (isRecording) {
@@ -866,9 +866,9 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
               ) : isRecording ? (
                 <StopCircle className="h-5 w-5 text-red-500" />
               ) : hasContent ? (
-                <ArrowUp className="h-4 w-4 text-[#1F2023]" />
+                <ArrowUp className="h-4 w-4 text-primary-foreground" />
               ) : (
-                <Mic className="h-5 w-5 text-[#1F2023] transition-colors" />
+                <Mic className="h-5 w-5 text-inherit transition-colors" />
               )}
             </Button>
           </PromptInputAction>

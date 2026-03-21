@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { cn } from '@/src/lib/utils';
 import { api } from '@/src/lib/api';
 import { useToast } from '@/src/components/ui/Toast';
+import { Modal } from '@/src/components/ui/Modal';
 
 interface ChannelPageProps {
   type: 'website' | 'email' | 'whatsapp' | 'instagram' | 'facebook' | 'telegram' | 'discord' | 'slack' | 'voice';
@@ -38,6 +39,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
   const [verificationResult, setVerificationResult] = useState<{success: boolean, detail: string} | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [showToken, setShowToken] = useState(false);
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
 
   const statsDisplay = [
     { label: 'Total Messages', value: channelStats.total_messages.toLocaleString(), change: '+0%', icon: MessageSquare, color: 'emerald' },
@@ -111,9 +113,17 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
       const res = await api.channels.verify(channelId);
       setVerificationResult({ success: res.success, detail: res.detail });
       if (res.success) {
-        toast('Success', res.detail, 'success');
+        if (res.info?.msg_delivery === "failed") {
+          toast('Success (with Warning)', 'Connection verified, but we couldn\'t send a test message. Please DM your bot or add it to a server first!', 'warning');
+        } else {
+          toast('Success', res.detail, 'success');
+        }
       } else {
-        toast('Verification Failed', res.detail, 'error');
+        if (res.detail.includes("Message Content Intent")) {
+          setIsErrorModalOpen(true);
+        } else {
+          toast('Verification Failed', res.detail, 'error');
+        }
       }
     } catch (err: any) {
       setVerificationResult({ success: false, detail: err.message });
@@ -792,6 +802,61 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
           </div>
         </div>
       </div>
+
+      {/* Discord Intent Error Modal */}
+      <Modal 
+        isOpen={isErrorModalOpen} 
+        onClose={() => setIsErrorModalOpen(false)} 
+        title="Privileged Intents Required"
+        className="max-w-md"
+      >
+        <div className="space-y-6">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-start gap-4">
+            <AlertCircle className="w-6 h-6 text-red-500 shrink-0 mt-1" />
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-red-500">Missing Message Content Intent</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Your Discord bot is connected, but it doesn't have permission to read message content. This is required for your AI to respond to users.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">How to fix this:</h4>
+            <div className="space-y-3">
+              {[
+                "Go to the Discord Developer Portal.",
+                "Select your application and click on the 'Bot' tab.",
+                "Scroll down to 'Privileged Gateway Intents'.",
+                "Toggle ON the 'Message Content Intent' switch.",
+                "Click 'Save Changes'."
+              ].map((step, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-5 h-5 rounded-full bg-accent flex items-center justify-center text-[10px] font-bold shrink-0">{i + 1}</div>
+                  <span className="text-sm text-foreground">{step}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-4 flex flex-col gap-3">
+            <a 
+              href="https://discord.com/developers/applications" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="w-full py-3 bg-primary text-primary-foreground rounded-2xl text-center text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 flex items-center justify-center gap-2"
+            >
+              Go to Developer Portal <ExternalLink className="w-4 h-4" />
+            </a>
+            <button 
+              onClick={() => setIsErrorModalOpen(false)}
+              className="w-full py-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors"
+            >
+              I've enabled it, let me try again
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

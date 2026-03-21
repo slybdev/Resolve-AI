@@ -164,9 +164,9 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
                 onClick={onToggle}
-                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 cursor-pointer overflow-hidden border shadow-sm shrink-0 bg-primary/10 border-primary/20 mb-4"
+                className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 cursor-pointer overflow-hidden border shadow-sm shrink-0 bg-foreground/10 border-foreground/20 mb-4"
               >
-                <Bot className="w-5 h-5 text-primary" />
+                <Bot className="w-5 h-5 text-foreground" />
               </motion.div>
             ) : (
               <motion.span 
@@ -177,7 +177,7 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
                 onClick={onToggle}
                 className="text-xl font-black tracking-tight text-foreground mb-6 cursor-pointer hover:opacity-80 transition-opacity"
               >
-                <span className="text-primary">X</span>entralDesk
+                <span className="text-foreground">XentralDesk</span>
               </motion.span>
             )}
           </AnimatePresence>

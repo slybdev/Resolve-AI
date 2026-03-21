@@ -5,6 +5,7 @@ Discord channel service — handles interactions via Discord webhooks or bot API
 import logging
 import uuid
 import httpx
+import asyncio
 from typing import Optional
 
 from sqlalchemy import select
@@ -55,7 +56,7 @@ class DiscordService:
         if author.get("bot"):
             return True # Ignore bot's own messages
 
-        external_contact_id = str(author.get("id"))
+        external_contact_id = str(payload.get("channel_id") or author.get("id"))
         username = author.get("username", "Discord User")
         global_name = author.get("global_name") or username
         message_text = payload.get("content")
@@ -89,7 +90,8 @@ class DiscordService:
             external_message_id=external_message_id,
             message_text=message_text or "",
             first_name=global_name,
-            message_type=message_type
+            message_type=message_type,
+            duration=attachments[0].get("duration") if attachments else None
         )
         
         return True
@@ -123,30 +125,37 @@ class DiscordService:
         async with httpx.AsyncClient() as client:
             headers = {"Authorization": f"Bot {token}"}
             
-            # Auto-detect media type if text looks like a URL
-            if message_type == "text" and text:
-                lower = text.lower().strip()
-                if any(lower.endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']):
-                    message_type = "image"
-                elif any(lower.endswith(ext) for ext in ['.mp4', '.mov', '.webm']):
-                    message_type = "video"
-                elif any(lower.endswith(ext) for ext in ['.ogg', '.mp3', '.wav']):
-                    message_type = "voice"
-
-            # Discord treats most media as attachments or embeds. 
-            # For simplicity, we send as message content (Discord rich previews will handle URLs)
-            # or we can use embeds for a "premium" look.
-            
             payload = {"content": text}
             
+            # For media messages where text is the URL, Discord's rich previews
+            # will handle it automatically, but we can also use embeds for a cleaner look
+            if message_type in ["image", "video", "voice", "file"] and text:
+                # If we have both caption and URL, format it
+                pass # Currently the dashboard sends the URL as 'text'
+            
             # Send to the channel (assuming external_contact_id is the Discord Channel ID)
-            # If it's a DM, we first need to create a DM channel, but usually, 
-            # in bot contexts, we already have the channel ID.
+            # If it's a DM and we only have a User ID, we must first create a DM channel.
             url = f"https://discord.com/api/v10/channels/{external_contact_id}/messages"
+            logger.info(f"Attempting to send Discord message to: {external_contact_id}")
             
             try:
                 response = await client.post(url, headers=headers, json=payload)
-                if response.status_code != 200:
+                
+                # If 404/400, it might be a User ID instead of a Channel ID
+                if response.status_code in [400, 404]:
+                    try:
+                        # Try to create a DM channel with this ID as a recipient_id
+                        dm_url = "https://discord.com/api/v10/users/@me/channels"
+                        dm_resp = await client.post(dm_url, headers=headers, json={"recipient_id": external_contact_id})
+                        if dm_resp.status_code in [200, 201]:
+                            dm_channel_id = dm_resp.json().get("id")
+                            # Now try sending to the actual DM channel
+                            url = f"https://discord.com/api/v10/channels/{dm_channel_id}/messages"
+                            response = await client.post(url, headers=headers, json=payload)
+                    except Exception:
+                        pass # Creation failed, original error will be logged below
+
+                if response.status_code not in [200, 201]:
                     logger.error(f"Failed to send Discord message: {response.text}")
                     return False
                 return True
@@ -157,15 +166,67 @@ class DiscordService:
     async def verify_connection(self, token: str) -> Optional[dict]:
         """
         Verifies if a Discord Bot Token is valid.
+        Also checks if the bot is failing to start in the manager.
         """
+        # First, check basic API validity
         url = "https://discord.com/api/v10/users/@me"
         headers = {"Authorization": f"Bot {token}"}
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.get(url, headers=headers, timeout=5.0)
-                if response.status_code == 200:
-                    return response.json()
-                logger.error(f"Discord verification failed: {response.status_code}")
+                if response.status_code != 200:
+                    logger.error(f"Discord verification failed: {response.status_code}")
+                    return None
+                
+                bot_info = response.json()
+                
+                # Now check if the manager has reported any errors for this token
+                from app.services.channels.discord_manager import discord_bot_manager
+                
+                # Try to send a test message if the bot is active in the manager
+                client_instance = discord_bot_manager.active_clients.get(token)
+                msg_delivery_status = "success"
+                if client_instance and client_instance.is_ready():
+                    test_sent = False
+                    try:
+                        # 1. Try to DM the owner
+                        app_info = await client_instance.application_info()
+                        owner = app_info.owner
+                        if owner:
+                            await owner.send("✅ **XentralDesk: Connection Successful!**\nYour bot is now connected and ready to handle messages.")
+                            logger.info(f"Sent Discord verification test message to owner: {owner.name}")
+                            test_sent = True
+                    except Exception:
+                        pass # DM failed (privacy settings or no shared server)
+
+                    if not test_sent:
+                        # 2. Try to send to the first available text channel in any server
+                        try:
+                            for guild in client_instance.guilds:
+                                for channel in guild.text_channels:
+                                    if channel.permissions_for(guild.me).send_messages:
+                                        await channel.send("✅ **XentralDesk: Connection Successful!**\nThis bot is now connected to the dashboard.")
+                                        logger.info(f"Sent Discord verification test message to channel: {channel.name} in {guild.name}")
+                                        test_sent = True
+                                        break
+                                if test_sent: break
+                        except Exception as chan_err:
+                            logger.warning(f"Could not send Discord test message to any channel: {chan_err}")
+                    
+                    if not test_sent:
+                        msg_delivery_status = "failed"
+                
+                bot_info["msg_delivery"] = msg_delivery_status
+
+                # Give it a tiny bit of time to catch background errors if just started
+                for _ in range(5):
+                    error = discord_bot_manager.bot_errors.get(token)
+                    if error:
+                        bot_info["error"] = error
+                        break
+                    await asyncio.sleep(0.2)
+
+                return bot_info
             except Exception as e:
                 logger.error(f"Error verifying Discord token: {e}")
         return None

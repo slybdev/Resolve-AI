@@ -38,6 +38,7 @@ dependencies = [
     # Utils
     "python-multipart>=0.0.12",
     "python-dotenv>=1.0.1",
+    "discord.py>=2.4.0",
 ]
 
 [project.optional-dependencies]

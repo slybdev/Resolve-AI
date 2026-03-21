@@ -186,34 +186,7 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
                   </div>
                 </div>
 
-                <div className="bg-card border border-border rounded-3xl p-6 space-y-4 shadow-sm border-dashed">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-foreground">Local Development</h3>
-                    <span className="px-2 py-1 bg-primary/10 text-[10px] font-bold text-primary rounded-md">DEV</span>
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Use this snippet to test the widget locally on your development machine.</p>
-                  <div className="relative">
-                    <pre className="p-4 bg-accent/50 border border-border rounded-xl text-[10px] font-mono text-foreground/50 overflow-x-auto">
-{`<script>
-  window.XENTRALDESK_WORKSPACE_ID = "${workspaceId}";
-  window.XENTRALDESK_COLOR = "${primaryColor}";
-  window.XENTRALDESK_TITLE = "${title}";
-  window.XENTRALDESK_THEME = "${theme}";
-</script>
-<script type="module" src="${window.location.origin}/src/widget/main.tsx"></script>`}
-                    </pre>
-                    <button 
-                      onClick={() => {
-                        const snippet = `<script>\n  window.XENTRALDESK_WORKSPACE_ID = "${workspaceId}";\n  window.XENTRALDESK_COLOR = "${primaryColor}";\n  window.XENTRALDESK_TITLE = "${title}";\n  window.XENTRALDESK_THEME = "${theme}";\n</script>\n<script type="module" src="${window.location.origin}/src/widget/main.tsx"></script>`;
-                        navigator.clipboard.writeText(snippet);
-                        toast('Copied!', 'Development snippet copied to clipboard.', 'info');
-                      }}
-                      className="absolute top-2 right-2 p-2 hover:bg-accent rounded-lg text-muted-foreground hover:text-foreground transition-colors btn-press"
-                    >
-                      <Code className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+
               </div>
             </div>
           </div>
@@ -224,10 +197,7 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
       <div className="w-96 flex flex-col shrink-0 bg-accent/30 p-8">
         <div className="flex items-center justify-between mb-8">
           <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Live Preview</h3>
-          <div className="flex items-center gap-2 p-1 bg-accent/50 rounded-lg border border-border">
-            <button className="p-1.5 bg-background border border-border rounded-md text-foreground shadow-sm"><Monitor className="w-3 h-3" /></button>
-            <button className="p-1.5 hover:bg-background/50 rounded-md text-muted-foreground transition-colors"><Smartphone className="w-3 h-3" /></button>
-          </div>
+
         </div>
 
         <div className="flex-1 flex items-end justify-center relative">

@@ -96,13 +96,13 @@ async def widget_websocket_endpoint(
                 external_contact_id = session_id  # Use session as unique identifier
                 
                 # Route message to XentralDesk core
-                # This will create/update contacts and conversations
                 await routing_service.route_incoming_message(
                     db=db,
                     channel_id=channel.id,
                     external_contact_id=external_contact_id,
-                    contact_name=contact_name,
-                    message_text=text
+                    message_text=text,
+                    message_type=message_data.get("message_type", "text"),
+                    duration=message_data.get("duration")
                 )
                 
                 # Commit the transaction to save message and any created contacts/conversations

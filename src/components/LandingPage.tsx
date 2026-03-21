@@ -26,7 +26,7 @@ export const LandingPage = () => {
         <div className="flex items-center gap-2 bg-white/5 border border-white/10 backdrop-blur-lg py-2 px-3 md:px-4 rounded-full pointer-events-auto shadow-lg transition-all hover:bg-white/10 group cursor-pointer">
             <div className="flex items-center">
               <span className="text-xl font-black tracking-tighter text-white">
-                <span className="text-primary">X</span>entralDesk
+                XentralDesk
               </span>
             </div>
         </div>

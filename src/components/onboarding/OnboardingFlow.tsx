@@ -250,7 +250,7 @@ export const OnboardingFlow = () => {
                   <div className="flex-1 p-4 space-y-4 overflow-y-auto">
                     <div className="flex gap-2">
                       <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm shrink-0">
-                        <span className="text-sm font-black text-primary">X</span>
+                        <span className="text-sm font-black text-white">X</span>
                       </div>
                       <div className="bg-card border border-border rounded-2xl rounded-tl-none p-3 text-sm max-w-[80%]">
                         Hi! I'm {aiData.name}. How can I help you today?
@@ -562,11 +562,11 @@ export const OnboardingFlow = () => {
       <header className="h-16 border-b border-white/10 flex items-center justify-between px-8 bg-black/50 backdrop-blur-md sticky top-0 z-50">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 shadow-sm">
-              <div className="w-4 h-4 rounded-sm bg-primary/20" />
+            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center border border-white/20 shadow-sm">
+              <Bot className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-black tracking-tighter text-foreground">
-              <span className="text-primary">X</span>entralDesk
+            <span className="text-xl font-black tracking-tighter text-white">
+              XentralDesk
             </span>
           </div>
           <div className="h-4 w-px bg-white/10 mx-2" />
@@ -629,6 +629,13 @@ export const OnboardingFlow = () => {
       <AnimatePresence>
         {activeTask && renderTaskModal()}
       </AnimatePresence>
+
+      <footer className="h-12 border-t border-white/5 flex items-center justify-center px-8 bg-black/30 backdrop-blur-sm z-50">
+        <div className="flex items-center gap-2 opacity-40 hover:opacity-100 transition-opacity duration-300 cursor-default">
+          <Bot className="w-4 h-4 text-primary" />
+          <span className="text-[10px] font-bold tracking-widest uppercase">Powered by XentralDesk AI</span>
+        </div>
+      </footer>
 
       {/* Progress Bar */}
       <div className="fixed bottom-0 left-0 right-0 h-1 bg-white/5">

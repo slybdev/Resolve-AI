@@ -17,16 +17,37 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Silence noisy libraries
+logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
+logging.getLogger("discord").setLevel(logging.WARNING)
+logging.getLogger("aiomysql").setLevel(logging.WARNING)
 
-@asynccontextmanager
+
 async def lifespan(app: FastAPI):  # noqa: ARG001
     """Application lifespan — startup & shutdown hooks."""
     # ── Startup ──
-    # Database and Redis connections are lazily initialized via their
-    # respective modules, so no explicit startup action is needed here.
+    from app.services.channels.discord_manager import discord_bot_manager
+    from app.db.session import async_session_factory
+    
+    logger.info("LIFESPAN: Starting Discord Bot Manager in background...")
+    discord_bot_manager.set_db_factory(async_session_factory)
+    
+    async def _start_bots_task():
+        try:
+            async with async_session_factory() as db:
+                await discord_bot_manager.start_all_bots(db)
+            logger.info("LIFESPAN: Discord bots started successfully.")
+        except Exception as e:
+            logger.error(f"LIFESPAN: Failed to start Discord bots: {e}")
+
+    import asyncio
+    asyncio.create_task(_start_bots_task())
+    
     yield
     # ── Shutdown ──
-    # Dispose the engine connection pool on shutdown.
+    from app.services.channels.discord_manager import discord_bot_manager
+    await discord_bot_manager.stop_all()
+    
     from app.db.session import engine
 
     await engine.dispose()
@@ -54,62 +75,46 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # ── Health check ──
-    @app.get("/health", tags=["health"])
-    async def health_check():
-        return {"status": "healthy"}
-
-    # ── Register routers ──
-    # Engineer A routers:
+    # ── Include Routers (Matching app/api/*.py) ──
     from app.api.auth import router as auth_router
     from app.api.onboarding import router as onboarding_router
-    from app.api.workspaces import router as workspaces_router
+    from app.api.workspaces import router as workspace_router
+    from app.api.channels import router as channel_router
+    from app.api.conversations import router as conversation_router
+    from app.api.contacts import router as contact_router
+    from app.api.webhooks import router as webhook_router
+    from app.api.uploads import router as upload_router
+    from app.api.tags import router as tags_router
+    from app.api.websocket import router as websocket_router
+    from app.api.widget import router as widget_router
+    from app.api.companies import router as companies_router
+    from app.api.team import router as team_router
+    from app.api.api_keys import router as api_keys_router
+    from app.api.settings import router as settings_router
 
     app.include_router(auth_router)
-    from app.api import (
-        auth,
-        onboarding,
-        workspaces,
-        companies,
-        contacts,
-        tags,
-        team,
-        settings as api_settings, # Renamed to avoid conflict with app settings
-        api_keys,
-        channels,
-        webhooks,
-        widget,
-        conversations,
-        websocket,
-        uploads
-    )
+    app.include_router(onboarding_router)
+    app.include_router(workspace_router)
+    app.include_router(channel_router)
+    app.include_router(conversation_router)
+    app.include_router(contact_router)
+    app.include_router(webhook_router)
+    app.include_router(upload_router)
+    app.include_router(tags_router)
+    app.include_router(websocket_router)
+    app.include_router(widget_router)
+    app.include_router(companies_router)
+    app.include_router(team_router)
+    app.include_router(api_keys_router)
+    app.include_router(settings_router)
 
-    app.include_router(auth.router)
-    app.include_router(onboarding.router)
-    app.include_router(workspaces.router)
-    app.include_router(companies.router)
-    app.include_router(contacts.router)
-    app.include_router(tags.router)
-    app.include_router(team.router)
-    app.include_router(api_settings.router)
-    app.include_router(api_keys.router)
-    app.include_router(channels.router)
-    app.include_router(webhooks.router)
-    app.include_router(widget.router)
-    app.include_router(conversations.router)
-    app.include_router(websocket.router)
-    app.include_router(uploads.router)
-
-    # ── Static files for uploads ──
+    # ── Static Files ──
     from fastapi.staticfiles import StaticFiles
     import os
-    upload_dir = "/app/uploads"
-    if not os.path.exists(upload_dir):
-        os.makedirs(upload_dir, exist_ok=True)
-    app.mount("/uploads", StaticFiles(directory=upload_dir), name="uploads")
+    os.makedirs("uploads", exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
     return app
 
 
-# Module-level instance used by uvicorn
 app = create_app()

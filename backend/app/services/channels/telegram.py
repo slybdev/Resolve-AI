@@ -100,7 +100,10 @@ class TelegramService:
             message_type = "voice"
         elif "video" in tg_message:
             file_id = tg_message["video"]["file_id"]
-            message_type = "file" # or "video"
+            message_type = "video"
+        elif "sticker" in tg_message:
+            file_id = tg_message["sticker"]["file_id"]
+            message_type = "sticker"
 
         if file_id:
             token = channel.config.get("token")
@@ -124,7 +127,8 @@ class TelegramService:
             message_text=message_text,
             first_name=first_name,
             last_name=last_name,
-            message_type=message_type
+            message_type=message_type,
+            duration=tg_message.get("voice", {}).get("duration") if message_type == "voice" else None
         )
         
         # db.commit() is handled by the handle_webhook caller

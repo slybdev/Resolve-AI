@@ -56,13 +56,19 @@ async def create_channel(
     await db.commit()
     await db.refresh(channel)
 
-    # ── Telegram Webhook Setup ──
     if channel.type == ChannelType.TELEGRAM:
         from app.services.channels.telegram import telegram_service
         token = channel.config.get("token")
         if token:
             settings = get_settings()
             await telegram_service.set_webhook(token, settings.BASE_URL)
+    
+    # ── Discord Bot Setup ──
+    if channel.type == ChannelType.DISCORD:
+        from app.services.channels.discord_manager import discord_bot_manager
+        token = channel.config.get("token") or channel.config.get("bot_token")
+        if token and channel.is_active:
+            await discord_bot_manager.start_bot(token, str(channel.id))
 
     return channel
 
@@ -102,13 +108,21 @@ async def update_channel(
     await db.commit()
     await db.refresh(channel)
 
-    # ── Update Telegram Webhook ──
     if channel.type == ChannelType.TELEGRAM:
         from app.services.channels.telegram import telegram_service
         token = channel.config.get("token")
         if token:
             settings = get_settings()
             await telegram_service.set_webhook(token, settings.BASE_URL)
+
+    # ── Update Discord Bot ──
+    if channel.type == ChannelType.DISCORD:
+        from app.services.channels.discord_manager import discord_bot_manager
+        token = channel.config.get("token") or channel.config.get("bot_token")
+        if not channel.is_active:
+            await discord_bot_manager.stop_bot(token)
+        elif token:
+            await discord_bot_manager.start_bot(token, str(channel.id))
 
     return channel
 
@@ -124,6 +138,12 @@ async def delete_channel(
     channel = result.scalar_one_or_none()
     if not channel:
         raise HTTPException(status_code=404, detail="Channel not found")
+
+    if channel.type == ChannelType.DISCORD:
+        from app.services.channels.discord_manager import discord_bot_manager
+        token = channel.config.get("token") or channel.config.get("bot_token")
+        if token:
+            await discord_bot_manager.stop_bot(token)
 
     await db.delete(channel)
     await db.commit()
@@ -237,11 +257,22 @@ async def verify_channel(
         
         bot_info = await discord_service.verify_connection(token)
         if bot_info:
+            if "error" in bot_info:
+                return ChannelVerifyResponse(
+                    success=False,
+                    detail=bot_info["error"]
+                )
+            
             background_tasks.add_task(discord_service.sync_messages, db, channel)
             return ChannelVerifyResponse(
-                success=True, 
-                detail=f"Connected as {bot_info.get('username')}#{bot_info.get('discriminator', '0000')}",
-                info=bot_info
+                success=True,
+                detail="Discord connection verified successfully.",
+                info={
+                    "username": bot_info.get("username"),
+                    "discriminator": bot_info.get("discriminator"),
+                    "id": bot_info.get("id"),
+                    "msg_delivery": bot_info.get("msg_delivery", "success")
+                }
             )
         else:
             return ChannelVerifyResponse(success=False, detail="Invalid token or Discord API unreachable")

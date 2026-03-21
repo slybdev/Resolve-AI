@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '@/src/lib/api';
 import { Sidebar } from './dashboard/Sidebar';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { AllConversations } from './dashboard/pages/AllConversations';
 import { AssignedToMe } from './dashboard/pages/AssignedToMe';
@@ -47,6 +47,7 @@ import { CommandPalette } from './dashboard/CommandPalette';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [currentView, setCurrentView] = useState('all-conversations');
+  const [viewHistory, setViewHistory] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
@@ -82,8 +83,22 @@ const Dashboard = () => {
   };
 
   const handleViewChange = (view: string) => {
-    setCurrentView(view);
+    if (view !== currentView) {
+      setViewHistory(prev => [...prev, currentView]);
+      setCurrentView(view);
+    }
     setIsSidebarOpen(false);
+  };
+
+  const handleBack = () => {
+    if (viewHistory.length > 0) {
+      const newHistory = [...viewHistory];
+      const prevView = newHistory.pop();
+      if (prevView) {
+        setViewHistory(newHistory);
+        setCurrentView(prevView);
+      }
+    }
   };
 
   const toggleSidebar = () => {
@@ -179,8 +194,21 @@ const Dashboard = () => {
         />
       </div>
 
-      <main className="flex-1 h-full overflow-hidden relative">
-        {renderView()}
+      <main className="flex-1 h-full overflow-hidden relative flex flex-col">
+        {viewHistory.length > 0 && (
+          <div className="px-8 pt-4 pb-0 flex items-center justify-start z-10">
+            <button 
+              onClick={handleBack}
+              className="group flex items-center gap-2 px-3 py-1.5 hover:bg-accent rounded-xl text-xs font-bold text-muted-foreground hover:text-foreground transition-all border border-transparent hover:border-border shadow-sm active:scale-95"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+              <span>Back</span>
+            </button>
+          </div>
+        )}
+        <div className="flex-1 overflow-hidden relative">
+          {renderView()}
+        </div>
       </main>
 
       <CommandPalette 

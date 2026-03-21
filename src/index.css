@@ -31,6 +31,8 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-bubble-customer: var(--bubble-text-customer);
+  --color-bubble-agent: var(--bubble-text-agent);
 }
 
 :root {
@@ -40,7 +42,7 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.145 0 0); /* Dark buttons/accents */
+  --primary: oklch(0.145 0 0); /* Reverted to dark; using explicit white for logos */
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.96 0 0); /* Subtle hover states */
   --secondary-foreground: oklch(0.145 0 0);
@@ -55,6 +57,8 @@
   --ring: oklch(0.145 0 0);
   --radius: 1rem; /* More rounded corners globally */
   --button-ripple-color: oklch(0.145 0 0 / 0.1);
+  --bubble-text-customer: oklch(0.2 0.05 240); /* Dark blue for customer bubbles */
+  --bubble-text-agent: oklch(0.145 0 0); /* Almost black for agent bubbles */
 }
 
 .dark {
@@ -78,6 +82,8 @@
   --input: oklch(0.25 0 0);
   --ring: oklch(0.87 0 0);
   --button-ripple-color: oklch(0.985 0 0 / 0.2);
+  --bubble-text-customer: oklch(0.985 0 0); /* White/Light for dark mode */
+  --bubble-text-agent: oklch(0.985 0 0); /* White/Light for dark mode */
 }
 
 @layer base {

@@ -72,6 +72,30 @@ const formatTime = (date: Date) => {
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase();
 };
 
+const AVATAR_COLORS = [
+  'bg-rose-500', 'bg-pink-500', 'bg-fuchsia-500', 'bg-purple-500',
+  'bg-violet-500', 'bg-indigo-500', 'bg-blue-500', 'bg-sky-500',
+  'bg-cyan-500', 'bg-teal-500', 'bg-emerald-500', 'bg-green-500',
+  'bg-amber-500', 'bg-orange-500', 'bg-red-500',
+];
+
+const getAvatarColor = (name: string) => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+};
+
+const LetterAvatar = ({ name, size = 'md' }: { name: string; size?: 'xs' | 'sm' | 'md' | 'lg' }) => {
+  const letter = (name || '?')[0].toUpperCase();
+  const color = getAvatarColor(name || 'A');
+  const sizes = { xs: 'w-3.5 h-3.5 text-[7px]', sm: 'w-8 h-8 text-sm', md: 'w-12 h-12 text-lg', lg: 'w-20 h-20 text-3xl' };
+  return (
+    <div className={cn(sizes[size], color, 'rounded-full flex items-center justify-center text-white font-bold shrink-0 select-none')}>
+      {letter}
+    </div>
+  );
+};
+
 const VideoMessage = ({ url, sender }: { url: string; sender: string }) => {
   return (
     <div className={cn(
@@ -121,8 +145,8 @@ const VoiceMessage = ({ url, sender, time }: { url: string; sender: string; time
     <div className={cn(
       "flex flex-col gap-1 p-3 rounded-2xl min-w-[260px] shadow-lg border relative overflow-hidden backdrop-blur-md",
       sender === 'customer' 
-        ? "bg-blue-500/40 border-blue-400/20 text-white" 
-        : "bg-black/60 border-white/10 text-[#e9edef]"
+        ? "bg-blue-500/20 dark:bg-blue-500/40 border-blue-500/30 dark:border-blue-400/20 text-bubble-customer" 
+        : "bg-zinc-100 dark:bg-black/60 border-zinc-200 dark:border-white/10 text-bubble-agent"
     )}>
       <audio 
         ref={audioRef} 
@@ -136,7 +160,7 @@ const VoiceMessage = ({ url, sender, time }: { url: string; sender: string; time
         <button 
           type="button"
           onClick={togglePlay}
-          className="w-11 h-11 flex items-center justify-center transition-all btn-press shrink-0 text-white/90 hover:text-white"
+          className="w-11 h-11 flex items-center justify-center transition-all btn-press shrink-0 text-current opacity-90 hover:opacity-100"
         >
           {isPlaying ? (
             <div className="flex gap-[3px] items-center">
@@ -171,7 +195,7 @@ const VoiceMessage = ({ url, sender, time }: { url: string; sender: string; time
       </div>
 
       <div className="flex justify-between items-center mt-1 px-1">
-        <span className="text-[10px] text-white/50 font-medium whitespace-nowrap">
+        <span className="text-[10px] opacity-70 font-medium whitespace-nowrap">
           {isPlaying ? formatTimeSeconds(currentTime) : formatTimeSeconds(duration)}
         </span>
       </div>
@@ -222,7 +246,7 @@ const CollapsibleNote = ({ msg }: { msg: Message }) => {
             </div>
             {isExpanded && (
               <div className="flex items-center gap-1.5 ml-4">
-                <img src={msg.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=agent"} className="w-3.5 h-3.5 rounded-full" alt="" />
+                <LetterAvatar name="You" size="xs" />
                 <span className="text-[9px] text-muted-foreground font-bold">You</span>
               </div>
             )}
@@ -462,7 +486,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                   )} />
                   
                   <div className="relative shrink-0">
-                    <img src={chat.avatar} className="w-12 h-12 rounded-full border border-border/50 object-cover" alt="" referrerPolicy="no-referrer" />
+                    <LetterAvatar name={chat.customerName} size="md" />
                     <div className={cn(
                       "absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card",
                       chat.status === 'open' ? "bg-green-500" : "bg-zinc-400"
@@ -487,7 +511,26 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                           {(() => {
                             const conversationMessages = messages[chat.id] || [];
                             const lastNonInternal = [...conversationMessages].reverse().find(m => !m.isInternal);
-                            return lastNonInternal ? lastNonInternal.text : chat.lastMessage;
+                            if (lastNonInternal) {
+                              const t = (lastNonInternal as any).type || 'text';
+                              if (t === 'image') return 'Photo 📷';
+                              if (t === 'voice' || t === 'audio') {
+                                const body = lastNonInternal.text || '';
+                                let dur = '';
+                                if (body.includes('|')) {
+                                  try {
+                                    const secs = parseInt(body.split('|')[1]);
+                                    dur = `${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')} `;
+                                  } catch {}
+                                }
+                                return `${dur}🎙️ Audio`;
+                              }
+                              if (t === 'video') return 'Video 🎥';
+                              if (t === 'file') return 'File 📄';
+                              if (t === 'sticker') return 'Sticker ✨';
+                              return lastNonInternal.text || chat.lastMessage;
+                            }
+                            return chat.lastMessage;
                           })()}
                         </p>
                       </div>
@@ -506,7 +549,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2 mt-1 transition-opacity">
                       <div className="flex items-center gap-1 px-1.5 py-0.5 bg-accent/50 rounded text-[8px] font-black text-muted-foreground uppercase tracking-tighter">
                         {chat.channel === 'website' && <Globe className="w-2.5 h-2.5" />}
                         {chat.channel === 'whatsapp' && <MessageCircle className="w-2.5 h-2.5" />}
@@ -560,7 +603,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                   onClick={() => setIsDetailsOpen(true)}
                   title="Show Customer Details"
                 >
-                  <img src={conversationsList.find(c => c.id === selectedId)?.avatar} className="w-8 h-8 rounded-full border border-border shrink-0" alt="" referrerPolicy="no-referrer" />
+                  <LetterAvatar name={conversationsList.find(c => c.id === selectedId)?.customerName || '?'} size="sm" />
                   <div className="min-w-0">
                     <h3 className="text-sm font-bold text-foreground truncate">{conversationsList.find(c => c.id === selectedId)?.customerName}</h3>
                   </div>
@@ -661,7 +704,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                     ) : (
                       <>
                         {msg.sender === 'customer' ? (
-                          <img src={msg.avatar} className="w-8 h-8 rounded-full shrink-0" alt="" referrerPolicy="no-referrer" />
+                          <LetterAvatar name={conversationsList.find(c => c.id === selectedId)?.customerName || '?'} size="sm" />
                         ) : (
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-lg",
@@ -679,10 +722,10 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                           (msg.sender === 'ai' || msg.sender === 'human') && "text-right"
                         )}>
                           <div className={cn(
-                            "rounded-2xl text-sm text-foreground shadow-lg border overflow-hidden backdrop-blur-md",
+                            "rounded-2xl text-sm shadow-lg border overflow-hidden backdrop-blur-md",
                             msg.sender === 'customer' 
-                              ? "bg-blue-500/40 border-blue-400/20 text-[#e9edef] rounded-tl-none" 
-                              : "bg-black/60 border-white/10 text-[#e9edef] rounded-tr-none",
+                              ? "bg-blue-500/20 dark:bg-blue-500/40 border-blue-500/30 dark:border-blue-400/20 text-bubble-customer rounded-tl-none" 
+                              : "bg-zinc-100 dark:bg-black/60 border-zinc-200 dark:border-white/10 text-bubble-agent rounded-tr-none",
                             (msg.type === 'image' || msg.type === 'video') && "p-1"
                           )}>
                             {msg.type === 'image' ? (
@@ -711,8 +754,8 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                     <FileText className="w-6 h-6 text-red-500" />
                                   </div>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-bold truncate text-[#e9edef]">Attachment</p>
-                                    <p className="text-[10px] text-[#8696a0] font-medium uppercase tracking-widest">Click to Download</p>
+                                    <p className="text-xs font-bold truncate text-current opacity-90">Attachment</p>
+                                    <p className="text-[10px] text-current opacity-60 font-medium uppercase tracking-widest">Click to Download</p>
                                   </div>
                                 </div>
                               </div>
@@ -926,7 +969,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
               </button>
               <div className="flex flex-col items-center text-center mb-6">
                 <div className="relative mb-4">
-                  <img src={conversationsList.find(c => c.id === selectedId)?.avatar} className="w-20 h-20 rounded-full border-2 border-border shadow-2xl" alt="" referrerPolicy="no-referrer" />
+                  <LetterAvatar name={conversationsList.find(c => c.id === selectedId)?.customerName || '?'} size="lg" />
                 </div>
                 <h3 className="text-lg font-bold text-foreground leading-tight">{conversationsList.find(c => c.id === selectedId)?.customerName}</h3>
                 <p className="text-xs text-muted-foreground mt-1">Contact Details</p>
