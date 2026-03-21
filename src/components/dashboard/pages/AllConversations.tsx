@@ -163,8 +163,8 @@ import { LetterAvatar } from '../../ui/Avatar';
 const VideoMessage = ({ url, sender }: { url: string; sender: string }) => {
   return (
     <div className={cn(
-      "relative rounded-2xl overflow-hidden min-w-[200px] max-w-sm shadow-lg border group",
-      sender === 'customer' ? "border-border" : "border-primary/20"
+      "relative rounded-xl overflow-hidden min-w-[200px] max-w-[300px] group",
+      sender === 'customer' ? "" : ""
     )}>
       <video src={url} className="w-full h-auto" controls />
       <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
@@ -207,10 +207,10 @@ const VoiceMessage = ({ url, sender, time }: { url: string; sender: string; time
 
   return (
     <div className={cn(
-      "flex flex-col gap-1 p-3 rounded-2xl min-w-[260px] shadow-lg border relative overflow-hidden backdrop-blur-md",
+      "flex flex-col gap-1 p-3 min-w-[260px] relative overflow-hidden",
       sender === 'customer' 
-        ? "bg-blue-500/20 dark:bg-blue-500/40 border-blue-500/30 dark:border-blue-400/20 text-bubble-customer" 
-        : "bg-zinc-100 dark:bg-black/60 border-zinc-200 dark:border-white/10 text-bubble-agent"
+        ? "text-blue-500" 
+        : "text-zinc-600 dark:text-zinc-300"
     )}>
       <audio 
         ref={audioRef} 
@@ -818,7 +818,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 )}
                                 <img 
                                   src={msg.attachmentUrl || msg.text} 
-                                  className="max-w-full max-h-[250px] object-contain rounded-xl cursor-pointer hover:opacity-95 transition-all" 
+                                  className="max-w-[300px] max-h-[250px] object-contain rounded-xl cursor-pointer hover:opacity-95 transition-all" 
                                   alt="Sent image" 
                                   onClick={() => window.open(msg.attachmentUrl || msg.text, '_blank')} 
                                 />
@@ -833,7 +833,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 )}
                                 <VideoMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} />
                               </div>
-                            ) : (msg.type === 'voice' || msg.type === 'audio') ? (
+                            ) : (msg.type === 'voice' || msg.type === 'audio' || (msg.attachmentUrl && msg.attachmentUrl.match(/\.(ogg|mp3|wav|m4a|webm)/i))) ? (
                               <VoiceMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} time={msg.time} />
                             ) : msg.type === 'file' ? (
                               <div className="p-3">
