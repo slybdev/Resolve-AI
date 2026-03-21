@@ -139,7 +139,7 @@ class WhatsAppService:
         logger.info(f"Manual sync requested for WhatsApp channel: {channel.id}")
         return 0
 
-    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, phone_number: str, text: str):
+    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, phone_number: str, text: str, message_type: str = "text"):
         """
         Sends a WhatsApp message via the Node.js Bridge.
         """
@@ -149,20 +149,37 @@ class WhatsAppService:
             raise ValueError("Channel not found or inactive")
 
         # Use the local Node.js service URL
-        # Note: In docker, it's 'whatsapp-service:3001'
         url = "http://whatsapp-service:3001/send"
+        
+        # Determine if it's media (based on message_type or body containing /uploads/)
+        payload_type = message_type
+        media_url = None
+        
+        if "/uploads/" in text:
+            media_url = text
+            # Guess type if not explicitly set
+            if message_type == "text":
+                if any(ext in text.lower() for ext in [".jpg", ".jpeg", ".png", ".gif"]):
+                    payload_type = "image"
+                elif any(ext in text.lower() for ext in [".mp4", ".mov"]):
+                    payload_type = "video"
+                elif any(ext in text.lower() for ext in [".ogg", ".mp3", ".wav", ".m4a"]):
+                    payload_type = "audio"
+                else:
+                    payload_type = "file"
+
         payload = {
             "to": phone_number,
-            "text": text,
-            "type": "text"
+            "text": text if payload_type == "text" else "", # Keep text as caption for media
+            "type": payload_type,
+            "mediaUrl": media_url
         }
 
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.post(url, json=payload, timeout=10.0)
+                response = await client.post(url, json=payload, timeout=20.0)
                 if response.status_code not in [200, 201]:
                     logger.error(f"Failed to send WhatsApp message via bridge: {response.text}")
-                    # Fallback to Meta API if config exists? (Optional)
                     return False
                 return True
             except Exception as e:

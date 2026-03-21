@@ -4,7 +4,8 @@ import makeWASocket, {
     fetchLatestBaileysVersion,
     makeCacheableSignalKeyStore,
     isJidBroadcast,
-    proto
+    proto,
+    downloadMediaMessage
 } from '@whiskeysockets/baileys';
 import { Boom } from '@hapi/boom';
 import express from 'express';
@@ -27,6 +28,38 @@ const AUTH_PATH = './sessions';
 
 if (!fs.existsSync(AUTH_PATH)) {
     fs.mkdirSync(AUTH_PATH, { recursive: true });
+}
+
+const UPLOADS_PATH = '/app/uploads';
+if (!fs.existsSync(UPLOADS_PATH)) {
+    fs.mkdirSync(UPLOADS_PATH, { recursive: true });
+}
+
+const BASE_URL = process.env.BASE_URL || 'https://xentraldesk.com';
+
+async function downloadAndSaveMedia(message: proto.IMessage) {
+    const type = Object.keys(message)[0];
+    const mimeType = (message as any)[type]?.mimetype || '';
+    const extension = mimeType.split('/')[1]?.split(';')[0] || 'bin';
+    const filename = `${Date.now()}-${Math.floor(Math.random() * 1000)}.${extension}`;
+    const localPath = path.join(UPLOADS_PATH, filename);
+
+    try {
+        const buffer = await downloadMediaMessage(
+            { message } as any,
+            'buffer',
+            {},
+            { 
+                logger,
+                reuploadRequest: sock.updateMediaMessage
+            }
+        );
+        fs.writeFileSync(localPath, buffer);
+        return `${BASE_URL}/uploads/${filename}`;
+    } catch (err) {
+        logger.error(`Failed to download media: ${err}`);
+        return null;
+    }
 }
 
 let sock: any = null;
@@ -120,13 +153,34 @@ async function connectToWhatsApp() {
                     if (!msg.key.fromMe && !isJidBroadcast(msg.key.remoteJid)) {
                         logger.info(`Received WhatsApp message from: ${msg.key.remoteJid}`);
                         
+                        const msgContent = msg.message;
+                        if (!msgContent) continue;
+
+                        let text = msgContent.conversation || msgContent.extendedTextMessage?.text || '';
+                        let type = 'text';
+                        let mediaUrl = null;
+
+                        if (msgContent.imageMessage) {
+                            type = 'image';
+                            mediaUrl = await downloadAndSaveMedia(msgContent);
+                        } else if (msgContent.videoMessage) {
+                            type = 'video';
+                            mediaUrl = await downloadAndSaveMedia(msgContent);
+                        } else if (msgContent.audioMessage) {
+                            type = 'audio';
+                            mediaUrl = await downloadAndSaveMedia(msgContent);
+                        } else if (msgContent.documentMessage) {
+                            type = 'file';
+                            mediaUrl = await downloadAndSaveMedia(msgContent);
+                        }
+
                         // Prepare simplified payload for backend
                         const payload = {
                             remoteJid: msg.key.remoteJid,
                             pushName: msg.pushName || 'WhatsApp User',
                             message: {
-                                text: msg.message?.conversation || msg.message?.extendedTextMessage?.text || '',
-                                type: msg.message?.imageMessage ? 'image' : msg.message?.videoMessage ? 'video' : 'text',
+                                text: mediaUrl || text,
+                                type: type,
                                 timestamp: msg.messageTimestamp,
                                 id: msg.key.id
                             },
@@ -166,14 +220,25 @@ app.get('/qr', (req, res) => {
 });
 
 app.post('/send', async (req, res) => {
-    const { to, text, type } = req.body;
+    const { to, text, type, mediaUrl } = req.body;
     if (!sock || connectionState !== 'open') {
         return res.status(500).json({ error: 'WhatsApp not connected' });
     }
 
     try {
         const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
-        await sock.sendMessage(jid, { text });
+        
+        if (type === 'image' && mediaUrl) {
+            await sock.sendMessage(jid, { image: { url: mediaUrl }, caption: text });
+        } else if (type === 'video' && mediaUrl) {
+            await sock.sendMessage(jid, { video: { url: mediaUrl }, caption: text });
+        } else if (type === 'audio' && mediaUrl) {
+            await sock.sendMessage(jid, { audio: { url: mediaUrl }, ptt: true });
+        } else if (type === 'file' && mediaUrl) {
+            await sock.sendMessage(jid, { document: { url: mediaUrl }, fileName: 'file' });
+        } else {
+            await sock.sendMessage(jid, { text });
+        }
         res.json({ success: true });
     } catch (err) {
         logger.error(`Failed to send message: ${err}`);

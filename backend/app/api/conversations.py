@@ -3,6 +3,7 @@ API routes for Conversations and Messages.
 """
 
 import uuid
+import re
 from datetime import datetime
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -238,16 +239,39 @@ async def send_message(
                     thread_id = last_incoming.external_id if last_incoming else None
                     subject = "Re: Support Request"
                     if last_incoming and last_incoming.body:
-                        first_line = last_incoming.body.split('\n')[0]
-                        if first_line.startswith("Subject: "):
-                            original_subject = first_line.replace("Subject: ", "").strip()
+                        # Try to find "Subject: " in the first few lines
+                        body_start = last_incoming.body[:500]
+                        subject_match = re.search(r"^Subject:\s*(.*)$", body_start, re.MULTILINE | re.IGNORECASE)
+                        if subject_match:
+                            original_subject = subject_match.group(1).strip()
                             if not original_subject.lower().startswith("re:"):
                                 subject = f"Re: {original_subject}"
                             else:
                                 subject = original_subject
+                        elif last_incoming.message_type == "text" and last_incoming.body:
+                             # If no Subject: prefix, use a snippet of the first line
+                             first_line = last_incoming.body.split('\n')[0].strip()
+                             if len(first_line) > 50:
+                                 first_line = first_line[:47] + "..."
+                             subject = f"Re: {first_line}"
 
                     await email_service.send_email(
                         db, channel.id, email_address, subject, payload.body, thread_id=thread_id
+                    )
+
+        # WhatsApp
+        elif channel and channel.type.value == "whatsapp":
+            contact = conversation.contact
+            if contact:
+                phone_number = contact.channel_data.get("phone_number")
+                if not phone_number:
+                    # Fallback to external_contact_id if not in channel_data
+                    phone_number = contact.external_contact_id
+                
+                if phone_number:
+                    from app.services.channels.whatsapp import whatsapp_service
+                    await whatsapp_service.send_message(
+                        db, channel.id, phone_number, payload.body, payload.message_type or "text"
                     )
 
     return {"status": "sent"}

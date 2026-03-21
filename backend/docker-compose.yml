@@ -66,8 +66,10 @@ services:
     container_name: xentraldesk-whatsapp
     environment:
       - BACKEND_URL=http://api:8000/api/v1/webhooks/whatsapp_qr
+      - BASE_URL=https://xentraldesk.com
     volumes:
       - ../whatsapp-service/sessions:/app/sessions
+      - ./uploads:/app/uploads
     depends_on:
       - api
     restart: unless-stopped
