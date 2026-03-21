@@ -232,7 +232,7 @@ app.post('/send', async (req, res) => {
             await sock.sendMessage(jid, { image: { url: mediaUrl }, caption: text });
         } else if (type === 'video' && mediaUrl) {
             await sock.sendMessage(jid, { video: { url: mediaUrl }, caption: text });
-        } else if (type === 'audio' && mediaUrl) {
+        } else if ((type === 'audio' || type === 'voice') && mediaUrl) {
             await sock.sendMessage(jid, { audio: { url: mediaUrl }, ptt: true });
         } else if (type === 'file' && mediaUrl) {
             await sock.sendMessage(jid, { document: { url: mediaUrl }, fileName: 'file' });

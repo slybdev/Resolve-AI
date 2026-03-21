@@ -441,7 +441,14 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
             attachmentUrl = m.body;
             text = "";
           }
+          // Fallback if attachmentUrl is still empty
+          if (!attachmentUrl && m.body && (m.body.startsWith('http') || m.body.startsWith('/uploads'))) {
+            attachmentUrl = m.body;
+            text = "";
+          }
         }
+
+        console.log(`[Conversation] Message ${m.id} type=${m.message_type} body=${m.body?.substring(0, 50)} attachmentUrl=${attachmentUrl}`);
 
         return {
           id: m.id,
@@ -811,7 +818,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 )}
                                 <img 
                                   src={msg.attachmentUrl || msg.text} 
-                                  className="max-w-full max-h-[350px] object-contain rounded-xl cursor-pointer hover:opacity-95 transition-all" 
+                                  className="max-w-full max-h-[250px] object-contain rounded-xl cursor-pointer hover:opacity-95 transition-all" 
                                   alt="Sent image" 
                                   onClick={() => window.open(msg.attachmentUrl || msg.text, '_blank')} 
                                 />
