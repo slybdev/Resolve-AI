@@ -540,7 +540,7 @@ async def google_oauth_callback(
             "https://www.googleapis.com/auth/userinfo.email"
         ],
         redirect_uri=f"{settings.BASE_URL}/api/v1/channels/google/callback",
-        state=original_state
+        state=state
     )
 
     try:
