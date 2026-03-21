@@ -187,19 +187,23 @@ class EmailService:
                 body = text_body
                 if html_body:
                     import re, html
-                    # Try to preserve line breaks
                     clean = re.sub(r'<(style|script)[^>]*>.*?</\1>', '', html_body, flags=re.IGNORECASE | re.DOTALL)
+                    clean = re.sub(r'<a\s+(?:[^>]*?\s+)?href=["\'](https?://[^"\']+)["\'][^>]*>(.*?)</a>', r'\2 (\1)', clean, flags=re.IGNORECASE)
                     clean = re.sub(r'<br\s*/?>', '\n', clean, flags=re.IGNORECASE)
                     clean = re.sub(r'</(p|div|h[1-6]|tr|li)>', '\n\n', clean, flags=re.IGNORECASE)
                     clean = re.sub(r'<[^>]+>', ' ', clean)
                     clean = html.unescape(clean)
                     clean = re.sub(r' +', ' ', clean)
                     clean = re.sub(r'\n\s*\n', '\n\n', clean).strip()
-                    if not body or len(clean) > len(body):
+                    if clean:
                         body = clean
 
                 if not body:
                     body = "[Empty Message]"
+                    
+                # Truncate to avoid MySQL TEXT column overflow (65,535 bytes max)
+                if len(body) > 60000:
+                    body = body[:60000] + "\n\n... [Message Truncated]"
 
                 # Strip threaded email quotes
                 import re
