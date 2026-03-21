@@ -83,6 +83,54 @@ const renderMessageText = (text: string) => {
   return parts.length > 0 ? parts : text;
 };
 
+const ExpandableMessage = ({ text, sender }: { text: string; sender: string }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const maxLength = 700;
+  
+  if (!text) return null;
+  
+  const shouldTruncate = text.length > maxLength;
+  const displayedText = (shouldTruncate && !isExpanded) 
+    ? text.slice(0, maxLength) 
+    : text;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <div className={cn(
+        "whitespace-pre-wrap break-words [overflow-wrap:anywhere]",
+        shouldTruncate && !isExpanded && "max-h-[400px] overflow-hidden relative"
+      )}>
+        {renderMessageText(displayedText)}
+        {shouldTruncate && !isExpanded && (
+          <>
+            <span className="opacity-50">...</span>
+            <div className={cn(
+              "absolute bottom-0 left-0 right-0 h-20 pointer-events-none",
+              sender === 'customer' 
+                ? "bg-gradient-to-t from-blue-500/10 to-transparent" 
+                : "bg-gradient-to-t from-background/40 to-transparent"
+            )} />
+          </>
+        )}
+      </div>
+      {shouldTruncate && (
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+          className={cn(
+            "text-[10px] font-black uppercase tracking-widest hover:underline w-fit py-1 px-2 rounded-md transition-colors",
+            sender === 'customer' ? "text-blue-400 hover:bg-blue-400/10" : "text-primary hover:bg-primary/10"
+          )}
+        >
+          {isExpanded ? "Show Less" : "View More Content"}
+        </button>
+      )}
+    </div>
+  );
+};
+
 interface Conversation {
   id: string;
   customerName: string;
@@ -710,7 +758,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={cn(
-                      "flex gap-3 max-w-[80%]",
+                      "flex gap-3 max-w-[85%]",
                       (msg.sender === 'ai' || msg.sender === 'human') && "ml-auto flex-row-reverse",
                       msg.isInternal && "max-w-full w-full justify-center"
                     )}
@@ -734,7 +782,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                           </div>
                         )}
                         <div className={cn(
-                          "space-y-1",
+                          "space-y-1 min-w-0",
                           (msg.sender === 'ai' || msg.sender === 'human') && "text-right"
                         )}>
                           <div className={cn(
@@ -746,7 +794,11 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                           )}>
                             {msg.type === 'image' ? (
                               <div className="relative">
-                                {msg.text && <p className="p-3 pb-1">{msg.text}</p>}
+                                {msg.text && (
+                                  <div className="p-3 pb-1">
+                                    <ExpandableMessage text={msg.text} sender={msg.sender} />
+                                  </div>
+                                )}
                                 <img 
                                   src={msg.attachmentUrl || msg.text} 
                                   className="max-w-full max-h-[350px] object-contain rounded-xl cursor-pointer hover:opacity-95 transition-all" 
@@ -757,14 +809,22 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                               </div>
                             ) : msg.type === 'video' ? (
                               <div className="relative">
-                                {msg.text && <p className="p-3 pb-1">{msg.text}</p>}
+                                {msg.text && (
+                                  <div className="p-3 pb-1">
+                                    <ExpandableMessage text={msg.text} sender={msg.sender} />
+                                  </div>
+                                )}
                                 <VideoMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} />
                               </div>
                             ) : msg.type === 'voice' ? (
                               <VoiceMessage url={msg.attachmentUrl || msg.text} sender={msg.sender} time={msg.time} />
                             ) : msg.type === 'file' ? (
                               <div className="p-3">
-                                {msg.text && <p className="mb-2">{msg.text}</p>}
+                                {msg.text && (
+                                  <div className="mb-2 p-3">
+                                    <ExpandableMessage text={msg.text} sender={msg.sender} />
+                                  </div>
+                                )}
                                 <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10 hover:bg-white/10 transition-colors cursor-pointer" onClick={() => window.open(msg.attachmentUrl || msg.text, '_blank')}>
                                   <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center">
                                     <FileText className="w-6 h-6 text-red-500" />
@@ -776,8 +836,8 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                                 </div>
                               </div>
                             ) : (
-                              <div className="p-3 whitespace-pre-wrap break-words break-all text-sm">
-                                {renderMessageText(msg.text)}
+                              <div className="p-3 text-sm">
+                                <ExpandableMessage text={msg.text} sender={msg.sender} />
                               </div>
                             )}
                           </div>
