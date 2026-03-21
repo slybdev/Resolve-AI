@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/src/lib/utils';
+import { LetterAvatar } from '../../ui/Avatar';
+
 
 interface Customer {
   id: string;
@@ -256,7 +258,7 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
                       <div className="relative">
-                        <img src={customer.avatar} alt={customer.name} className="w-11 h-11 rounded-2xl border border-white/10" />
+                        <LetterAvatar name={customer.name} size="md" className="rounded-2xl border border-white/10" />
                         <div className={cn(
                           "absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-[#050505]",
                           customer.status === 'active' ? "bg-emerald-500" : customer.status === 'away' ? "bg-amber-500" : "bg-white/20"
@@ -321,7 +323,7 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
               {/* Profile Header */}
               <div className="text-center space-y-6">
                 <div className="relative inline-block">
-                  <img src={selectedCustomer.avatar} alt={selectedCustomer.name} className="w-28 h-28 rounded-[2.5rem] border-4 border-white/5 shadow-2xl mx-auto" />
+                  <LetterAvatar name={selectedCustomer.name} size="xl" className="rounded-[2.5rem] border-4 border-white/5 shadow-2xl mx-auto" />
                   <div className={cn(
                     "absolute -bottom-2 -right-2 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border-2 border-[#050505] shadow-xl",
                     selectedCustomer.status === 'active' ? "bg-emerald-500 text-white" : "bg-white/10 text-muted-foreground"

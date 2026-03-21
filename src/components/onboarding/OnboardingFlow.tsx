@@ -26,6 +26,8 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '@/src/lib/utils';
 import { api } from '@/src/lib/api';
 import { useToast } from '@/src/components/ui/Toast';
+import { LetterAvatar } from '../ui/Avatar';
+
 
 interface Step {
   id: number;
@@ -582,8 +584,8 @@ export const OnboardingFlow = () => {
               Step {currentStep} of {steps.length}
             </span>
           </div>
-          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
-            <img src="https://i.pravatar.cc/150?u=me" alt="Profile" className="w-full h-full object-cover" />
+          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden shrink-0">
+            <LetterAvatar name="Me" size="sm" />
           </div>
         </div>
       </header>

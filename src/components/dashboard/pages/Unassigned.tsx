@@ -1,6 +1,8 @@
 import React from 'react';
 import { Bot, Clock, ShieldCheck, UserPlus, FileText } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { LetterAvatar } from '../../ui/Avatar';
+
 
 interface UnassignedTicket {
   id: string;
@@ -50,7 +52,7 @@ export const Unassigned = ({ workspaceId }: { workspaceId: string }) => {
           {unassignedTickets.map((ticket) => (
             <div key={ticket.id} className="bg-card border border-border rounded-2xl p-6 flex flex-col md:flex-row gap-6 transition-all hover:border-primary/20">
               <div className="flex items-center gap-4 shrink-0">
-                <img src={ticket.avatar} className="w-16 h-16 rounded-full border border-border" alt="" referrerPolicy="no-referrer" />
+                <LetterAvatar name={ticket.customerName} size="lg" className="rounded-full border border-border" />
                 <div>
                   <h3 className="text-lg font-bold text-foreground">{ticket.customerName}</h3>
                   <p className="text-xs text-muted-foreground">Received {ticket.time}</p>
