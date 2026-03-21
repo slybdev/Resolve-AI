@@ -85,8 +85,15 @@ async function connectToWhatsApp() {
 
                 if (shouldClearSession) {
                     if (fs.existsSync(AUTH_PATH)) {
-                        fs.rmSync(AUTH_PATH, { recursive: true, force: true });
-                        fs.mkdirSync(AUTH_PATH, { recursive: true });
+                        logger.warn('Clearing sessions directory contents...');
+                        try {
+                            const files = fs.readdirSync(AUTH_PATH);
+                            for (const file of files) {
+                                fs.rmSync(path.join(AUTH_PATH, file), { recursive: true, force: true });
+                            }
+                        } catch (err) {
+                            logger.error(`Error clearing sessions contents: ${err}`);
+                        }
                     }
                 }
 
@@ -188,10 +195,12 @@ app.post('/clear-session', async (req, res) => {
             await sock.logout().catch(() => {});
             sock = null;
         }
-        // Delete session files
+        // Delete session contents safely
         if (fs.existsSync(AUTH_PATH)) {
-            fs.rmSync(AUTH_PATH, { recursive: true, force: true });
-            fs.mkdirSync(AUTH_PATH, { recursive: true });
+            const files = fs.readdirSync(AUTH_PATH);
+            for (const file of files) {
+                fs.rmSync(path.join(AUTH_PATH, file), { recursive: true, force: true });
+            }
         }
         qrCode = null;
         connectionState = 'close';
