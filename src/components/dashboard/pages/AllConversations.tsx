@@ -695,14 +695,24 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                 </button>
                 
                 <div className="flex items-center gap-1 bg-accent/30 p-1 rounded-full border border-border/50">
-                  <button 
-                    onClick={() => setIsCallActive(true)}
-                    className="w-7 h-7 flex items-center justify-center hover:bg-accent rounded-full text-foreground transition-all"
-                    title="Voice Call"
-                  >
-                    <Phone className="w-3.5 h-3.5 fill-current" />
-                  </button>
-                  <button className="w-7 h-7 flex items-center justify-center hover:bg-accent rounded-full text-foreground transition-all">
+                  {(conversationsList.find(c => c.id === selectedId)?.channel !== 'email') && (
+                    <>
+                      <button 
+                        className="w-7 h-7 flex items-center justify-center hover:bg-accent rounded-full text-foreground transition-all"
+                        title="Video Call"
+                      >
+                        <Video className="w-3.5 h-3.5 fill-current" />
+                      </button>
+                      <button 
+                        className="w-7 h-7 flex items-center justify-center hover:bg-accent rounded-full text-foreground transition-all"
+                        title="Voice Call"
+                        onClick={() => setIsCallActive(true)}
+                      >
+                        <Phone className="w-3.5 h-3.5 fill-current" />
+                      </button>
+                    </>
+                  )}
+                  <button className="w-7 h-7 flex items-center justify-center hover:bg-accent rounded-full text-foreground transition-all" title="Toggle Theme">
                     <Moon className="w-3.5 h-3.5 fill-current" />
                   </button>
                 </div>
@@ -939,7 +949,7 @@ export const AllConversations = ({ workspaceId }: { workspaceId: string }) => {
                 }}
                 isLoading={isLoading}
                 placeholder={activeTab === 'reply' ? "Type a message or use / for commands..." : "Type an internal note (only visible to teammates)..."}
-                disableVoice={conversationsList.find(c => c.id === selectedId)?.channel === 'email'}
+                disableVoice={['email', 'gmail'].includes(conversationsList.find(c => c.id === selectedId)?.channel?.toLowerCase() || '')}
               />
             </div>
           </>

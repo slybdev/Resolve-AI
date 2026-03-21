@@ -58,6 +58,20 @@ services:
       timeout: 5s
       retries: 5
 
+  # ---------- WhatsApp Bridge (Node.js) ----------
+  whatsapp-service:
+    build:
+      context: ../whatsapp-service
+      dockerfile: ../backend/Dockerfile.node # We'll create a simple Node Dockerfile
+    container_name: xentraldesk-whatsapp
+    environment:
+      - BACKEND_URL=http://api:8000/api/v1/webhooks/whatsapp_qr
+    volumes:
+      - ../whatsapp-service/sessions:/app/sessions
+    depends_on:
+      - api
+    restart: unless-stopped
+
 volumes:
   mysql_data:
   redis_data:

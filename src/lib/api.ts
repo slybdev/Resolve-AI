@@ -233,6 +233,13 @@ class APIClient {
         method: 'POST',
       }),
   };
+
+  // WhatsApp QR Bridge
+  whatsappQr = {
+    getQr: () => this.request('/whatsapp-qr/qr'),
+    getStatus: () => this.request('/whatsapp-qr/status'),
+    logout: () => this.request('/whatsapp-qr/logout', { method: 'POST' }),
+  };
 }
 
 export const api = new APIClient();

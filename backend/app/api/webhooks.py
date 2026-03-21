@@ -49,6 +49,23 @@ async def whatsapp_webhook(
         
     return {"status": "ok"}
 
+@router.post("/whatsapp_qr")
+async def whatsapp_qr_webhook(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    """Ingest webhooks from WhatsApp QR Bridge (Node.js)."""
+    payload = await request.json()
+    logger.info(f"Received WhatsApp QR relay: {payload}")
+    
+    from app.services.channels.whatsapp import whatsapp_service
+    success = await whatsapp_service.handle_qr_webhook(db, payload)
+    
+    if not success:
+        return {"status": "error", "message": "Channel not found or processing failed"}
+        
+    return {"status": "ok"}
+
 @router.get("/instagram")
 async def instagram_webhook_verify(
     hub_mode: str = Query(None, alias="hub.mode"),

@@ -110,6 +110,7 @@ def create_app() -> FastAPI:
     from app.api.conversations import router as conversation_router
     from app.api.contacts import router as contact_router
     from app.api.webhooks import router as webhook_router
+    from app.api.whatsapp_qr import router as whatsapp_qr_router
     from app.api.uploads import router as upload_router
     from app.api.tags import router as tags_router
     from app.api.websocket import router as websocket_router
@@ -126,6 +127,7 @@ def create_app() -> FastAPI:
     app.include_router(conversation_router)
     app.include_router(contact_router)
     app.include_router(webhook_router)
+    app.include_router(whatsapp_qr_router)
     app.include_router(upload_router)
     app.include_router(tags_router)
     app.include_router(websocket_router)

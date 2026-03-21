@@ -65,14 +65,48 @@ class WhatsAppService:
             logger.error(f"No active WhatsApp channel found for phone_number_id: {phone_number_id}")
             return False
 
-        # 2. Route to conversation
+        await db.commit()
+        return True
+
+    async def handle_qr_webhook(self, db: AsyncSession, payload: dict):
+        """
+        Processes an incoming message relayed from the Node.js WhatsApp QR Bridge.
+        """
+        remote_jid = payload.get("remoteJid") # e.g. "123456789@s.whatsapp.net"
+        push_name = payload.get("pushName", "WhatsApp User")
+        msg = payload.get("message", {})
+        
+        message_text = msg.get("text")
+        message_type = msg.get("type", "text")
+        external_message_id = msg.get("id")
+
+        if not remote_jid or not message_text:
+            return True
+
+        # Find the active WhatsApp channel (assuming only one for now, or match by workspace)
+        # In a real multi-tenant app, we'd need a way to map the session to a workspace.
+        # For now, we'll pick the first active WhatsApp channel.
+        result = await db.execute(
+            select(Channel).where(
+                Channel.type == ChannelType.WHATSAPP,
+                Channel.is_active == True
+            )
+        )
+        target_channel = result.scalars().first()
+        
+        if not target_channel:
+            logger.error("No active WhatsApp channel found for QR relay")
+            return False
+
+        # Route to conversation
         await routing_service.route_incoming_message(
             db=db,
             channel_id=target_channel.id,
-            external_contact_id=external_contact_id,
-            contact_name=f"WA: {external_contact_id}",
+            external_contact_id=remote_jid,
+            contact_name=push_name,
             message_text=message_text,
-            external_message_id=external_message_id
+            external_message_id=external_message_id,
+            message_type=message_type
         )
         
         await db.commit()
@@ -107,32 +141,32 @@ class WhatsAppService:
 
     async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, phone_number: str, text: str):
         """
-        Sends a WhatsApp message back via Meta API.
+        Sends a WhatsApp message via the Node.js Bridge.
         """
         result = await db.execute(select(Channel).where(Channel.id == channel_id))
         channel = result.scalar_one_or_none()
         if not channel or not channel.is_active:
             raise ValueError("Channel not found or inactive")
 
-        token = channel.config.get("access_token")
-        phone_number_id = channel.config.get("phone_number_id")
-        if not token or not phone_number_id:
-            raise ValueError("WhatsApp credentials not configured")
-
-        url = f"https://graph.facebook.com/v19.0/{phone_number_id}/messages"
-        headers = {"Authorization": f"Bearer {token}"}
+        # Use the local Node.js service URL
+        # Note: In docker, it's 'whatsapp-service:3001'
+        url = "http://whatsapp-service:3001/send"
         payload = {
-            "messaging_product": "whatsapp",
             "to": phone_number,
-            "type": "text",
-            "text": {"body": text}
+            "text": text,
+            "type": "text"
         }
 
         async with httpx.AsyncClient() as client:
-            response = await client.post(url, headers=headers, json=payload)
-            if response.status_code not in [200, 201]:
-                logger.error(f"Failed to send WhatsApp message: {response.text}")
+            try:
+                response = await client.post(url, json=payload, timeout=10.0)
+                if response.status_code not in [200, 201]:
+                    logger.error(f"Failed to send WhatsApp message via bridge: {response.text}")
+                    # Fallback to Meta API if config exists? (Optional)
+                    return False
+                return True
+            except Exception as e:
+                logger.error(f"Error calling WhatsApp bridge: {str(e)}")
                 return False
-            return True
 
 whatsapp_service = WhatsAppService()

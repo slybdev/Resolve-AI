@@ -833,7 +833,7 @@ export const PromptInputBox = React.forwardRef((props: PromptInputBoxProps, ref:
                 ? "Stop generation"
                 : isRecording
                 ? "Stop recording"
-                : hasContent
+                : (hasContent || disableVoice)
                 ? "Send message"
                 : "Voice message"
             }

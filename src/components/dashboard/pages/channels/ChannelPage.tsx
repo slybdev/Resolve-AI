@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Globe, Mail, MessageSquare, Send, Slack, Mic, 
   CheckCircle2, AlertCircle, Settings, BarChart3, 
@@ -25,7 +25,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
   const [isLoading, setIsLoading] = useState(true);
   const [channelId, setChannelId] = useState<string | null>(null);
   const { toast } = useToast();
-  
+
   // Form State
   const [config, setConfig] = useState<any>({});
   const [name, setName] = useState(title);
@@ -40,6 +40,62 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
   const [isSyncing, setIsSyncing] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+
+  // WhatsApp QR States
+  const [waMode, setWaMode] = useState<'qr' | 'api'>('qr');
+  const [qrStatus, setQrStatus] = useState<any>(null);
+  const [isPollingQr, setIsPollingQr] = useState(false);
+  const pollingInterval = useRef<any>(null);
+
+  useEffect(() => {
+    if (type === 'whatsapp' && waMode === 'qr') {
+      startQrPolling();
+    } else {
+      stopQrPolling();
+    }
+    return () => stopQrPolling();
+  }, [type, waMode]);
+
+  const startQrPolling = () => {
+    if (isPollingQr) return;
+    setIsPollingQr(true);
+    fetchQrStatus();
+    pollingInterval.current = setInterval(fetchQrStatus, 5000);
+  };
+
+  const stopQrPolling = () => {
+    setIsPollingQr(false);
+    if (pollingInterval.current) {
+        clearInterval(pollingInterval.current);
+        pollingInterval.current = null;
+    }
+  };
+
+  const fetchQrStatus = async () => {
+    try {
+        const res = await api.whatsappQr.getQr();
+        setQrStatus(res);
+        if (res.status === 'authenticated') {
+            stopQrPolling();
+            setIsConnected(true);
+            toast('Success', 'WhatsApp connected successfully!', 'success');
+        }
+    } catch (err) {
+        console.error('Failed to fetch QR:', err);
+    }
+  };
+
+  const handleLogoutWa = async () => {
+    try {
+        await api.whatsappQr.logout();
+        setQrStatus(null);
+        startQrPolling();
+        toast('Success', 'WhatsApp logged out', 'success');
+    } catch (err) {
+        console.error('Logout failed:', err);
+        toast('Error', 'Logout failed', 'error');
+    }
+  };
 
   const statsDisplay = [
     { label: 'Total Messages', value: channelStats.total_messages.toLocaleString(), change: '+0%', icon: MessageSquare, color: 'emerald' },
@@ -387,73 +443,131 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
               )}
 
               {type === 'whatsapp' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">WhatsApp Business Number</label>
-                      <input 
-                        type="text" 
-                        value={config.phone_number || ''}
-                        onChange={(e) => setConfig({...config, phone_number: e.target.value})}
-                        placeholder="+1 (555) 000-0000" 
-                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Phone Number ID</label>
-                      <input 
-                        type="text" 
-                        value={config.phone_number_id || ''}
-                        onChange={(e) => setConfig({...config, phone_number_id: e.target.value})}
-                        placeholder="123456789012345" 
-                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
-                      />
-                    </div>
+                <div className="space-y-6">
+                  {/* Mode Selector */}
+                  <div className="flex bg-accent/20 p-1 rounded-xl w-fit">
+                    <button 
+                      onClick={() => setWaMode('qr')}
+                      className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${waMode === 'qr' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      Linked Device (QR)
+                    </button>
+                    <button 
+                      onClick={() => setWaMode('api')}
+                      className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${waMode === 'api' ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      WhatsApp Business API
+                    </button>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">System Access Token</label>
-                    <div className="relative">
-                      <input 
-                        type={showToken ? 'text' : 'password'}
-                        value={config.access_token || ''} 
-                        onChange={(e) => setConfig({...config, access_token: e.target.value})}
-                        placeholder="EAAB..." 
-                        className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowToken(!showToken)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      >
-                        {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* Webhook Info for Meta Dashboard */}
-                  <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl space-y-3">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-primary" />
-                      <h3 className="text-xs font-bold text-foreground">Webhook Configuration (Meta Dashboard)</h3>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Callback URL</span>
-                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
-                          {import.meta.env.VITE_API_URL}/webhooks/whatsapp
-                        </code>
+
+                  {waMode === 'qr' ? (
+                    <div className="space-y-6">
+                      <div className="flex flex-col md:flex-row gap-8 items-center bg-accent/10 p-6 rounded-2xl border border-border">
+                        <div className="flex-shrink-0 bg-white p-4 rounded-xl shadow-inner">
+                          {qrStatus?.status === 'qr' ? (
+                            <img src={qrStatus.qr} alt="WhatsApp QR Code" className="w-48 h-48" />
+                          ) : qrStatus?.status === 'authenticated' ? (
+                            <div className="w-48 h-48 flex flex-col items-center justify-center gap-3 text-green-500">
+                              <CheckCircle2 className="w-16 h-16" />
+                              <span className="text-xs font-bold uppercase tracking-widest text-foreground">Connected</span>
+                            </div>
+                          ) : (
+                            <div className="w-48 h-48 flex items-center justify-center text-muted-foreground">
+                              <RefreshCw className="w-8 h-8 animate-spin" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-4 max-w-sm">
+                          <div className="space-y-1">
+                            <h3 className="text-sm font-bold text-foreground">Link your WhatsApp Account</h3>
+                            <p className="text-xs text-muted-foreground leading-relaxed">
+                              Open WhatsApp on your phone, tap Settings &gt; Linked Devices, and point your camera at this QR code.
+                            </p>
+                          </div>
+                          <ul className="space-y-2">
+                            {[
+                              'Messages synced automatically',
+                              'Supports groups and personal chats',
+                              'No Business API approval required'
+                            ].map((text, i) => (
+                              <li key={i} className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                                <div className="w-1 h-1 rounded-full bg-primary" />
+                                {text}
+                              </li>
+                            ))}
+                          </ul>
+                          {qrStatus?.status === 'authenticated' && (
+                            <button 
+                              onClick={handleLogoutWa}
+                              className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors"
+                            >
+                              Disconnect Session
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase">Verify Token</span>
-                        <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
-                          xentraldesk_verify_token
-                        </code>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">WhatsApp Business Number</label>
+                          <input 
+                            type="text" 
+                            value={config.phone_number || ''}
+                            onChange={(e) => setConfig({...config, phone_number: e.target.value})}
+                            placeholder="+1 (555) 000-0000" 
+                            className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Phone Number ID</label>
+                          <input 
+                            type="text" 
+                            value={config.phone_number_id || ''}
+                            onChange={(e) => setConfig({...config, phone_number_id: e.target.value})}
+                            placeholder="123456789012345" 
+                            className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">System Access Token</label>
+                        <div className="relative">
+                          <input 
+                            type={showToken ? 'text' : 'password'}
+                            value={config.access_token || ''} 
+                            onChange={(e) => setConfig({...config, access_token: e.target.value})}
+                            placeholder="EAAB..." 
+                            className="w-full bg-accent/30 border border-border rounded-xl py-3 px-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowToken(!showToken)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                          >
+                            {showToken ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Webhook Info for Meta Dashboard */}
+                      <div className="p-4 bg-primary/5 border border-primary/10 rounded-2xl space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-4 h-4 text-primary" />
+                          <h3 className="text-xs font-bold text-foreground">Webhook Configuration (Meta Dashboard)</h3>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex flex-col gap-1">
+                            <span className="text-[9px] font-bold text-muted-foreground uppercase">Callback URL</span>
+                            <code className="text-[10px] bg-background border border-border p-1.5 rounded-lg select-all">
+                              {import.meta.env.VITE_API_URL}/webhooks/whatsapp
+                            </code>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed italic">
-                      Copy these values into your Meta App's WhatsApp Webhook settings.
-                    </p>
-                  </div>
+                  )}
                 </div>
               )}
 

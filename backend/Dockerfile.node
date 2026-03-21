@@ -1,0 +1,18 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Install dependencies for Puppeteer (if using whatsapp-web.js) or just standard build tools
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+# Using tsx to run the service directly without a separate build step for simplicity
+CMD ["npx", "tsx", "index.ts"]
