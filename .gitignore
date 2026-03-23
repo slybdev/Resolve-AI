@@ -1,8 +1,21 @@
-node_modules/
-build/
-dist/
-coverage/
-.DS_Store
-*.log
-.env*
+# env files
+.env
+.env.*
 !.env.example
+
+# python
+__pycache__/
+*.pyc
+
+# logs
+*.log
+
+# node
+node_modules/
+dist/
+build/
+coverage/
+
+# misc
+.DS_Store
+.pytest_cache/

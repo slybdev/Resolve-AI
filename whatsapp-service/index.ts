@@ -15,8 +15,13 @@ import QRCode from 'qrcode';
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const logger = pino({ level: 'info' });
 const app = express();
@@ -24,15 +29,25 @@ app.use(express.json());
 
 const PORT = 3001;
 const BACKEND_URL = process.env.BACKEND_URL || 'http://api:8000/api/v1/webhooks/whatsapp';
-const AUTH_PATH = './sessions';
+const AUTH_PATH = path.resolve(__dirname, 'sessions');
 
 if (!fs.existsSync(AUTH_PATH)) {
-    fs.mkdirSync(AUTH_PATH, { recursive: true });
+    try {
+        fs.mkdirSync(AUTH_PATH, { recursive: true });
+        logger.info(`Created sessions directory at ${AUTH_PATH}`);
+    } catch (err) {
+        logger.error(`Failed to create sessions directory at ${AUTH_PATH}: ${err}`);
+    }
 }
 
-const UPLOADS_PATH = '/app/uploads';
+const UPLOADS_PATH = path.resolve(__dirname, 'uploads');
 if (!fs.existsSync(UPLOADS_PATH)) {
-    fs.mkdirSync(UPLOADS_PATH, { recursive: true });
+    try {
+        fs.mkdirSync(UPLOADS_PATH, { recursive: true });
+        logger.info(`Created uploads directory at ${UPLOADS_PATH}`);
+    } catch (err) {
+        logger.error(`Failed to create uploads directory at ${UPLOADS_PATH}: ${err}`);
+    }
 }
 
 const BASE_URL = process.env.BASE_URL || 'https://xentraldesk.com';
