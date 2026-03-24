@@ -143,10 +143,14 @@ interface SidebarProps {
   isCollapsed?: boolean;
   onToggle?: () => void;
   onLogout?: () => void;
+  allowedPages?: string[];
 }
 
-export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onToggle, onLogout }: SidebarProps) => {
+export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onToggle, onLogout, allowedPages = [] }: SidebarProps) => {
   const { theme, setTheme } = useTheme();
+
+  // If allowedPages is empty, show everything (owner/admin). Otherwise filter.
+  const canAccess = (viewKey: string) => allowedPages.length === 0 || allowedPages.includes(viewKey);
 
   return (
     <div className={cn(
@@ -183,57 +187,69 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
           </AnimatePresence>
         </div>
         
+        {canAccess('all-conversations') && (
         <SidebarSection title="Inbox" icon={Inbox} isCollapsed={isCollapsed} onToggle={onToggle} defaultOpen={true}>
           <NavItem icon={Inbox} label="All Conversations" active={currentView === 'all-conversations'} onClick={() => onViewChange('all-conversations')} isCollapsed={isCollapsed} />
           <NavItem icon={UserCheck} label="Assigned to Me" active={currentView === 'assigned-to-me'} onClick={() => onViewChange('assigned-to-me')} isCollapsed={isCollapsed} />
           <NavItem icon={Users} label="Unassigned" active={currentView === 'unassigned'} onClick={() => onViewChange('unassigned')} isCollapsed={isCollapsed} />
           <NavItem icon={AlertCircle} label="Urgent / SLA" active={currentView === 'urgent-sla'} onClick={() => onViewChange('urgent-sla')} isCollapsed={isCollapsed} />
         </SidebarSection>
+        )}
 
+        {(canAccess('people') || canAccess('csat')) && (
         <SidebarSection title="Customers" icon={Users} isCollapsed={isCollapsed} onToggle={onToggle}>
-          <NavItem icon={Users} label="People & CRM" active={currentView === 'people'} onClick={() => onViewChange('people')} isCollapsed={isCollapsed} />
-          <NavItem icon={Star} label="CSAT & Sentiment" active={currentView === 'csat'} onClick={() => onViewChange('csat')} isCollapsed={isCollapsed} />
+          {canAccess('people') && <NavItem icon={Users} label="People & CRM" active={currentView === 'people'} onClick={() => onViewChange('people')} isCollapsed={isCollapsed} />}
+          {canAccess('csat') && <NavItem icon={Star} label="CSAT & Sentiment" active={currentView === 'csat'} onClick={() => onViewChange('csat')} isCollapsed={isCollapsed} />}
         </SidebarSection>
+        )}
 
+        {canAccess('outbound') && (
         <SidebarSection title="Outbound" icon={Megaphone} isCollapsed={isCollapsed} onToggle={onToggle}>
           <NavItem icon={Megaphone} label="Campaigns" active={currentView === 'outbound'} onClick={() => onViewChange('outbound')} isCollapsed={isCollapsed} />
           <NavItem icon={LayoutDashboard} label="Product Tours" active={currentView === 'product-tours'} onClick={() => onViewChange('product-tours')} isCollapsed={isCollapsed} />
           <NavItem icon={Megaphone} label="News & Updates" active={currentView === 'news'} onClick={() => onViewChange('news')} isCollapsed={isCollapsed} />
         </SidebarSection>
+        )}
 
+        {(canAccess('analyze') || canAccess('train') || canAccess('test')) && (
         <SidebarSection title="AI Agent" icon={Bot} isCollapsed={isCollapsed} onToggle={onToggle}>
-          <NavItem icon={BarChart} label="Analyze" active={currentView === 'analyze'} onClick={() => onViewChange('analyze')} isCollapsed={isCollapsed} />
-          <NavItem icon={GraduationCap} label="Train Agent" active={currentView === 'train'} onClick={() => onViewChange('train')} isCollapsed={isCollapsed} />
+          {canAccess('analyze') && <NavItem icon={BarChart} label="Analyze" active={currentView === 'analyze'} onClick={() => onViewChange('analyze')} isCollapsed={isCollapsed} />}
+          {canAccess('train') && <NavItem icon={GraduationCap} label="Train Agent" active={currentView === 'train'} onClick={() => onViewChange('train')} isCollapsed={isCollapsed} />}
           <NavItem icon={BookOpen} label="Public Help Center" active={currentView === 'help-center'} onClick={() => onViewChange('help-center')} isCollapsed={isCollapsed} />
-          <NavItem icon={TestTube} label="Test" active={currentView === 'test'} onClick={() => onViewChange('test')} isCollapsed={isCollapsed} />
+          {canAccess('test') && <NavItem icon={TestTube} label="Test" active={currentView === 'test'} onClick={() => onViewChange('test')} isCollapsed={isCollapsed} />}
           <NavItem icon={Rocket} label="Deploy" active={currentView === 'deploy'} onClick={() => onViewChange('deploy')} isCollapsed={isCollapsed} />
         </SidebarSection>
+        )}
 
+        {(canAccess('website-chat') || canAccess('email') || canAccess('whatsapp') || canAccess('instagram') || canAccess('facebook') || canAccess('telegram') || canAccess('discord') || canAccess('slack')) && (
         <SidebarSection title="Channels" icon={Share2} isCollapsed={isCollapsed} onToggle={onToggle}>
-          <NavItem icon={Globe} label="Website Chat" active={currentView === 'website-chat'} onClick={() => onViewChange('website-chat')} isCollapsed={isCollapsed} />
-          <NavItem icon={Mail} label="Email" active={currentView === 'email'} onClick={() => onViewChange('email')} isCollapsed={isCollapsed} />
-          <NavItem icon={MessageCircle} label="WhatsApp" active={currentView === 'whatsapp'} onClick={() => onViewChange('whatsapp')} isCollapsed={isCollapsed} />
-          <NavItem icon={Instagram} label="Instagram" active={currentView === 'instagram'} onClick={() => onViewChange('instagram')} isCollapsed={isCollapsed} />
-          <NavItem icon={Facebook} label="Facebook Messenger" active={currentView === 'facebook'} onClick={() => onViewChange('facebook')} isCollapsed={isCollapsed} />
-          <NavItem icon={Send} label="Telegram" active={currentView === 'telegram'} onClick={() => onViewChange('telegram')} isCollapsed={isCollapsed} />
-          <NavItem icon={Hash} label="Slack" active={currentView === 'slack'} onClick={() => onViewChange('slack')} isCollapsed={isCollapsed} />
+          {canAccess('website-chat') && <NavItem icon={Globe} label="Website Chat" active={currentView === 'website-chat'} onClick={() => onViewChange('website-chat')} isCollapsed={isCollapsed} />}
+          {canAccess('email') && <NavItem icon={Mail} label="Email" active={currentView === 'email'} onClick={() => onViewChange('email')} isCollapsed={isCollapsed} />}
+          {canAccess('whatsapp') && <NavItem icon={MessageCircle} label="WhatsApp" active={currentView === 'whatsapp'} onClick={() => onViewChange('whatsapp')} isCollapsed={isCollapsed} />}
+          {canAccess('instagram') && <NavItem icon={Instagram} label="Instagram" active={currentView === 'instagram'} onClick={() => onViewChange('instagram')} isCollapsed={isCollapsed} />}
+          {canAccess('facebook') && <NavItem icon={Facebook} label="Facebook Messenger" active={currentView === 'facebook'} onClick={() => onViewChange('facebook')} isCollapsed={isCollapsed} />}
+          {canAccess('telegram') && <NavItem icon={Send} label="Telegram" active={currentView === 'telegram'} onClick={() => onViewChange('telegram')} isCollapsed={isCollapsed} />}
+          {canAccess('slack') && <NavItem icon={Hash} label="Slack" active={currentView === 'slack'} onClick={() => onViewChange('slack')} isCollapsed={isCollapsed} />}
           <NavItem icon={Mic} label="Voice AI" active={currentView === 'voice-ai'} onClick={() => onViewChange('voice-ai')} isCollapsed={isCollapsed} />
         </SidebarSection>
+        )}
 
+        {(canAccess('ai-automations') || canAccess('macros') || canAccess('workflows')) && (
         <SidebarSection title="Automation" icon={Zap} isCollapsed={isCollapsed} onToggle={onToggle}>
-          <NavItem icon={Bot} label="AI Automations" active={currentView === 'ai-automations'} onClick={() => onViewChange('ai-automations')} isCollapsed={isCollapsed} />
-          <NavItem icon={Zap} label="Macros & Snippets" active={currentView === 'macros'} onClick={() => onViewChange('macros')} isCollapsed={isCollapsed} />
+          {canAccess('ai-automations') && <NavItem icon={Bot} label="AI Automations" active={currentView === 'ai-automations'} onClick={() => onViewChange('ai-automations')} isCollapsed={isCollapsed} />}
+          {canAccess('macros') && <NavItem icon={Zap} label="Macros & Snippets" active={currentView === 'macros'} onClick={() => onViewChange('macros')} isCollapsed={isCollapsed} />}
           <NavItem icon={ArrowUpRight} label="Escalations" active={currentView === 'escalations'} onClick={() => onViewChange('escalations')} isCollapsed={isCollapsed} />
-          <NavItem icon={GitBranch} label="Workflows" active={currentView === 'workflows'} onClick={() => onViewChange('workflows')} isCollapsed={isCollapsed} />
+          {canAccess('workflows') && <NavItem icon={GitBranch} label="Workflows" active={currentView === 'workflows'} onClick={() => onViewChange('workflows')} isCollapsed={isCollapsed} />}
         </SidebarSection>
+        )}
 
         <SidebarSection title="Settings" icon={Sliders} isCollapsed={isCollapsed} onToggle={onToggle}>
-          <NavItem icon={Users} label="Team Members" active={currentView === 'team-members'} onClick={() => onViewChange('team-members')} isCollapsed={isCollapsed} />
-          <NavItem icon={Clock} label="Business Hours & SLA" active={currentView === 'business-hours'} onClick={() => onViewChange('business-hours')} isCollapsed={isCollapsed} />
-          <NavItem icon={Layers} label="Integrations" active={currentView === 'integrations'} onClick={() => onViewChange('integrations')} isCollapsed={isCollapsed} />
-          <NavItem icon={MessageCircle} label="Chat Widget" active={currentView === 'chat-widget'} onClick={() => onViewChange('chat-widget')} isCollapsed={isCollapsed} />
-          <NavItem icon={CreditCard} label="Billing" active={currentView === 'billing'} onClick={() => onViewChange('billing')} isCollapsed={isCollapsed} />
-          <NavItem icon={Key} label="API Keys" active={currentView === 'api-keys'} onClick={() => onViewChange('api-keys')} isCollapsed={isCollapsed} />
+          {canAccess('team-members') && <NavItem icon={Users} label="Team Members" active={currentView === 'team-members'} onClick={() => onViewChange('team-members')} isCollapsed={isCollapsed} />}
+          {canAccess('business-hours') && <NavItem icon={Clock} label="Business Hours & SLA" active={currentView === 'business-hours'} onClick={() => onViewChange('business-hours')} isCollapsed={isCollapsed} />}
+          {canAccess('integrations') && <NavItem icon={Layers} label="Integrations" active={currentView === 'integrations'} onClick={() => onViewChange('integrations')} isCollapsed={isCollapsed} />}
+          {canAccess('chat-widget') && <NavItem icon={MessageCircle} label="Chat Widget" active={currentView === 'chat-widget'} onClick={() => onViewChange('chat-widget')} isCollapsed={isCollapsed} />}
+          {canAccess('billing') && <NavItem icon={CreditCard} label="Billing" active={currentView === 'billing'} onClick={() => onViewChange('billing')} isCollapsed={isCollapsed} />}
+          {canAccess('api-keys') && <NavItem icon={Key} label="API Keys" active={currentView === 'api-keys'} onClick={() => onViewChange('api-keys')} isCollapsed={isCollapsed} />}
           <NavItem 
             icon={LogOut} 
             label="Logout" 

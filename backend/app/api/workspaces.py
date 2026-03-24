@@ -169,7 +169,21 @@ async def create_invite(
             invited_by=current_user.id,
             email=body.email,
             role=body.role,
+            allowed_pages=body.allowed_pages if hasattr(body, 'allowed_pages') else [],
         )
+        return InviteResponse.model_validate(invite)
+    except invite_service.InviteError as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+
+@router.get("/invites/{token}", response_model=InviteResponse)
+async def get_invite_endpoint(
+    token: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """Get an invite by token (public endpoint so users can see invite before signup/login)."""
+    try:
+        invite = await invite_service.get_invite(db, token=token)
         return InviteResponse.model_validate(invite)
     except invite_service.InviteError as e:
         raise HTTPException(status_code=e.status_code, detail=e.detail)

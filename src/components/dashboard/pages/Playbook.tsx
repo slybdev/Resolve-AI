@@ -11,10 +11,15 @@ import {
   Terminal,
   X,
   CheckCircle2,
-  Save
+  Save,
+  Wand2,
+  Sparkles,
+  Zap,
+  RefreshCw
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { api } from '@/src/lib/api';
 
 interface Directive {
   id: string;
@@ -74,6 +79,12 @@ const playbookTemplates = [
 ];
 
 export const Playbook = ({ workspaceId }: { workspaceId: string }) => {
+  const [workspace, setWorkspace] = useState<any>(null);
+  const [systemPrompt, setSystemPrompt] = useState("");
+  const [activeTone, setActiveTone] = useState("Professional");
+  const [isSaving, setIsSaving] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
+
   const [selectedDirective, setSelectedDirective] = useState<Directive | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -82,6 +93,62 @@ export const Playbook = ({ workspaceId }: { workspaceId: string }) => {
     description: "",
     rules: ["", "", ""]
   });
+
+  const tones = [
+    { label: "Professional", icon: ShieldAlert, color: "text-blue-500" },
+    { label: "Friendly", icon: MessageSquare, color: "text-green-500" },
+    { label: "Humorous", icon: Zap, color: "text-yellow-500" },
+    { label: "Empathetic", icon: Sparkles, color: "text-purple-500" },
+    { label: "Concise", icon: Terminal, color: "text-orange-500" }
+  ];
+
+  React.useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const ws = await api.workspaces.get(workspaceId);
+        setWorkspace(ws);
+        setSystemPrompt(ws.ai_system_prompt || "");
+        setActiveTone(ws.ai_tone || "Professional");
+        countWords(ws.ai_system_prompt || "");
+      } catch (error) {
+        console.error("Failed to fetch workspace settings:", error);
+      }
+    };
+    fetchSettings();
+  }, [workspaceId]);
+
+  const countWords = (text: string) => {
+    const words = text.trim().split(/\s+/).filter(w => w.length > 0);
+    setWordCount(words.length);
+  };
+
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    const words = val.trim().split(/\s+/).filter(w => w.length > 0);
+    if (words.length <= 50) {
+      setSystemPrompt(val);
+      setWordCount(words.length);
+    }
+  };
+
+  const handleSavePlaybook = async () => {
+    setIsSaving(true);
+    try {
+      await api.request(`/api/v1/workspaces/${workspaceId}`, {
+        method: 'PUT', // update_workspace uses PUT in the backend
+        body: JSON.stringify({
+          ai_system_prompt: systemPrompt,
+          ai_tone: activeTone
+        })
+      });
+      alert("Playbook updated successfully!");
+    } catch (error) {
+      console.error("Failed to save playbook:", error);
+      alert("Failed to update playbook.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const applyTemplate = (template: typeof playbookTemplates[0]) => {
     setFormState({
@@ -109,11 +176,83 @@ export const Playbook = ({ workspaceId }: { workspaceId: string }) => {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-8 max-w-7xl mx-auto space-y-12">
+      {/* System Instructions & Tone Section */}
+      <section className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
+        <div className="p-8 border-b border-border bg-accent/5">
+          <div className="flex items-center justify-between mb-8">
+             <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center">
+                  <Wand2 className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">AI Instructions</h2>
+                  <p className="text-sm text-muted-foreground">Define who your agent is and how it should speak.</p>
+                </div>
+             </div>
+             <button 
+               onClick={handleSavePlaybook}
+               disabled={isSaving}
+               className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all btn-press shadow-lg shadow-primary/20 disabled:opacity-50"
+             >
+                {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Save Playbook
+             </button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* System Prompt TextArea */}
+            <div className="lg:col-span-2 space-y-3">
+              <div className="flex items-center justify-between ml-1">
+                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Core Instructions (Max 50 words)</label>
+                <span className={cn(
+                  "text-[10px] font-bold tracking-widest uppercase",
+                  wordCount >= 45 ? "text-orange-500" : "text-muted-foreground"
+                )}>
+                  {wordCount}/50 words
+                </span>
+              </div>
+              <textarea 
+                value={systemPrompt}
+                onChange={handlePromptChange}
+                placeholder="e.g. You are a helpful assistant for Stark Industries. Be clever but stay on topic. If you don't know, ask J.A.R.V.I.S..."
+                rows={4}
+                className="w-full bg-accent/50 border border-border rounded-2xl p-6 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all resize-none leading-relaxed"
+              />
+            </div>
+
+            {/* AI Tone Picker */}
+            <div className="space-y-3">
+              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">AI Agent Personality</label>
+              <div className="grid grid-cols-1 gap-2">
+                {tones.map((tone) => (
+                  <button
+                    key={tone.label}
+                    onClick={() => setActiveTone(tone.label)}
+                    className={cn(
+                      "flex items-center justify-between p-3 rounded-xl border transition-all text-left",
+                      activeTone === tone.label 
+                        ? "bg-primary/10 border-primary/40 text-foreground" 
+                        : "bg-accent/30 border-border text-muted-foreground hover:border-primary/20"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <tone.icon className={cn("w-4 h-4", activeTone === tone.label ? tone.color : "opacity-40")} />
+                      <span className="text-xs font-bold">{tone.label}</span>
+                    </div>
+                    {activeTone === tone.label && <CheckCircle2 className="w-4 h-4 text-primary" />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-foreground">Behavioral Playbook</h2>
-          <p className="text-sm text-muted-foreground">Define how your AI agent interacts and handles complex scenarios.</p>
+          <p className="text-sm text-muted-foreground">Detailed rules for handling specific customer situations.</p>
         </div>
         <button 
           onClick={handleOpenAddModal}

@@ -16,6 +16,7 @@ const SignUp = lazy(() => import('./components/auth/SignUp').then(module => ({ d
 const Login = lazy(() => import('./components/auth/Login').then(module => ({ default: module.Login })));
 const PricingPage = lazy(() => import('./components/auth/PricingPage').then(module => ({ default: module.PricingPage })));
 const OnboardingFlow = lazy(() => import('./components/onboarding/OnboardingFlow').then(module => ({ default: module.OnboardingFlow })));
+const InviteAcceptPage = lazy(() => import('./components/auth/InviteAcceptPage').then(module => ({ default: module.InviteAcceptPage })));
 
 const LoadingScreen = () => (
   <div className="h-screen w-full flex items-center justify-center bg-black">
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/onboarding" element={<OnboardingFlow />} />
+          <Route path="/invite/accept" element={<InviteAcceptPage />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <Dashboard />

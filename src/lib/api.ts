@@ -22,24 +22,28 @@ class APIClient {
     return !!this.accessToken;
   }
 
-  private getHeaders() {
+  private getHeaders(isFormData: boolean = false) {
     return {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(this.accessToken ? { 'Authorization': `Bearer ${this.accessToken}` } : {}),
     };
   }
 
   async request(endpoint: string, options: RequestInit = {}) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    // Normalize URL to avoid double slashes
+    const url = `${API_BASE_URL}${endpoint}`.replace(/([^:]\/)\/+/g, "$1");
+    
+    const isFormData = options.body instanceof FormData;
+    
+    const response = await fetch(url, {
       ...options,
       headers: {
-        ...this.getHeaders(),
+        ...this.getHeaders(isFormData),
         ...options.headers,
       },
     });
 
     if (!response.ok) {
-      // Handle Unauthorized (401) sessions
       if (response.status === 401 && !endpoint.includes('/auth/')) {
         this.auth.logout();
         window.location.href = '/login';
@@ -113,11 +117,23 @@ class APIClient {
   // Team
   team = {
     members: (workspaceId: string) => this.request(`/team/${workspaceId}/members`),
+    invites: (workspaceId: string) => this.request(`/team/${workspaceId}/invites`),
+    invite: (workspaceId: string, data: any) =>
+      this.request(`/team/${workspaceId}/invite`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
     updateRole: (workspaceId: string, userId: string, role: string) => 
       this.request(`/team/${workspaceId}/members/${userId}`, {
         method: 'PATCH',
         body: JSON.stringify({ role }),
       }),
+    removeMember: (workspaceId: string, userId: string) =>
+      this.request(`/team/${workspaceId}/members/${userId}`, { method: 'DELETE' }),
+    revokeInvite: (workspaceId: string, inviteId: string) =>
+      this.request(`/team/${workspaceId}/invites/${inviteId}`, { method: 'DELETE' }),
+    currentMember: (workspaceId: string) =>
+      this.request(`/team/${workspaceId}/me`),
   };
 
   // Settings
@@ -137,6 +153,10 @@ class APIClient {
     create: (data: any) => this.request('/workspaces', {
       method: 'POST',
       body: JSON.stringify(data),
+    }),
+    getInvite: (token: string) => this.request(`/workspaces/invites/${token}`),
+    acceptInvite: (token: string) => this.request(`/workspaces/invites/accept?token=${token}`, {
+      method: 'POST',
     }),
   };
 
@@ -231,6 +251,120 @@ class APIClient {
     markAsRead: (conversation_id: string) => 
       this.request(`/conversations/${conversation_id}/read`, {
         method: 'POST',
+      }),
+  };
+
+  // Knowledge
+  knowledge = {
+    sources: {
+      list: (workspaceId: string) => this.request(`/workspaces/${workspaceId}/knowledge/sources`),
+      get: (workspaceId: string, id: string) => this.request(`/workspaces/${workspaceId}/knowledge/sources/${id}`),
+      create: (workspaceId: string, data: any) => this.request(`/workspaces/${workspaceId}/knowledge/sources`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+      update: (workspaceId: string, id: string, data: any) => this.request(`/workspaces/${workspaceId}/knowledge/sources/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+      delete: (workspaceId: string, id: string) => this.request(`/workspaces/${workspaceId}/knowledge/sources/${id}`, {
+        method: 'DELETE',
+      }),
+      sync: (workspaceId: string, id: string) => this.request(`/workspaces/${workspaceId}/knowledge/sources/${id}/sync`, {
+        method: 'POST',
+      }),
+      // Legacy upload endpoint (kept for backward compat)
+      uploadFile: (workspaceId: string, id: string, file: File, parentId?: string) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (parentId) formData.append('parent_id', parentId);
+        
+        return this.request(`/workspaces/${workspaceId}/knowledge/sources/${id}/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+      },
+    },
+    documents: {
+      list: (workspaceId: string, params?: { source_id?: string; folder_id?: string; status_filter?: string }) => {
+        const searchParams = new URLSearchParams();
+        if (params?.source_id) searchParams.append('source_id', params.source_id);
+        if (params?.folder_id) searchParams.append('folder_id', params.folder_id);
+        if (params?.status_filter) searchParams.append('status_filter', params.status_filter);
+        
+        const queryString = searchParams.toString();
+        return this.request(`/workspaces/${workspaceId}/knowledge/documents${queryString ? `?${queryString}` : ''}`);
+      },
+      get: (workspaceId: string, id: string) => this.request(`/workspaces/${workspaceId}/knowledge/documents/${id}`),
+      delete: (workspaceId: string, id: string) => this.request(`/workspaces/${workspaceId}/knowledge/documents/${id}`, {
+        method: 'DELETE',
+      }),
+      upload: (workspaceId: string, file: File, sourceId?: string, folderId?: string) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        if (sourceId) formData.append('source_id', sourceId);
+        if (folderId) formData.append('folder_id', folderId);
+
+        return this.request(`/workspaces/${workspaceId}/knowledge/documents/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+      },
+      update: (workspaceId: string, id: string, data: { title?: string; usage_agent?: boolean; usage_copilot?: boolean; usage_help_center?: boolean }) => 
+        this.request(`/workspaces/${workspaceId}/knowledge/documents/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+        }),
+    },
+    folders: {
+      list: (workspaceId: string, parentId?: string) => {
+        const searchParams = new URLSearchParams();
+        if (parentId) searchParams.append('parent_id', parentId);
+        const queryString = searchParams.toString();
+        return this.request(`/workspaces/${workspaceId}/knowledge/folders${queryString ? `?${queryString}` : ''}`);
+      },
+      create: (workspaceId: string, data: { name: string; parent_id?: string }) => this.request(`/workspaces/${workspaceId}/knowledge/folders`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+      update: (workspaceId: string, id: string, data: { name?: string; parent_id?: string; usage_agent?: boolean; usage_copilot?: boolean; usage_help_center?: boolean }) => 
+        this.request(`/workspaces/${workspaceId}/knowledge/folders/${id}`, {
+          method: 'PATCH',
+          body: JSON.stringify(data),
+        }),
+      delete: (workspaceId: string, id: string) => this.request(`/workspaces/${workspaceId}/knowledge/folders/${id}`, {
+        method: 'DELETE',
+      }),
+      assignDocument: (workspaceId: string, folderId: string, documentId: string) => this.request(`/workspaces/${workspaceId}/knowledge/folders/${folderId}/documents`, {
+        method: 'POST',
+        body: JSON.stringify({ document_id: documentId }),
+      }),
+      removeDocument: (workspaceId: string, folderId: string, documentId: string) => this.request(`/workspaces/${workspaceId}/knowledge/folders/${folderId}/documents/${documentId}`, {
+        method: 'DELETE',
+      }),
+    },
+    notion: {
+      authorizeUrl: (workspaceId: string) => `${API_BASE_URL}/notion/authorize?workspace_id=${workspaceId}`.replace(/([^:]\/)\/+/g, "$1"),
+      sync: (sourceId: string) => this.request(`/notion/sync/${sourceId}`, { method: 'POST' }),
+    },
+    search: {
+      semantic: (workspaceId: string, query: string, topK: number = 5) => 
+        this.request(`/search/knowledge?workspace_id=${workspaceId}&query=${encodeURIComponent(query)}&top_k=${topK}`, {
+          method: 'POST',
+        }),
+    }
+  };
+
+  // AI
+  ai = {
+    query: (workspaceId: string, query: string, folderId?: string) => 
+      this.request('/ai/query', {
+        method: 'POST',
+        body: JSON.stringify({
+          workspace_id: workspaceId,
+          query: query,
+          folder_id: folderId
+        }),
       }),
   };
 

@@ -16,6 +16,7 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.services import auth_service
+from app.services import invite_service
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
@@ -27,6 +28,12 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
         user, tokens = await auth_service.register(
             db, email=body.email, password=body.password, full_name=body.full_name
         )
+        # If an invite_token was provided, accept it atomically after registration
+        if body.invite_token:
+            try:
+                await invite_service.accept_invite(db, token=body.invite_token, user=user)
+            except invite_service.InviteError:
+                pass  # Don't fail registration if invite acceptance fails
         return AuthResponse(
             user=UserResponse.model_validate(user),
             tokens=TokenResponse(**tokens),

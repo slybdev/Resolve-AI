@@ -19,3 +19,6 @@ from app.models.api_key import APIKey  # noqa: F401
 
 # Engineer B models (Milestone 2)
 from app.models.channel import Channel  # noqa: F401
+
+# Knowledge & Training models
+from app.models.knowledge import KnowledgeSource, KnowledgeDocument, Folder  # noqa: F401

@@ -20,12 +20,20 @@ logger = logging.getLogger(__name__)
 # Silence noisy libraries
 logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 logging.getLogger("discord").setLevel(logging.WARNING)
-logging.getLogger("aiomysql").setLevel(logging.WARNING)
+logging.getLogger("psycopg").setLevel(logging.WARNING)
 
 
 async def lifespan(app: FastAPI):  # noqa: ARG001
     """Application lifespan — startup & shutdown hooks."""
     # ── Startup ──
+    from arq import create_pool
+    from arq.connections import RedisSettings
+    from app.core.config import get_settings
+    
+    settings = get_settings()
+    # Initialize background task pool (Redis)
+    app.state.arq_pool = await create_pool(RedisSettings.from_dsn(settings.REDIS_URL))
+    
     from app.services.channels.discord_manager import discord_bot_manager
     from app.db.session import async_session_factory
     
@@ -61,19 +69,25 @@ async def lifespan(app: FastAPI):  # noqa: ARG001
                 logger.error(f"Error in email polling task: {e}")
 
     import asyncio
-    asyncio.create_task(_start_bots_task())
-    email_polling_task = asyncio.create_task(_poll_emails_task())
+    # asyncio.create_task(_start_bots_task())
+    # email_polling_task = asyncio.create_task(_poll_emails_task())
+    email_polling_task = None
     
     yield
     # ── Shutdown ──
     from app.services.channels.discord_manager import discord_bot_manager
     await discord_bot_manager.stop_all()
     
-    email_polling_task.cancel()
-    try:
-        await email_polling_task
-    except asyncio.CancelledError:
-        pass
+    if email_polling_task:
+        email_polling_task.cancel()
+        try:
+            await email_polling_task
+        except asyncio.CancelledError:
+            pass
+    
+    # Close Redis pool
+    if hasattr(app.state, "arq_pool"):
+        await app.state.arq_pool.close()
     
     from app.db.session import engine
 
@@ -94,9 +108,19 @@ def create_app() -> FastAPI:
     )
 
     # ── CORS ──
+    print(f"CORS ORIGINS (Env): {settings.BACKEND_CORS_ORIGINS}")
+    # Hardcode for local dev to ensure hot-reload and credentials work
+    origins = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:8000",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:8000",
+    ]
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -119,6 +143,10 @@ def create_app() -> FastAPI:
     from app.api.team import router as team_router
     from app.api.api_keys import router as api_keys_router
     from app.api.settings import router as settings_router
+    from app.api.knowledge import router as knowledge_router
+    from app.api.notion import router as notion_router
+    from app.api.search import router as search_router
+    from app.api.ai import router as ai_router
 
     app.include_router(auth_router)
     app.include_router(onboarding_router)
@@ -136,6 +164,10 @@ def create_app() -> FastAPI:
     app.include_router(team_router)
     app.include_router(api_keys_router)
     app.include_router(settings_router)
+    app.include_router(knowledge_router)
+    app.include_router(notion_router)
+    app.include_router(search_router)
+    app.include_router(ai_router)
 
     # ── Static Files ──
     from fastapi.staticfiles import StaticFiles

@@ -26,10 +26,15 @@ class Settings(BaseSettings):
         return self.BACKEND_URL
 
     # ── Database ──
-    DATABASE_URL: str = "mysql+aiomysql://xentraldesk:xentraldesk_dev@localhost:3306/xentraldesk"
+    DATABASE_URL: str = "postgresql+psycopg://xentraldesk:xentraldesk_dev@db:5432/xentraldesk"
+
+    # ── Notion OAuth ──
+    NOTION_CLIENT_ID: str = ""
+    NOTION_CLIENT_SECRET: str = ""
+    NOTION_REDIRECT_URI: str = "http://localhost:8000/api/v1/notion/callback"
 
     # ── Redis ──
-    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_URL: str = "redis://redis:6379/0"
 
     # ── Auth / JWT ──
     SECRET_KEY: str = "change-me-to-a-random-secret-key"

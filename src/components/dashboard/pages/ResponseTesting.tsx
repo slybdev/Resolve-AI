@@ -2,46 +2,63 @@ import React, { useState } from 'react';
 import { Play, Bot, User, ShieldCheck, Database, RefreshCw, MoreVertical, Search, MessageSquare } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { PromptInputBox } from '../../ui/ai-prompt-box';
+import { api } from '@/src/lib/api';
 
 interface TestMessage {
   id: string;
   role: 'user' | 'ai';
   content: string;
   confidence?: number;
-  sources?: string[];
+  sources?: { title: string; score: number; content: string }[];
 }
 
 export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
-  const [messages, setMessages] = useState<TestMessage[]>([
-    {
-      id: '1',
-      role: 'user',
-      content: 'What is your refund policy for arc reactors?'
-    },
-    {
-      id: '2',
-      role: 'ai',
-      content: 'Our refund policy for arc reactors allows for a full refund within 30 days of purchase, provided the core is still intact and has not been exposed to extreme gamma radiation.',
-      confidence: 0.94,
-      sources: ['Refund Policy v2.1', 'Product Manual v4']
-    }
-  ]);
+  const [messages, setMessages] = useState<TestMessage[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastAiResponse, setLastAiResponse] = useState<TestMessage | null>(null);
+  
+  const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  const handleSend = (content: string) => {
+  // Auto-scroll to bottom whenever messages or loading state changes
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isLoading]);
+
+  const handleSend = async (content: string) => {
     const userMsg: TestMessage = { id: Date.now().toString(), role: 'user', content };
-    setMessages([...messages, userMsg]);
+    setMessages(prev => [...prev, userMsg]);
+    setIsLoading(true);
     
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await api.ai.query(workspaceId, content);
+      
       const aiMsg: TestMessage = {
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: "I'm processing your request using the knowledge base. Based on our documents, the standard procedure is to verify the serial number first.",
-        confidence: 0.88,
-        sources: ['Support FAQ', 'Internal Wiki']
+        content: response.answer,
+        confidence: response.confidence_score,
+        sources: response.sources.map((s: any) => ({
+          title: s.title,
+          score: s.score,
+          content: s.content
+        }))
       };
+      
       setMessages(prev => [...prev, aiMsg]);
-    }, 1000);
+      setLastAiResponse(aiMsg);
+    } catch (error) {
+      console.error("AI Query failed:", error);
+      const errorMsg: TestMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'ai',
+        content: "Sorry, I encountered an error while processing your request. Please try again."
+      };
+      setMessages(prev => [...prev, errorMsg]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -55,8 +72,11 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
             </div>
             <h2 className="text-sm font-bold text-foreground">AI Playground</h2>
           </div>
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-accent border border-border rounded-lg text-[10px] font-bold text-foreground transition-colors btn-press">
-            <RefreshCw className="w-3 h-3" />
+          <button 
+            onClick={() => { setMessages([]); setLastAiResponse(null); }}
+            className="flex items-center gap-2 px-3 py-1.5 bg-card hover:bg-accent border border-border rounded-lg text-[10px] font-bold text-foreground transition-colors btn-press"
+          >
+            <RefreshCw className={cn("w-3 h-3", isLoading && "animate-spin")} />
             Clear Session
           </button>
         </div>
@@ -66,13 +86,13 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
             <div key={msg.id} className={cn("flex gap-4 max-w-[85%]", msg.role === 'ai' ? "ml-0" : "ml-auto flex-row-reverse")}>
                 <div className={cn(
                   "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm",
-                  msg.role === 'ai' ? "bg-primary/10 border border-primary/20" : "bg-accent border border-border"
+                  msg.role === 'ai' ? "bg-primary/20 border border-primary/30" : "bg-accent border border-border"
                 )}>
                   {msg.role === 'ai' ? (
-                    <div className="w-full h-full rounded-lg flex items-center justify-center bg-primary/10 border border-primary/20">
-                      <div className="w-4 h-4 rounded-sm bg-primary/30" />
-                    </div>
-                  ) : <User className="w-5 h-5 text-muted-foreground" />}
+                    <Bot className="w-5 h-5 text-primary" />
+                  ) : (
+                    <User className="w-5 h-5 text-muted-foreground" />
+                  )}
                 </div>
               <div className={cn("space-y-2", msg.role === 'user' && "text-right")}>
                 <div className={cn(
@@ -92,12 +112,41 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
               </div>
             </div>
           ))}
+
+          {messages.length === 0 && !isLoading && (
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-40 py-20">
+              <div className="w-16 h-16 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center">
+                <Bot className="w-8 h-8 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-bold text-foreground">AI Ready to Help</p>
+                <p className="text-[10px] text-muted-foreground">Ask me anything about your knowledge base</p>
+              </div>
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="flex gap-4 max-w-[85%] ml-0">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 shadow-sm bg-primary/20 border border-primary/30">
+                <Bot className="w-5 h-5 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <div className="p-4 rounded-2xl text-sm leading-relaxed shadow-sm bg-primary/10 border border-primary/20 text-foreground rounded-tl-none flex items-center gap-1 min-w-[60px] h-[48px]">
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
+                </div>
+              </div>
+            </div>
+          )}
+          <div ref={scrollRef} className="h-0 w-0" />
         </div>
 
         <div className="p-8 border-t border-border">
           <PromptInputBox 
             onSend={handleSend}
-            placeholder="Type a customer question to test AI response..."
+            placeholder={isLoading ? "AI is thinking..." : "Type a customer question to test AI response..."}
+            disabled={isLoading}
           />
         </div>
       </div>
@@ -116,11 +165,30 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
               <div className="relative w-24 h-24 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90">
                   <circle cx="48" cy="48" r="40" fill="transparent" stroke="hsl(var(--accent))" strokeWidth="8" />
-                  <circle cx="48" cy="48" r="40" fill="transparent" stroke="hsl(var(--primary))" strokeWidth="8" strokeDasharray="251.2" strokeDashoffset="25.12" strokeLinecap="round" />
+                  <circle 
+                    cx="48" 
+                    cy="48" 
+                    r="40" 
+                    fill="transparent" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth="8" 
+                    strokeDasharray="251.2" 
+                    strokeDashoffset={251.2 * (1 - (lastAiResponse?.confidence || 0))} 
+                    strokeLinecap="round" 
+                  />
                 </svg>
-                <span className="absolute text-xl font-bold text-foreground">94%</span>
+                <span className="absolute text-xl font-bold text-foreground">
+                  {Math.round((lastAiResponse?.confidence || 0) * 100)}%
+                </span>
               </div>
-              <p className="text-xs text-green-500 font-bold">High Confidence</p>
+              <p className={cn(
+                "text-xs font-bold",
+                (lastAiResponse?.confidence || 0) > 0.8 ? "text-green-500" : 
+                (lastAiResponse?.confidence || 0) > 0.5 ? "text-yellow-500" : "text-red-500"
+              )}>
+                {(lastAiResponse?.confidence || 0) > 0.8 ? "High Confidence" : 
+                 (lastAiResponse?.confidence || 0) > 0.5 ? "Medium Confidence" : "Low Confidence"}
+              </p>
             </div>
           </div>
 
@@ -128,21 +196,23 @@ export const ResponseTesting = ({ workspaceId }: { workspaceId: string }) => {
           <div className="space-y-4">
             <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Retrieved Knowledge</h4>
             <div className="space-y-3">
-              {[
-                { title: 'Refund Policy v2.1', score: 0.92, content: 'Refunds for arc reactors are processed within 30 days...' },
-                { title: 'Product Manual v4', score: 0.85, content: 'Ensure the palladium core is removed before shipping...' }
-              ].map((source, i) => (
+              {lastAiResponse?.sources?.length ? lastAiResponse.sources.map((source, i) => (
                 <div key={i} className="bg-card border border-border p-4 rounded-2xl space-y-2 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Database className="w-3 h-3 text-primary" />
                       <span className="text-[10px] font-bold text-foreground">{source.title}</span>
                     </div>
-                    <span className="text-[10px] font-mono text-muted-foreground">Score: {source.score}</span>
+                    <span className="text-[10px] font-mono text-muted-foreground">Score: {source.score.toFixed(3)}</span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2 italic">"{source.content}"</p>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3 italic">"{source.content}"</p>
                 </div>
-              ))}
+              )) : (
+                <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground border border-dashed border-border rounded-2xl">
+                  <Search className="w-8 h-8 opacity-20 mb-2" />
+                  <p className="text-[10px]">No sources retrieved yet.</p>
+                </div>
+              )}
             </div>
           </div>
 

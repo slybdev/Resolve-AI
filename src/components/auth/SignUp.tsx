@@ -9,6 +9,8 @@ export const SignUp = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const selectedPlan = searchParams.get('plan');
+  const inviteToken = searchParams.get('invite_token');
+  const isInviteFlow = !!inviteToken;
   
   const [formData, setFormData] = React.useState({
     fullName: '',
@@ -18,6 +20,18 @@ export const SignUp = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isInviteFlow && inviteToken) {
+      api.workspaces.getInvite(inviteToken)
+        .then((invite) => {
+          setFormData((prev) => ({ ...prev, email: invite.email }));
+        })
+        .catch((err) => {
+          setError('Failed to load invite details. The link may be invalid or expired.');
+        });
+    }
+  }, [isInviteFlow, inviteToken]);
 
   const passwordStrength = React.useMemo(() => {
     const password = formData.password;
@@ -61,9 +75,16 @@ export const SignUp = () => {
       await api.auth.register({
         email: formData.email,
         password: formData.password,
-        full_name: formData.fullName
+        full_name: formData.fullName,
+        ...(isInviteFlow && inviteToken ? { invite_token: inviteToken } : {}),
       });
-      navigate('/onboarding');
+
+      if (isInviteFlow) {
+        // Invite acceptance is handled on the backend — go straight to dashboard
+        navigate('/dashboard');
+      } else {
+        navigate('/onboarding');
+      }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please try again.');
     } finally {
@@ -134,9 +155,13 @@ export const SignUp = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => !isInviteFlow && setFormData({ ...formData, email: e.target.value })}
+                  readOnly={isInviteFlow}
                   placeholder="john@company.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                  className={cn(
+                    "w-full bg-white/5 border border-white/10 rounded-xl py-2.5 pl-11 pr-4 text-sm text-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all",
+                    isInviteFlow && "opacity-60 cursor-not-allowed"
+                  )}
                 />
               </div>
             </div>

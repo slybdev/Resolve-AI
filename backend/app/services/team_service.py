@@ -7,7 +7,7 @@ from typing import List
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy.orm import selectinload
 from app.models.user import User
 from app.models.workspace import WorkspaceMember
 
@@ -20,7 +20,9 @@ class TeamService:
     ) -> List[WorkspaceMember]:
         """Get all members of a workspace."""
         result = await db.execute(
-            select(WorkspaceMember).where(WorkspaceMember.workspace_id == workspace_id)
+            select(WorkspaceMember)
+            .options(selectinload(WorkspaceMember.user))
+            .where(WorkspaceMember.workspace_id == workspace_id)
         )
         return result.scalars().all()
 

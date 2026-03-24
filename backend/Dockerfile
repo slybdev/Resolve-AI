@@ -32,8 +32,10 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY . .
 
-# Switch to non-root user
-USER appuser
+# Ensure uploads directory exists
+RUN mkdir -p /app/uploads
+
+# EXPOSE 8000
 
 EXPOSE 8000
 

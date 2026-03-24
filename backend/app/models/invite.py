@@ -5,7 +5,7 @@ Invite model — team invitation system for workspaces.
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, Uuid
+from sqlalchemy import DateTime, ForeignKey, JSON, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -30,6 +30,9 @@ class Invite(Base):
     )  # pending, accepted, expired
     expires_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
+    )
+    allowed_pages: Mapped[list] = mapped_column(
+        JSON, default=list, nullable=True
     )
 
     # Relationships

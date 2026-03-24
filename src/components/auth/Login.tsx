@@ -1,11 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Bot, Mail, Lock, Github, Chrome, Eye, EyeOff } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '@/src/lib/api';
 
 export const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const inviteToken = searchParams.get('invite_token');
+  const isInviteFlow = !!inviteToken;
+
   const [formData, setFormData] = React.useState({
     email: '',
     password: ''
@@ -13,6 +17,18 @@ export const Login = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isInviteFlow && inviteToken) {
+      api.workspaces.getInvite(inviteToken)
+        .then((invite) => {
+          setFormData((prev) => ({ ...prev, email: invite.email }));
+        })
+        .catch((err) => {
+          setError('Failed to load invite details. The link may be invalid or expired.');
+        });
+    }
+  }, [isInviteFlow, inviteToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +40,16 @@ export const Login = () => {
         email: formData.email,
         password: formData.password
       });
+
+      if (isInviteFlow && inviteToken) {
+        try {
+          // Accept the invite
+          await api.workspaces.acceptInvite(inviteToken);
+        } catch (_) {
+          // Ignore error, they still logged in
+        }
+      }
+
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
@@ -71,9 +97,10 @@ export const Login = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => !isInviteFlow && setFormData({ ...formData, email: e.target.value })}
+                  readOnly={isInviteFlow}
                   placeholder="john@company.com"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                  className={`w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-11 pr-4 text-white placeholder:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all ${isInviteFlow ? 'opacity-60 cursor-not-allowed' : ''}`}
                 />
               </div>
             </div>

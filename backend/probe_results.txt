@@ -1,0 +1,9 @@
+models/gemini-2.0-flash-lite-preview-09-2025 -> FAILED: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-2.0-flash-lite-preview-09-2025 is n
+models/gemini-flash-latest -> SUCCESS
+models/gemini-2.0-flash -> FAILED: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please 
+models/gemini-flash-lite-latest -> SUCCESS
+models/gemini-2.0-flash-lite -> FAILED: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please 
+models/gemma-3-4b-it -> SUCCESS
+models/gemini-2.0-flash-exp -> FAILED: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-2.0-flash-exp is not found for API 
+models/gemini-1.5-flash-8b -> FAILED: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash-8b is not found for API v
+models/gemini-1.5-pro-latest -> FAILED: 404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-pro-latest is not found for API

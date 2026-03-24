@@ -6,14 +6,14 @@ services:
       dockerfile: Dockerfile
     container_name: xentraldesk-api
     ports:
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     env_file:
       - .env
     environment:
-      - DATABASE_URL=mysql+aiomysql://xentraldesk:xentraldesk_dev@mysql:3306/xentraldesk
+      - DATABASE_URL=postgresql+psycopg://xentraldesk:xentraldesk_dev@db:5432/xentraldesk
       - REDIS_URL=redis://redis:6379/0
     depends_on:
-      mysql:
+      db:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -21,28 +21,53 @@ services:
       - ./app:/app/app
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
+##      - ./uploads:/app/uploads
+    restart: unless-stopped
+    command: /bin/sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: xentraldesk-worker
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+psycopg://xentraldesk:xentraldesk_dev@db:5432/xentraldesk
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
       - ./uploads:/app/uploads
     restart: unless-stopped
-    command: /bin/sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    command: arq app.worker.WorkerSettings
 
-  # ---------- MySQL 8.0 ----------
-  mysql:
-    image: mysql:8.0
-    container_name: xentraldesk-mysql
+  # ---------- PostgreSQL with pgvector ----------
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: xentraldesk-db
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_dev}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-xentraldesk}
-      MYSQL_USER: ${MYSQL_USER:-xentraldesk}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-xentraldesk_dev}
-
-    command: --default-authentication-plugin=mysql_native_password
+      POSTGRES_USER: ${POSTGRES_USER:-xentraldesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-xentraldesk_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-xentraldesk}
+    ports:
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - xentral_postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD-SHELL", "pg_isready -U xentraldesk -d xentraldesk"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   # ---------- Redis 7 ----------
   redis:
@@ -58,22 +83,21 @@ services:
       timeout: 5s
       retries: 5
 
-  # ---------- WhatsApp Bridge (Node.js) ----------
-  whatsapp-service:
-    build:
-      context: ../whatsapp-service
-      dockerfile: ../backend/Dockerfile.node # We'll create a simple Node Dockerfile
-    container_name: xentraldesk-whatsapp
-    environment:
-      - BACKEND_URL=http://api:8000/api/v1/webhooks/whatsapp_qr
-      - BASE_URL=https://xentraldesk.com
-    volumes:
-      - ../whatsapp-service/sessions:/app/sessions
-      - ./uploads:/app/uploads
-    depends_on:
-      - api
-    restart: unless-stopped
+#  # ---------- WhatsApp Bridge (Node.js) ----------
+#  whatsapp-service:
+#    build:
+#      context: ../whatsapp-service
+#      dockerfile: ../backend/Dockerfile.node
+#    container_name: xentraldesk-whatsapp
+#    environment:
+#      - BACKEND_URL=http://api:8000/api/v1/webhooks/whatsapp_qr
+#      - BASE_URL=https://xentraldesk.com
+#    volumes:
+#      - ../whatsapp-service/sessions:/app/sessions
+#    depends_on:
+#      - api
+#    restart: unless-stopped
 
 volumes:
-  mysql_data:
+  xentral_postgres_data:
   redis_data:

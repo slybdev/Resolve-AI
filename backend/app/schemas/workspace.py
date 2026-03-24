@@ -5,6 +5,8 @@ Workspace schemas — request/response models for workspace CRUD.
 import uuid
 from datetime import datetime
 
+from typing import List, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -29,6 +31,8 @@ class WorkspaceUpdate(BaseModel):
         pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$",
     )
     plan: str | None = Field(default=None, max_length=50)
+    ai_system_prompt: str | None = Field(default=None, max_length=1000)
+    ai_tone: str | None = Field(default=None, max_length=50)
 
 
 # ── Responses ──
@@ -39,6 +43,7 @@ class WorkspaceMemberResponse(BaseModel):
     user_id: uuid.UUID
     workspace_id: uuid.UUID
     role: str
+    allowed_pages: Optional[List[str]] = []
     created_at: datetime
 
     model_config = {"from_attributes": True}
@@ -57,6 +62,8 @@ class WorkspaceResponse(BaseModel):
     slug: str
     plan: str
     owner_id: uuid.UUID
+    ai_system_prompt: Optional[str] = None
+    ai_tone: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -69,6 +76,7 @@ class WorkspaceResponse(BaseModel):
 class InviteCreate(BaseModel):
     email: str = Field(max_length=255)
     role: str = Field(default="member", max_length=50)
+    allowed_pages: List[str] = Field(default_factory=list)
 
 
 class InviteAccept(BaseModel):
@@ -81,6 +89,8 @@ class InviteResponse(BaseModel):
     workspace_id: uuid.UUID
     role: str
     status: str
+    token: str
+    allowed_pages: Optional[List[str]] = []
     expires_at: datetime
     created_at: datetime
 

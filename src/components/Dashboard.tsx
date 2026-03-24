@@ -55,6 +55,8 @@ const Dashboard = () => {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [workspaceId, setWorkspaceId] = useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [allowedPages, setAllowedPages] = useState<string[]>([]);
+  const [currentMemberRole, setCurrentMemberRole] = useState<string | null>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -85,7 +87,17 @@ const Dashboard = () => {
     try {
       const workspaces = await api.workspaces.list();
       if (workspaces && workspaces.length > 0) {
-        setWorkspaceId(workspaces[0].id);
+        const wsId = workspaces[0].id;
+        setWorkspaceId(wsId);
+        // Fetch the current user's membership to get allowed_pages
+        try {
+          const member = await api.team.currentMember(wsId);
+          setAllowedPages(member?.allowed_pages || []);
+          setCurrentMemberRole(member?.role || null);
+        } catch {
+          setAllowedPages([]); // Owner / admin — full access
+          setCurrentMemberRole('owner'); // Fallback for workspace creator
+        }
       }
     } catch (err) {
       console.error("Failed to fetch workspaces", err);
@@ -179,9 +191,8 @@ const Dashboard = () => {
       case 'train': return <Train workspaceId={workspaceId} />;
       case 'test': return <Test workspaceId={workspaceId} />;
       case 'deploy': return <ComingSoon title="Deploy Agent" />;
-      case 'prompt-editor': return <PromptEditor workspaceId={workspaceId} />;
       case 'ai-settings': return <AISettings workspaceId={workspaceId} />;
-      case 'team-members': return <TeamMembers workspaceId={workspaceId} />;
+      case 'team-members': return <TeamMembers workspaceId={workspaceId} currentUserRole={currentMemberRole} />;
       case 'business-hours': return <BusinessHours workspaceId={workspaceId} />;
       case 'integrations': return <Integrations workspaceId={workspaceId} onViewChange={handleViewChange} />;
       case 'chat-widget': return <ChatWidget workspaceId={workspaceId} />;
@@ -203,6 +214,7 @@ const Dashboard = () => {
           isCollapsed={!isSidebarOpen} 
           onToggle={toggleSidebar}
           onLogout={handleLogout}
+          allowedPages={allowedPages}
         />
       </div>
 

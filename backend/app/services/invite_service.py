@@ -28,6 +28,7 @@ async def create_invite(
     invited_by: uuid.UUID,
     email: str,
     role: str = "member",
+    allowed_pages: list | None = None,
 ) -> Invite:
     """Create a team invite for the given workspace."""
     # Verify workspace exists
@@ -71,10 +72,24 @@ async def create_invite(
         role=role,
         status="pending",
         expires_at=datetime.now(timezone.utc) + timedelta(days=7),
+        allowed_pages=allowed_pages or [],
     )
     db.add(invite)
     await db.flush()
+    await db.commit()
+    await db.refresh(invite)
 
+    return invite
+
+
+async def get_invite(db: AsyncSession, token: str) -> Invite:
+    """Get an invite by its token."""
+    result = await db.execute(select(Invite).where(Invite.token == token))
+    invite = result.scalar_one_or_none()
+    
+    if not invite:
+        raise InviteError("Invite not found", status_code=404)
+        
     return invite
 
 
@@ -92,7 +107,8 @@ async def accept_invite(
     if not invite:
         raise InviteError("Invalid or expired invite", status_code=404)
 
-    if invite.expires_at < datetime.now(timezone.utc):
+    expires_at_aware = invite.expires_at.replace(tzinfo=timezone.utc) if invite.expires_at.tzinfo is None else invite.expires_at
+    if expires_at_aware < datetime.now(timezone.utc):
         invite.status = "expired"
         await db.flush()
         raise InviteError("Invite has expired", status_code=410)
@@ -117,10 +133,12 @@ async def accept_invite(
         user_id=user.id,
         workspace_id=invite.workspace_id,
         role=invite.role,
+        allowed_pages=invite.allowed_pages or [],
     )
     db.add(member)
 
     invite.status = "accepted"
-    await db.flush()
+    await db.commit()
+    await db.refresh(member)
 
     return member
