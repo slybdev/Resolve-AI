@@ -1,0 +1,100 @@
+﻿xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/services', 'mode': 'browser', 'depth': 0, 'duration_ms': 40373.36, 'chars': 1350}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Cognitive Infrastructure at Scale (1350 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [9/9]: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/contact "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/contact, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | ERROR:app.services.browser_service:Playwright fetch failed for https://mcgatetechnologies.com/contact: Page.goto: Timeout 20000ms exceeded.
+xentraldesk-worker  | Call log:
+xentraldesk-worker  |   - navigating to "https://mcgatetechnologies.com/contact", waiting until "domcontentloaded"
+xentraldesk-worker  | 
+xentraldesk-worker  | ERROR:app.connectors.website_connector:Playwright fallback failed for https://mcgatetechnologies.com/contact
+xentraldesk-worker  | WARNING:trafilatura.core:discarding data: None
+xentraldesk-worker  | WARNING:app.services.extraction_service:Trafilatura returned low-value content for https://mcgatetechnologies.com/contact, using fallback.
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/contact (Insufficient content after removal of boiler-plate)
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Γ£ù No content extracted from: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£à TARGET INGESTION COMPLETE: 4/9 pages extracted.
+xentraldesk-worker  | INFO:app.services.knowledge_service:≡ƒò╕∩╕Å SCRAPER DISCOVERED 4 DOCUMENTS
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document c6500736-ada7-4af1-9d85-d58ed90d172b
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 39fa341b-e0c5-48f1-b242-e130111c87e7: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document c6500736-ada7-4af1-9d85-d58ed90d172b: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [2/4]: Architecting the Future
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 39fa341b-e0c5-48f1-b242-e130111c87e7: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d8f6ee25-02cc-4728-a9c5-8247fa6ff9c0: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [3/4]: Defining the Visionary Standard
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document 16160cb0-f9f3-4685-ac46-64dd5f291e67
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 39fa341b-e0c5-48f1-b242-e130111c87e7: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [4/4]: Cognitive Infrastructure at Scale
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document d6bff3b2-be38-4ec9-8154-34818266c7c7
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 0 cached, 2 new
+xentraldesk-worker  | INFO:google_genai._api_client:Retrying due to aiohttp error: Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef3911e50> [Temporary failure in name resolution]
+xentraldesk-worker  | ERROR:app.embeddings.gemini:Gemini Embedding API error (attempt): Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef8f13b50> [Name or service not known]
+xentraldesk-worker  | INFO:google_genai._api_client:Retrying due to aiohttp error: Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef8f13b50> [Name or service not known]
+xentraldesk-worker  | ERROR:app.embeddings.gemini:Gemini Embedding API error (attempt): Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef3c737d0> [Name or service not known]
+xentraldesk-worker  | INFO:google_genai._api_client:Retrying due to aiohttp error: Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef3c737d0> [Name or service not known]
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 39fa341b-e0c5-48f1-b242-e130111c87e7: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 4 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: c6500736-ada7-4af1-9d85-d58ed90d172b Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | 21:49:11: 434.45s ΓåÉ 8bd75cf7ad18481481348420aba60ac2:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker:434.45s ΓåÉ 8bd75cf7ad18481481348420aba60ac2:scrape_document_job ΓùÅ 
+xentraldesk-worker  | PostgreSQL is up - proceeding
+xentraldesk-worker  | 21:55:09: Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | INFO:arq.worker:Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | 21:55:09: redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=159
+xentraldesk-worker  | INFO:arq.worker:redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=159
+xentraldesk-worker  | INFO:app.worker:Worker: Starting up...
+xentraldesk-worker  | INFO:app.services.browser_service:Initializing Playwright Browser...
+xentraldesk-worker  | INFO:app.services.browser_service:Playwright Browser started.

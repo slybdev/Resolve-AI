@@ -1,0 +1,20 @@
+﻿xentraldesk-api  |     await self.middleware_stack(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+xentraldesk-api  |     await route.handle(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/routing.py", line 350, in handle
+xentraldesk-api  |     await self.app(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/fastapi/routing.py", line 160, in app
+xentraldesk-api  |     await wrap_app_handling_exceptions(app, session)(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+xentraldesk-api  |     raise exc
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+xentraldesk-api  |     await app(scope, receive, sender)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/fastapi/routing.py", line 157, in app
+xentraldesk-api  |     await func(session)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/fastapi/routing.py", line 764, in app
+xentraldesk-api  |     await dependant.call(**solved_result.values)
+xentraldesk-api  |   File "/app/app/api/websocket.py", line 154, in widget_websocket_endpoint
+xentraldesk-api  |     await pubsub_manager.redis.publish(redis_channel, {"type": "system", "message": "visitor_disconnected"})
+xentraldesk-api  |           ^^^^^^^^^^^^^^^^^^^^
+xentraldesk-api  | AttributeError: 'PubSubManager' object has no attribute 'redis'. Did you mean: '_redis'?
+xentraldesk-api  | INFO:     connection closed

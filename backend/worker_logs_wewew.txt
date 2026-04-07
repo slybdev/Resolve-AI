@@ -1,0 +1,300 @@
+﻿xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 39fa341b-e0c5-48f1-b242-e130111c87e7: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 16160cb0-f9f3-4685-ac46-64dd5f291e67: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [4/4]: Cognitive Infrastructure at Scale
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document d6bff3b2-be38-4ec9-8154-34818266c7c7
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 0 cached, 2 new
+xentraldesk-worker  | INFO:google_genai._api_client:Retrying due to aiohttp error: Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef3911e50> [Temporary failure in name resolution]
+xentraldesk-worker  | ERROR:app.embeddings.gemini:Gemini Embedding API error (attempt): Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef8f13b50> [Name or service not known]
+xentraldesk-worker  | INFO:google_genai._api_client:Retrying due to aiohttp error: Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef8f13b50> [Name or service not known]
+xentraldesk-worker  | ERROR:app.embeddings.gemini:Gemini Embedding API error (attempt): Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef3c737d0> [Name or service not known]
+xentraldesk-worker  | INFO:google_genai._api_client:Retrying due to aiohttp error: Cannot connect to host generativelanguage.googleapis.com:443 ssl:<ssl.SSLContext object at 0x7bcef3c737d0> [Name or service not known]
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 39fa341b-e0c5-48f1-b242-e130111c87e7: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d6bff3b2-be38-4ec9-8154-34818266c7c7: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 4 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: c6500736-ada7-4af1-9d85-d58ed90d172b Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | 21:49:11: 434.45s ΓåÉ 8bd75cf7ad18481481348420aba60ac2:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker:434.45s ΓåÉ 8bd75cf7ad18481481348420aba60ac2:scrape_document_job ΓùÅ 
+xentraldesk-worker  | PostgreSQL is up - proceeding
+xentraldesk-worker  | 21:55:09: Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | INFO:arq.worker:Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | 21:55:09: redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=159
+xentraldesk-worker  | INFO:arq.worker:redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=159
+xentraldesk-worker  | INFO:app.worker:Worker: Starting up...
+xentraldesk-worker  | INFO:app.services.browser_service:Initializing Playwright Browser...
+xentraldesk-worker  | INFO:app.services.browser_service:Playwright Browser started.
+xentraldesk-worker  | PostgreSQL is up - proceeding
+xentraldesk-worker  | 22:00:39: Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | INFO:arq.worker:Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | 22:00:39: redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=159
+xentraldesk-worker  | INFO:arq.worker:redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=159
+xentraldesk-worker  | INFO:app.worker:Worker: Starting up...
+xentraldesk-worker  | INFO:app.services.browser_service:Initializing Playwright Browser...
+xentraldesk-worker  | INFO:app.services.browser_service:Playwright Browser started.
+xentraldesk-worker  | 22:04:02:   0.12s ΓåÆ 42283019229749e4995a25074fc23d87:scrape_document_job('a56cd44e-439e-4bbc-a086-e36d1340783b', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:arq.worker:  0.12s ΓåÆ 42283019229749e4995a25074fc23d87:scrape_document_job('a56cd44e-439e-4bbc-a086-e36d1340783b', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé SCRAPE JOB STARTED                                  Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document ID: a56cd44e-439e-4bbc-a086-e36d1340783b Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé URL: https://mcgatetechnologies.com/          Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ ≡ƒÆÄ GOD_MODE v4: SCRAPER NAMING LOCK          Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ SOURCE_NAME: mc gate                          Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ DOC_ID: a56cd44e-439e-4bbc-a086-e36d1340783b  Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/robots.txt "HTTP/1.1 200 OK"
+xentraldesk-worker  | WARNING:app.connectors.website_connector:robots.txt at https://mcgatetechnologies.com/robots.txt returned HTML. Likely an SPA catch-all. Ignoring restrictions.
+xentraldesk-worker  | INFO:app.connectors.website_connector:≡ƒÄ» TARGET MODE: Processing 7 user-selected URLs
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [1/7]: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/ "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/', 'mode': 'browser', 'depth': 0, 'duration_ms': 52825.22, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Architecting the Future (1014 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [2/7]: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/contact "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/contact, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/contact (Insufficient content after removal of boiler-plate)
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Γ£ù No content extracted from: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [3/7]: https://mcgatetechnologies.com/privacy
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/privacy "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/privacy, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/privacy
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/privacy', 'mode': 'browser', 'depth': 0, 'duration_ms': 42485.66, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/privacy (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [4/7]: https://mcgatetechnologies.com/terms
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/terms "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/terms, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/terms
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/terms', 'mode': 'browser', 'depth': 0, 'duration_ms': 44353.86, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/terms (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [5/7]: https://mcgatetechnologies.com/careers
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/careers "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/careers, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/careers
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/careers', 'mode': 'browser', 'depth': 0, 'duration_ms': 41575.3, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/careers (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [6/7]: https://mcgatetechnologies.com/about
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/about "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/about, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/about
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/about', 'mode': 'browser', 'depth': 0, 'duration_ms': 39070.27, 'chars': 1058}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Defining the Visionary Standard (1058 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [7/7]: https://mcgatetechnologies.com/services
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/services "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/services, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/services
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/services', 'mode': 'browser', 'depth': 0, 'duration_ms': 43832.37, 'chars': 1350}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Cognitive Infrastructure at Scale (1350 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£à TARGET INGESTION COMPLETE: 3/7 pages extracted.
+xentraldesk-worker  | INFO:app.services.knowledge_service:≡ƒò╕∩╕Å SCRAPER DISCOVERED 3 DOCUMENTS
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document a56cd44e-439e-4bbc-a086-e36d1340783b
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 0e962b6e-8643-44e3-9470-f2e8c6cc8e60: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document a56cd44e-439e-4bbc-a086-e36d1340783b: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [2/3]: Defining the Visionary Standard
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 0e962b6e-8643-44e3-9470-f2e8c6cc8e60: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 7036cc35-73bf-4b41-8d1c-2f64585cdaf3: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [3/3]: Cognitive Infrastructure at Scale
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document 0de6f770-19f3-4211-bb6a-320ed623358a
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 0e962b6e-8643-44e3-9470-f2e8c6cc8e60: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 0de6f770-19f3-4211-bb6a-320ed623358a: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 3 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: a56cd44e-439e-4bbc-a086-e36d1340783b Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | 22:09:26: 324.14s ΓåÉ 42283019229749e4995a25074fc23d87:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker:324.14s ΓåÉ 42283019229749e4995a25074fc23d87:scrape_document_job ΓùÅ 
+xentraldesk-worker  | PostgreSQL is up - proceeding
+xentraldesk-worker  | 22:14:37: Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | INFO:arq.worker:Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | 22:14:37: redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=160
+xentraldesk-worker  | INFO:arq.worker:redis_version=7.4.8 mem_usage=5.13M clients_connected=2 db_keys=160
+xentraldesk-worker  | INFO:app.worker:Worker: Starting up...
+xentraldesk-worker  | INFO:app.services.browser_service:Initializing Playwright Browser...
+xentraldesk-worker  | INFO:app.services.browser_service:Playwright Browser started.
+xentraldesk-worker  | 22:17:17:   0.29s ΓåÆ 745fdb91a1254204a65def4879ee0d12:scrape_document_job('e01b36d5-a051-495e-a7e1-5c03db9ece14', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:arq.worker:  0.29s ΓåÆ 745fdb91a1254204a65def4879ee0d12:scrape_document_job('e01b36d5-a051-495e-a7e1-5c03db9ece14', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé SCRAPE JOB STARTED                                  Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document ID: e01b36d5-a051-495e-a7e1-5c03db9ece14 Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé URL: https://mcgatetechnologies.com/          Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ ≡ƒÆÄ GOD_MODE v4: SCRAPER NAMING LOCK          Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ SOURCE_NAME: wewew                            Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ DOC_ID: e01b36d5-a051-495e-a7e1-5c03db9ece14  Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/robots.txt "HTTP/1.1 200 OK"
+xentraldesk-worker  | WARNING:app.connectors.website_connector:robots.txt at https://mcgatetechnologies.com/robots.txt returned HTML. Likely an SPA catch-all. Ignoring restrictions.
+xentraldesk-worker  | INFO:app.connectors.website_connector:≡ƒÄ» TARGET MODE: Processing 9 user-selected URLs
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [1/9]: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/ "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/', 'mode': 'browser', 'depth': 0, 'duration_ms': 42252.94, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Architecting the Future (1014 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [2/9]: https://mcgatetechnologies.com/privacy
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/privacy "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/privacy, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/privacy
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/privacy', 'mode': 'browser', 'depth': 0, 'duration_ms': 38689.9, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/privacy (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [3/9]: https://mcgatetechnologies.com/terms
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/terms "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/terms, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/terms
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/terms', 'mode': 'browser', 'depth': 0, 'duration_ms': 40233.24, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/terms (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [4/9]: https://mcgatetechnologies.com/blog
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/blog "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/blog, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/blog
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/blog (Insufficient content after removal of boiler-plate)
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Γ£ù No content extracted from: https://mcgatetechnologies.com/blog
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [5/9]: https://mcgatetechnologies.com/services
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/services "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/services, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/services
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/services', 'mode': 'browser', 'depth': 0, 'duration_ms': 39103.63, 'chars': 1350}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Cognitive Infrastructure at Scale (1350 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [6/9]: https://mcgatetechnologies.com/careers
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/careers "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/careers, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/careers
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/careers', 'mode': 'browser', 'depth': 0, 'duration_ms': 41647.1, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/careers (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [7/9]: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/contact "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/contact, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/contact (Insufficient content after removal of boiler-plate)
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Γ£ù No content extracted from: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [8/9]: https://mcgatetechnologies.com/partners
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/partners "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/partners, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/partners
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/partners', 'mode': 'browser', 'depth': 0, 'duration_ms': 45400.95, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/partners (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [9/9]: https://mcgatetechnologies.com/about
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/about "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/about, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/about
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/about', 'mode': 'browser', 'depth': 0, 'duration_ms': 41369.12, 'chars': 1058}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Defining the Visionary Standard (1058 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£à TARGET INGESTION COMPLETE: 3/9 pages extracted.
+xentraldesk-worker  | INFO:app.services.knowledge_service:≡ƒò╕∩╕Å SCRAPER DISCOVERED 3 DOCUMENTS
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document e01b36d5-a051-495e-a7e1-5c03db9ece14
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 1a98ad8d-8bac-4daa-8525-58c51b27d9b2: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e01b36d5-a051-495e-a7e1-5c03db9ece14: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [2/3]: Cognitive Infrastructure at Scale
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 1a98ad8d-8bac-4daa-8525-58c51b27d9b2: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document bd3f39dd-7214-43d5-b10b-9ce5b8b264a4: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [3/3]: Defining the Visionary Standard
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document 845c5b84-ac64-40db-b1d9-8e31775ef467
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 1a98ad8d-8bac-4daa-8525-58c51b27d9b2: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 845c5b84-ac64-40db-b1d9-8e31775ef467: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 3 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: e01b36d5-a051-495e-a7e1-5c03db9ece14 Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | 22:23:42: 384.62s ΓåÉ 745fdb91a1254204a65def4879ee0d12:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker:384.62s ΓåÉ 745fdb91a1254204a65def4879ee0d12:scrape_document_job ΓùÅ 

@@ -1,0 +1,757 @@
+﻿xentraldesk-api  | INFO:app.main:LIFESPAN: Starting Discord Bot Manager in background...
+xentraldesk-api  | INFO:     Application startup complete.
+xentraldesk-api  | INFO:     172.18.0.1:49976 - "GET /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:49976 - "GET /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60600 - "GET /api/v1/team/5c75a34c-d213-4ac4-9422-8428f38c208f/me HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60610 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api  | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 1)
+xentraldesk-api  | INFO:     connection closed
+xentraldesk-api  | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api  | INFO:     172.18.0.1:60626 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api  | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 1)
+xentraldesk-api  | INFO:     connection open
+xentraldesk-api  | INFO:     172.18.0.1:60600 - "GET /api/v1/team/5c75a34c-d213-4ac4-9422-8428f38c208f/me HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:49976 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:49976 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60628 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api  | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 2)
+xentraldesk-api  | INFO:     connection open
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60638 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60032 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60032 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60032 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60032 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api  | INFO:     connection closed
+xentraldesk-api  | INFO:     172.18.0.1:60032 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:42054 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:42056 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:60032 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:42054 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:42056 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:42072 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api  | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 2)
+xentraldesk-api  | INFO:     connection open
+xentraldesk-api  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/robots.txt "HTTP/1.1 200 OK"
+xentraldesk-api  | WARNING:app.connectors.website_connector:robots.txt at https://mcgatetechnologies.com/robots.txt returned HTML. Likely an SPA catch-all. Ignoring restrictions.
+xentraldesk-api  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/ "HTTP/1.1 200 OK"
+xentraldesk-api  | INFO:app.services.browser_service:Initializing Playwright Browser...
+xentraldesk-api  | INFO:app.services.browser_service:Playwright Browser started.
+xentraldesk-api  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/, triggering Playwright fallback.
+xentraldesk-api  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/
+xentraldesk-api  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/', 'mode': 'browser', 'depth': 0, 'duration_ms': 42798.0, 'chars': 1014}
+xentraldesk-api  | INFO:     172.18.0.1:42060 - "POST /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources/website/preview HTTP/1.1" 200 OK
+xentraldesk-api  | WARNING:  WatchFiles detected changes in 'app/connectors/website_connector.py'. Reloading...
+xentraldesk-api  | INFO:     Shutting down
+xentraldesk-api  | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api  | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api  | INFO:     connection closed
+xentraldesk-api  | INFO:     connection closed
+xentraldesk-api  | INFO:     Waiting for application shutdown.
+xentraldesk-api  | INFO:     Application shutdown complete.
+xentraldesk-api  | INFO:     Finished server process [1319]
+xentraldesk-api  | INFO:app.services.ingestion_service:tiktoken available - using token-based chunking
+xentraldesk-api  | INFO:     Started server process [1489]
+xentraldesk-api  | INFO:     Waiting for application startup.
+xentraldesk-api  | INFO:app.main:LIFESPAN: Starting Discord Bot Manager in background...
+xentraldesk-api  | INFO:     Application startup complete.
+xentraldesk-api  | INFO:     172.18.0.1:38018 - "OPTIONS /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38030 - "OPTIONS /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38030 - "GET /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38018 - "OPTIONS /api/v1/team/5c75a34c-d213-4ac4-9422-8428f38c208f/me HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38030 - "GET /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38018 - "GET /api/v1/team/5c75a34c-d213-4ac4-9422-8428f38c208f/me HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38030 - "OPTIONS /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38040 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api  | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 1)
+xentraldesk-api  | INFO:     172.18.0.1:38056 - "OPTIONS /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     connection closed
+xentraldesk-api  | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api  | INFO:     172.18.0.1:38018 - "GET /api/v1/team/5c75a34c-d213-4ac4-9422-8428f38c208f/me HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38066 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api  | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 1)
+xentraldesk-api  | INFO:     connection open
+xentraldesk-api  | INFO:     172.18.0.1:38030 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api  | INFO:     172.18.0.1:38030 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-db   | 2026-04-01 09:44:50.094 UTC [310] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:44:50.094 UTC [310] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:44:50.094 UTC [310] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:44:51.060 UTC [308] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:44:51.060 UTC [308] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:44:51.060 UTC [308] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:44:53.168 UTC [311] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:44:53.168 UTC [311] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:44:53.168 UTC [311] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:44:54.096 UTC [306] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:44:54.096 UTC [306] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:44:54.096 UTC [306] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:44:56.081 UTC [309] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:44:56.081 UTC [309] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:44:56.081 UTC [309] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:44:57.080 UTC [310] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:44:57.080 UTC [310] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:44:57.080 UTC [310] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:44:59.068 UTC [308] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:44:59.068 UTC [308] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:44:59.068 UTC [308] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:00.074 UTC [307] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:00.074 UTC [307] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:00.074 UTC [307] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:02.070 UTC [311] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:02.070 UTC [311] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:02.070 UTC [311] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:03.048 UTC [306] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:03.048 UTC [306] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:03.048 UTC [306] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:05.243 UTC [309] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:05.243 UTC [309] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:05.243 UTC [309] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:06.087 UTC [310] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:06.087 UTC [310] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:06.087 UTC [310] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:08.083 UTC [308] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:08.083 UTC [308] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:08.083 UTC [308] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:09.084 UTC [307] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:09.084 UTC [307] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:09.084 UTC [307] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:11.198 UTC [311] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:11.198 UTC [311] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:11.198 UTC [311] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:12.044 UTC [306] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:12.044 UTC [306] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:12.044 UTC [306] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:14.122 UTC [309] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:14.122 UTC [309] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:14.122 UTC [309] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:15.130 UTC [310] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:15.130 UTC [310] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:15.130 UTC [310] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:17.068 UTC [308] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:17.068 UTC [308] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:17.068 UTC [308] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:18.084 UTC [307] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:18.084 UTC [307] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:18.084 UTC [307] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:20.103 UTC [311] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:20.103 UTC [311] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:20.103 UTC [311] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db   | 2026-04-01 09:45:21.089 UTC [306] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db   | 2026-04-01 09:45:21.089 UTC [306] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db   | 2026-04-01 09:45:21.089 UTC [306] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:23.085 UTC [309] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:23.085 UTC [309] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db      | 2026-04-01 09:45:23.085 UTC [309] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:24.130 UTC [310] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:24.130 UTC [310] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db      | 2026-04-01 09:45:24.130 UTC [310] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:26.100 UTC [308] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:26.100 UTC [308] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db      | 2026-04-01 09:45:26.100 UTC [308] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:27.048 UTC [307] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:27.048 UTC [307] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db      | 2026-04-01 09:45:27.048 UTC [307] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:29.102 UTC [311] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:29.102 UTC [311] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db      | 2026-04-01 09:45:29.102 UTC [311] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:30.081 UTC [306] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:30.081 UTC [306] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db      | 2026-04-01 09:45:30.081 UTC [306] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:32.182 UTC [309] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:32.182 UTC [309] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-api  | INFO:     172.18.0.1:38080 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api     | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 2)
+xentraldesk-api     | INFO:     connection open
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49970 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:33932 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:35544 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:51040 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49426 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49398 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:43406 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:35508 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:43920 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api     | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api     | INFO:     connection closed
+xentraldesk-api     | INFO:     connection closed
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "GET /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "GET /api/v1/workspaces HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49688 - "GET /api/v1/team/5c75a34c-d213-4ac4-9422-8428f38c208f/me HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49688 - "GET /api/v1/team/5c75a34c-d213-4ac4-9422-8428f38c208f/me HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49698 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api     | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 1)
+xentraldesk-api     | INFO:     connection closed
+xentraldesk-api     | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api     | INFO:     172.18.0.1:49708 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api     | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 1)
+xentraldesk-api     | INFO:     connection open
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49716 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api     | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 2)
+xentraldesk-api     | INFO:     connection open
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "GET /api/v1/conversations/?workspace_id=5c75a34c-d213-4ac4-9422-8428f38c208f HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:app.api.websocket:WebSocket left room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f
+xentraldesk-api     | INFO:     connection closed
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "OPTIONS /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49730 - "OPTIONS /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49746 - "OPTIONS /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49750 - "OPTIONS /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49730 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49746 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49682 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49750 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:49746 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:43536 - "WebSocket /api/v1/ws/widget/dashboard/5c75a34c-d213-4ac4-9422-8428f38c208f" [accepted]
+xentraldesk-api     | INFO:app.api.websocket:WebSocket joined room: workspace:5c75a34c-d213-4ac4-9422-8428f38c208f (Total: 2)
+xentraldesk-api     | INFO:     connection open
+xentraldesk-api     | INFO:     172.18.0.1:35176 - "OPTIONS /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources/website/preview HTTP/1.1" 200 OK
+xentraldesk-api     | WARNING:app.connectors.website_connector:Failed to fetch robots.txt for https://mcgatetechnologies.com/: 
+xentraldesk-api     | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/ "HTTP/1.1 200 OK"
+xentraldesk-api     | INFO:app.services.browser_service:Initializing Playwright Browser...
+xentraldesk-api     | INFO:app.services.browser_service:Playwright Browser started.
+xentraldesk-api     | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/, triggering Playwright fallback.
+xentraldesk-api     | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/
+xentraldesk-api     | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/', 'mode': 'browser', 'depth': 0, 'duration_ms': 66056.0, 'chars': 1319}
+xentraldesk-api     | INFO:     172.18.0.1:35176 - "POST /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources/website/preview HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "OPTIONS /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources/website/scrape HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:app.api.knowledge:ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+xentraldesk-api     | INFO:app.api.knowledge:Γòæ ≡ƒÆÄ GOD_MODE v6: NAMING TRACE                 Γòæ
+xentraldesk-api     | INFO:app.api.knowledge:Γòæ ALL KEYS RECEIVED: ['url', 'name', 'crawl_mode', 'max_depth', 'page_limit', 'include_patterns', 'exclude_patterns', 'frequency', 'content_focus', 'target_urls', 'respect_robots_txt']       Γòæ
+xentraldesk-api     | INFO:app.api.knowledge:Γòæ URL: https://mcgatetechnologies.com/          Γòæ
+xentraldesk-api     | INFO:app.api.knowledge:Γòæ PROVIDED_NAME: mcgate                         Γòæ
+xentraldesk-api     | INFO:app.api.knowledge:Γòæ FINAL SOURCE_NAME: mcgate                     Γòæ
+xentraldesk-api     | INFO:app.api.knowledge:ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+xentraldesk-api     | INFO:app.api.knowledge:Γ£ô ATOMIC CREATION COMPLETE: 3b479499-d430-4da8-9c38-f7ee4796b731 (mcgate)
+xentraldesk-api     | INFO:app.api.knowledge:Γ₧ñ ENQUEUEING BACKGROUND SCRAPE JOB (folder: None)...
+xentraldesk-api     | INFO:app.api.knowledge:Γ£ô JOB ENQUEUED SUCCESSFULLY
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "POST /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources/website/scrape HTTP/1.1" 201 Created
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59712 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/folders HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59716 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/sources HTTP/1.1" 200 OK
+xentraldesk-api     | INFO:     172.18.0.1:59720 - "GET /api/v1/workspaces/5c75a34c-d213-4ac4-9422-8428f38c208f/knowledge/documents HTTP/1.1" 200 OK
+xentraldesk-redis   | 1:M 31 Mar 2026 15:07:23.067 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 31 Mar 2026 15:07:23.070 * Background saving started by pid 7007
+xentraldesk-redis   | 7007:C 31 Mar 2026 15:07:23.183 * DB saved on disk
+xentraldesk-redis   | 7007:C 31 Mar 2026 15:07:23.184 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
+xentraldesk-redis   | 1:M 31 Mar 2026 15:07:23.274 * Background saving terminated with success
+xentraldesk-redis   | 1:C 31 Mar 2026 15:55:15.110 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 31 Mar 2026 15:55:15.110 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 31 Mar 2026 15:55:15.110 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.117 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.134 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.138 * Server initialized
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.142 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.142 * RDB age 2872 seconds
+xentraldesk-db      | 2026-04-01 09:45:32.182 UTC [309] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:45:33.143 UTC [310] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:45:33.143 UTC [310] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-worker  | PostgreSQL is up - proceeding
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.142 * RDB memory usage when created 4.43 Mb
+xentraldesk-worker  | 17:00:31: Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | INFO:arq.worker:Starting worker for 3 functions: process_document_job, scrape_document_job, run_campaign_job
+xentraldesk-worker  | 17:00:31: redis_version=7.4.8 mem_usage=4.51M clients_connected=1 db_keys=149
+xentraldesk-worker  | INFO:arq.worker:redis_version=7.4.8 mem_usage=4.51M clients_connected=1 db_keys=149
+xentraldesk-worker  | INFO:app.worker:Worker: Starting up...
+xentraldesk-worker  | INFO:app.services.browser_service:Initializing Playwright Browser...
+xentraldesk-db      | 2026-04-01 09:45:33.143 UTC [310] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.199 * Done loading RDB, keys loaded: 128, keys expired: 2.
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.199 * DB loaded from disk: 0.060 seconds
+xentraldesk-redis   | 1:M 31 Mar 2026 15:55:15.200 * Ready to accept connections tcp
+xentraldesk-redis   | 1:C 31 Mar 2026 16:18:37.419 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 31 Mar 2026 16:18:37.419 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 31 Mar 2026 16:18:37.419 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.421 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.429 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.432 * Server initialized
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.434 * Loading RDB produced by version 7.4.8
+xentraldesk-db      | 2026-04-01 09:48:56.121 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 09:48:59.802 UTC [28] LOG:  checkpoint complete: wrote 38 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=3.546 s, sync=0.044 s, total=3.682 s; sync files=25, longest=0.014 s, average=0.002 s; distance=74 kB, estimate=74 kB; lsn=0/2375608, redo lsn=0/23755D0
+xentraldesk-db      | 2026-04-01 09:53:56.863 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 09:53:57.325 UTC [28] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.411 s, sync=0.019 s, total=0.463 s; sync files=5, longest=0.012 s, average=0.004 s; distance=23 kB, estimate=69 kB; lsn=0/237B248, redo lsn=0/237B210
+xentraldesk-db      | 2026-04-01 09:56:34.145 UTC [791] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:56:34.145 UTC [791] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-db      | 2026-04-01 09:56:34.145 UTC [791] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:58:21.218 UTC [793] ERROR:  duplicate key value violates unique constraint "uq_channel_external_id"
+xentraldesk-db      | 2026-04-01 09:58:21.218 UTC [793] DETAIL:  Key (channel_id, external_id)=(e9c131fe-7ded-4332-ade1-97b5fd72e491, ) already exists.
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.434 * RDB age 4274 seconds
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.434 * RDB memory usage when created 4.43 Mb
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.478 * Done loading RDB, keys loaded: 128, keys expired: 2.
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.478 * DB loaded from disk: 0.046 seconds
+xentraldesk-redis   | 1:M 31 Mar 2026 16:18:37.479 * Ready to accept connections tcp
+xentraldesk-redis   | 1:signal-handler (1774975349) Received SIGTERM scheduling shutdown...
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:29.970 * User requested shutdown...
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:29.981 * Saving the final RDB snapshot before exiting.
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:30.163 * DB saved on disk
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:30.163 # Redis is now ready to exit, bye bye...
+xentraldesk-redis   | 1:C 31 Mar 2026 16:42:36.531 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 31 Mar 2026 16:42:36.532 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 31 Mar 2026 16:42:36.532 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.533 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.540 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.543 * Server initialized
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.545 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.545 * RDB age 7 seconds
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.545 * RDB memory usage when created 4.47 Mb
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.586 * Done loading RDB, keys loaded: 132, keys expired: 0.
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.587 * DB loaded from disk: 0.044 seconds
+xentraldesk-redis   | 1:M 31 Mar 2026 16:42:36.588 * Ready to accept connections tcp
+xentraldesk-redis   | 1:M 31 Mar 2026 18:05:29.264 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 31 Mar 2026 18:05:29.389 * Background saving started by pid 1273
+xentraldesk-worker  | INFO:app.services.browser_service:Playwright Browser started.
+xentraldesk-redis   | 1273:C 31 Mar 2026 18:05:29.896 * DB saved on disk
+xentraldesk-redis   | 1273:C 31 Mar 2026 18:05:29.897 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
+xentraldesk-redis   | 1:M 31 Mar 2026 18:05:29.902 * Background saving terminated with success
+xentraldesk-db      | 2026-04-01 09:58:21.218 UTC [793] STATEMENT:  INSERT INTO messages (conversation_id, sender_id, sender_type, body, message_type, channel_id, external_id, is_read, id) VALUES ($1::UUID, $2::UUID, $3::VARCHAR, $4::VARCHAR, $5::VARCHAR, $6::UUID, $7::VARCHAR, $8, $9::UUID) RETURNING messages.created_at, messages.updated_at
+xentraldesk-db      | 2026-04-01 09:58:56.387 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 09:58:57.373 UTC [28] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.914 s, sync=0.024 s, total=0.987 s; sync files=8, longest=0.015 s, average=0.003 s; distance=13 kB, estimate=63 kB; lsn=0/237E9A8, redo lsn=0/237E970
+xentraldesk-db      | 2026-04-01 10:09:44.310 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 10:09:44.977 UTC [28] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.139 s, sync=0.116 s, total=0.667 s; sync files=2, longest=0.081 s, average=0.058 s; distance=2 kB, estimate=57 kB; lsn=0/237F310, redo lsn=0/237F2D8
+xentraldesk-db      | 2026-04-01 10:19:45.077 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 10:19:47.144 UTC [28] LOG:  checkpoint complete: wrote 21 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.019 s, sync=0.014 s, total=2.067 s; sync files=10, longest=0.006 s, average=0.002 s; distance=19 kB, estimate=53 kB; lsn=0/2384148, redo lsn=0/2384110
+xentraldesk-db      | 2026-04-01 10:24:45.116 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 10:24:52.062 UTC [28] LOG:  checkpoint complete: wrote 69 buffers (0.4%); 0 WAL file(s) added, 0 removed, 0 recycled; write=6.857 s, sync=0.063 s, total=6.946 s; sync files=62, longest=0.006 s, average=0.002 s; distance=365 kB, estimate=365 kB; lsn=0/23DF848, redo lsn=0/23DF810
+xentraldesk-db      | 2026-04-01 10:29:45.119 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 10:29:45.258 UTC [28] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.107 s, sync=0.007 s, total=0.139 s; sync files=2, longest=0.005 s, average=0.004 s; distance=2 kB, estimate=329 kB; lsn=0/23E0310, redo lsn=0/23E02D8
+xentraldesk-db      | 2026-04-01 10:39:45.270 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 10:39:45.734 UTC [28] LOG:  checkpoint complete: wrote 4 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.405 s, sync=0.016 s, total=0.464 s; sync files=4, longest=0.009 s, average=0.004 s; distance=8 kB, estimate=297 kB; lsn=0/23E2348, redo lsn=0/23E2310
+xentraldesk-db      | 2026-04-01 10:44:45.792 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 10:44:46.745 UTC [28] LOG:  checkpoint complete: wrote 10 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.911 s, sync=0.018 s, total=0.954 s; sync files=9, longest=0.010 s, average=0.002 s; distance=12 kB, estimate=268 kB; lsn=0/23E54C0, redo lsn=0/23E5488
+xentraldesk-db      | 2026-04-01 10:54:45.785 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 10:54:49.368 UTC [28] LOG:  checkpoint complete: wrote 36 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=3.523 s, sync=0.030 s, total=3.584 s; sync files=35, longest=0.014 s, average=0.001 s; distance=124 kB, estimate=254 kB; lsn=0/2404690, redo lsn=0/2404658
+xentraldesk-db      | 
+xentraldesk-db      | PostgreSQL Database directory appears to contain a database; Skipping initialization
+xentraldesk-db      | 
+xentraldesk-db      | 2026-04-01 11:13:58.489 UTC [1] LOG:  starting PostgreSQL 16.13 (Debian 16.13-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+xentraldesk-db      | 2026-04-01 11:13:58.490 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+xentraldesk-db      | 2026-04-01 11:13:58.490 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+xentraldesk-db      | 2026-04-01 11:13:58.502 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+xentraldesk-db      | 2026-04-01 11:13:58.521 UTC [29] LOG:  database system was interrupted; last known up at 2026-04-01 10:54:49 UTC
+xentraldesk-db      | 2026-04-01 11:13:58.962 UTC [29] LOG:  database system was not properly shut down; automatic recovery in progress
+xentraldesk-db      | 2026-04-01 11:13:58.969 UTC [29] LOG:  redo starts at 0/2404658
+xentraldesk-db      | 2026-04-01 11:13:58.969 UTC [29] LOG:  invalid record length at 0/2404740: expected at least 24, got 0
+xentraldesk-db      | 2026-04-01 11:13:58.969 UTC [29] LOG:  redo done at 0/2404708 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+xentraldesk-db      | 2026-04-01 11:13:58.987 UTC [27] LOG:  checkpoint starting: end-of-recovery immediate wait
+xentraldesk-db      | 2026-04-01 11:13:59.018 UTC [27] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.007 s, sync=0.005 s, total=0.037 s; sync files=3, longest=0.002 s, average=0.002 s; distance=0 kB, estimate=0 kB; lsn=0/2404740, redo lsn=0/2404740
+xentraldesk-db      | 2026-04-01 11:13:59.039 UTC [1] LOG:  database system is ready to accept connections
+xentraldesk-db      | 2026-04-01 11:38:58.257 UTC [27] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 11:38:59.981 UTC [27] LOG:  checkpoint complete: wrote 17 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.646 s, sync=0.018 s, total=1.727 s; sync files=17, longest=0.009 s, average=0.002 s; distance=58 kB, estimate=58 kB; lsn=0/2412FB8, redo lsn=0/2412F80
+xentraldesk-db      | 2026-04-01 11:43:58.999 UTC [27] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 11:44:00.182 UTC [27] LOG:  checkpoint complete: wrote 12 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.120 s, sync=0.023 s, total=1.185 s; sync files=12, longest=0.011 s, average=0.002 s; distance=18 kB, estimate=54 kB; lsn=0/2417AA0, redo lsn=0/2417A68
+xentraldesk-db      | 2026-04-01 11:48:58.243 UTC [27] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 11:49:01.736 UTC [27] LOG:  checkpoint complete: wrote 35 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=3.430 s, sync=0.023 s, total=3.493 s; sync files=28, longest=0.011 s, average=0.001 s; distance=149 kB, estimate=149 kB; lsn=0/243D048, redo lsn=0/243D010
+xentraldesk-db      | 2026-04-01 11:53:58.789 UTC [27] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 11:53:59.255 UTC [27] LOG:  checkpoint complete: wrote 5 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.412 s, sync=0.016 s, total=0.466 s; sync files=5, longest=0.009 s, average=0.004 s; distance=8 kB, estimate=135 kB; lsn=0/243F0A0, redo lsn=0/243F068
+xentraldesk-db      | 2026-04-01 11:54:52.549 UTC [1] LOG:  received fast shutdown request
+xentraldesk-db      | 2026-04-01 11:54:52.566 UTC [1] LOG:  aborting any active transactions
+xentraldesk-db      | 2026-04-01 11:54:52.584 UTC [1] LOG:  background worker "logical replication launcher" (PID 32) exited with exit code 1
+xentraldesk-db      | 2026-04-01 11:54:52.584 UTC [27] LOG:  shutting down
+xentraldesk-db      | 2026-04-01 11:54:52.594 UTC [27] LOG:  checkpoint starting: shutdown immediate
+xentraldesk-db      | 2026-04-01 11:54:52.678 UTC [27] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.035 s, sync=0.001 s, total=0.094 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=121 kB; lsn=0/243F150, redo lsn=0/243F150
+xentraldesk-db      | 2026-04-01 11:54:52.715 UTC [1] LOG:  database system is shut down
+xentraldesk-db      | 
+xentraldesk-db      | PostgreSQL Database directory appears to contain a database; Skipping initialization
+xentraldesk-redis   | 1:signal-handler (1774980946) Received SIGTERM scheduling shutdown...
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:46.706 * User requested shutdown...
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:46.706 * Saving the final RDB snapshot before exiting.
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:46.759 * DB saved on disk
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:46.759 # Redis is now ready to exit, bye bye...
+xentraldesk-redis   | 1:C 31 Mar 2026 18:15:50.810 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 31 Mar 2026 18:15:50.810 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 31 Mar 2026 18:15:50.810 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.810 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.814 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.815 * Server initialized
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.816 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.816 * RDB age 4 seconds
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.816 * RDB memory usage when created 4.22 Mb
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.827 * Done loading RDB, keys loaded: 132, keys expired: 0.
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.827 * DB loaded from disk: 0.012 seconds
+xentraldesk-redis   | 1:M 31 Mar 2026 18:15:50.827 * Ready to accept connections tcp
+xentraldesk-redis   | 1:M 31 Mar 2026 19:15:51.053 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 31 Mar 2026 19:15:51.056 * Background saving started by pid 4345
+xentraldesk-redis   | 4345:C 31 Mar 2026 19:15:51.116 * DB saved on disk
+xentraldesk-redis   | 4345:C 31 Mar 2026 19:15:51.116 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+xentraldesk-redis   | 1:M 31 Mar 2026 19:15:51.157 * Background saving terminated with success
+xentraldesk-redis   | 1:M 31 Mar 2026 20:15:52.065 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 31 Mar 2026 20:15:52.067 * Background saving started by pid 8669
+xentraldesk-db      | 
+xentraldesk-db      | 2026-04-01 12:00:32.717 UTC [1] LOG:  starting PostgreSQL 16.13 (Debian 16.13-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+xentraldesk-redis   | 8669:C 31 Mar 2026 20:15:52.144 * DB saved on disk
+xentraldesk-redis   | 8669:C 31 Mar 2026 20:15:52.145 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+xentraldesk-redis   | 1:M 31 Mar 2026 20:15:52.168 * Background saving terminated with success
+xentraldesk-redis   | 1:M 31 Mar 2026 21:15:53.005 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 31 Mar 2026 21:15:53.008 * Background saving started by pid 12997
+xentraldesk-redis   | 12997:C 31 Mar 2026 21:15:53.077 * DB saved on disk
+xentraldesk-redis   | 12997:C 31 Mar 2026 21:15:53.077 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+xentraldesk-redis   | 1:M 31 Mar 2026 21:15:53.109 * Background saving terminated with success
+xentraldesk-redis   | 1:M 31 Mar 2026 22:15:54.004 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 31 Mar 2026 22:15:54.008 * Background saving started by pid 17310
+xentraldesk-redis   | 17310:C 31 Mar 2026 22:15:54.085 * DB saved on disk
+xentraldesk-redis   | 17310:C 31 Mar 2026 22:15:54.086 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+xentraldesk-redis   | 1:M 31 Mar 2026 22:15:54.110 * Background saving terminated with success
+xentraldesk-redis   | 1:M 31 Mar 2026 23:15:55.013 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 31 Mar 2026 23:15:55.015 * Background saving started by pid 21645
+xentraldesk-redis   | 21645:C 31 Mar 2026 23:15:55.088 * DB saved on disk
+xentraldesk-redis   | 21645:C 31 Mar 2026 23:15:55.089 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+xentraldesk-redis   | 1:M 31 Mar 2026 23:15:55.117 * Background saving terminated with success
+xentraldesk-redis   | 1:C 01 Apr 2026 07:59:42.285 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 01 Apr 2026 07:59:42.286 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-db      | 2026-04-01 12:00:32.725 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+xentraldesk-db      | 2026-04-01 12:00:32.725 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+xentraldesk-db      | 2026-04-01 12:00:32.744 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+xentraldesk-db      | 2026-04-01 12:00:32.789 UTC [30] LOG:  database system was shut down at 2026-04-01 11:54:52 UTC
+xentraldesk-redis   | 1:C 01 Apr 2026 07:59:42.286 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.298 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.303 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.315 * Server initialized
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.318 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.318 * RDB age 31427 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.318 * RDB memory usage when created 4.76 Mb
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.449 * Done loading RDB, keys loaded: 141, keys expired: 1.
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.449 * DB loaded from disk: 0.134 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 07:59:42.449 * Ready to accept connections tcp
+xentraldesk-redis   | 1:M 01 Apr 2026 08:59:43.054 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 01 Apr 2026 08:59:43.073 * Background saving started by pid 4301
+xentraldesk-redis   | 4301:C 01 Apr 2026 08:59:43.292 * DB saved on disk
+xentraldesk-redis   | 4301:C 01 Apr 2026 08:59:43.294 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
+xentraldesk-redis   | 1:M 01 Apr 2026 08:59:43.380 * Background saving terminated with success
+xentraldesk-redis   | 1:C 01 Apr 2026 09:38:54.405 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 01 Apr 2026 09:38:54.406 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 01 Apr 2026 09:38:54.406 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.408 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.422 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.424 * Server initialized
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.437 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.437 * RDB age 2351 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.437 * RDB memory usage when created 4.43 Mb
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.510 * Done loading RDB, keys loaded: 141, keys expired: 1.
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.510 * DB loaded from disk: 0.086 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 09:38:54.510 * Ready to accept connections tcp
+xentraldesk-redis   | 1:M 01 Apr 2026 10:38:55.082 * 1 changes in 3600 seconds. Saving...
+xentraldesk-worker  | 17:05:53:   0.22s ΓåÆ b4b0edd7e8a745aeafb9c9d75bb5d1db:scrape_document_job('17fb3c9b-c913-43f1-b6e2-28e5e9dcc056', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:arq.worker:  0.22s ΓåÆ b4b0edd7e8a745aeafb9c9d75bb5d1db:scrape_document_job('17fb3c9b-c913-43f1-b6e2-28e5e9dcc056', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé SCRAPE JOB STARTED                                  Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document ID: 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056 Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé URL: https://mcgatetechnologies.com/          Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ ≡ƒÆÄ GOD_MODE v4: SCRAPER NAMING LOCK          Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ SOURCE_NAME: mcgate                           Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ DOC_ID: 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056  Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+xentraldesk-db      | 2026-04-01 12:00:32.859 UTC [1] LOG:  database system is ready to accept connections
+xentraldesk-worker  | INFO:app.connectors.website_connector:≡ƒÜÇ ELITE INGESTION STARTING: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/ "HTTP/1.1 200 OK"
+xentraldesk-db      | 2026-04-01 12:05:32.835 UTC [28] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 12:05:34.510 UTC [28] LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.626 s, sync=0.022 s, total=1.676 s; sync files=18, longest=0.009 s, average=0.002 s; distance=66 kB, estimate=66 kB; lsn=0/244FA70, redo lsn=0/244FA38
+xentraldesk-db      | 2026-04-01 12:09:24.473 UTC [1] LOG:  received fast shutdown request
+xentraldesk-db      | 2026-04-01 12:09:24.487 UTC [1] LOG:  aborting any active transactions
+xentraldesk-db      | 2026-04-01 12:09:24.501 UTC [1] LOG:  background worker "logical replication launcher" (PID 33) exited with exit code 1
+xentraldesk-db      | 2026-04-01 12:09:24.511 UTC [28] LOG:  shutting down
+xentraldesk-db      | 2026-04-01 12:09:24.520 UTC [28] LOG:  checkpoint starting: shutdown immediate
+xentraldesk-db      | 2026-04-01 12:09:24.560 UTC [28] LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.001 s, total=0.050 s; sync files=0, longest=0.000 s, average=0.000 s; distance=0 kB, estimate=59 kB; lsn=0/244FB20, redo lsn=0/244FB20
+xentraldesk-db      | 2026-04-01 12:09:24.577 UTC [1] LOG:  database system is shut down
+xentraldesk-db      | 
+xentraldesk-db      | PostgreSQL Database directory appears to contain a database; Skipping initialization
+xentraldesk-db      | 
+xentraldesk-db      | 2026-04-01 12:17:22.400 UTC [1] LOG:  starting PostgreSQL 16.13 (Debian 16.13-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+xentraldesk-db      | 2026-04-01 12:17:22.401 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+xentraldesk-db      | 2026-04-01 12:17:22.401 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+xentraldesk-db      | 2026-04-01 12:17:22.420 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+xentraldesk-db      | 2026-04-01 12:17:22.446 UTC [29] LOG:  database system was shut down at 2026-04-01 12:09:24 UTC
+xentraldesk-db      | 2026-04-01 12:17:22.487 UTC [1] LOG:  database system is ready to accept connections
+xentraldesk-db      | 2026-04-01 12:22:22.512 UTC [27] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 12:22:24.086 UTC [27] LOG:  checkpoint complete: wrote 17 buffers (0.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=1.520 s, sync=0.024 s, total=1.575 s; sync files=18, longest=0.013 s, average=0.002 s; distance=61 kB, estimate=61 kB; lsn=0/245F1E8, redo lsn=0/245F1B0
+xentraldesk-db      | 
+xentraldesk-db      | PostgreSQL Database directory appears to contain a database; Skipping initialization
+xentraldesk-redis   | 1:M 01 Apr 2026 10:38:55.086 * Background saving started by pid 3899
+xentraldesk-redis   | 3899:C 01 Apr 2026 10:38:55.221 * DB saved on disk
+xentraldesk-redis   | 3899:C 01 Apr 2026 10:38:55.222 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
+xentraldesk-redis   | 1:M 01 Apr 2026 10:38:55.290 * Background saving terminated with success
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/', 'mode': 'browser', 'depth': 0, 'duration_ms': 42141.46, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/services (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/terms (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://www.linkedin.com/company/mcgatetech (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://x.com/mcgatetech (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/privacy (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/about (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/careers (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/contact (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£à INGESTION COMPLETE: 1 high-quality docs extracted.
+xentraldesk-worker  | INFO:app.services.knowledge_service:≡ƒò╕∩╕Å SCRAPER DISCOVERED 1 DOCUMENTS
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 0 cached, 2 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 7d1a6d12-39ca-466f-b5e8-fba1bad19d45: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 1 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: 17fb3c9b-c913-43f1-b6e2-28e5e9dcc056 Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | 17:06:37:  44.54s ΓåÉ b4b0edd7e8a745aeafb9c9d75bb5d1db:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker: 44.54s ΓåÉ b4b0edd7e8a745aeafb9c9d75bb5d1db:scrape_document_job ΓùÅ 
+xentraldesk-worker  | 18:36:37: recording health: Apr-01 18:36:37 j_complete=1 j_failed=0 j_retried=0 j_ongoing=0 queued=0
+xentraldesk-worker  | INFO:arq.worker:recording health: Apr-01 18:36:37 j_complete=1 j_failed=0 j_retried=0 j_ongoing=0 queued=0
+xentraldesk-worker  | 19:06:42:   0.28s ΓåÆ 8c169ee3d5fc4f888b3bfc3d4c1a246e:scrape_document_job('1319540f-82c0-44c6-9cfd-d97e442946ec', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:arq.worker:  0.28s ΓåÆ 8c169ee3d5fc4f888b3bfc3d4c1a246e:scrape_document_job('1319540f-82c0-44c6-9cfd-d97e442946ec', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé SCRAPE JOB STARTED                                  Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document ID: 1319540f-82c0-44c6-9cfd-d97e442946ec Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé URL: https://mcgatetechnologies.com/          Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ ≡ƒÆÄ GOD_MODE v4: SCRAPER NAMING LOCK          Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ SOURCE_NAME: mcgate                           Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ DOC_ID: 1319540f-82c0-44c6-9cfd-d97e442946ec  Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+xentraldesk-worker  | INFO:app.connectors.website_connector:≡ƒÜÇ ELITE INGESTION STARTING: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/ "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/', 'mode': 'browser', 'depth': 0, 'duration_ms': 36599.69, 'chars': 1319}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/partners (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/services (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/terms (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/privacy (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/blog (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/about (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/careers (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/contact (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£à INGESTION COMPLETE: 1 high-quality docs extracted.
+xentraldesk-worker  | INFO:app.services.knowledge_service:≡ƒò╕∩╕Å SCRAPER DISCOVERED 1 DOCUMENTS
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document 1319540f-82c0-44c6-9cfd-d97e442946ec
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 0 cached, 2 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 00a85f44-7a7c-4013-90d6-2552de3f6bc1: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 1319540f-82c0-44c6-9cfd-d97e442946ec: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 1 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: 1319540f-82c0-44c6-9cfd-d97e442946ec Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | 19:07:23:  40.92s ΓåÉ 8c169ee3d5fc4f888b3bfc3d4c1a246e:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker: 40.92s ΓåÉ 8c169ee3d5fc4f888b3bfc3d4c1a246e:scrape_document_job ΓùÅ 
+xentraldesk-worker  | 19:22:12:   0.15s ΓåÆ f3958de50855471b8545416eb4962229:scrape_document_job('76913b04-f119-4852-b07f-2e28a73dc4bd', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:arq.worker:  0.15s ΓåÆ f3958de50855471b8545416eb4962229:scrape_document_job('76913b04-f119-4852-b07f-2e28a73dc4bd', 'https://mcgatetechnologies.com/', None)
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé SCRAPE JOB STARTED                                  Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document ID: 76913b04-f119-4852-b07f-2e28a73dc4bd Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé URL: https://mcgatetechnologies.com/          Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòöΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòù
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ ≡ƒÆÄ GOD_MODE v4: SCRAPER NAMING LOCK          Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ SOURCE_NAME: mcgate                           Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γòæ DOC_ID: 76913b04-f119-4852-b07f-2e28a73dc4bd  Γòæ
+xentraldesk-worker  | INFO:app.services.knowledge_service:ΓòÜΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓò¥
+xentraldesk-worker  | INFO:app.connectors.website_connector:≡ƒÜÇ ELITE INGESTION STARTING: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/ "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/', 'mode': 'browser', 'depth': 0, 'duration_ms': 53427.19, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/services (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/terms (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://www.linkedin.com/company/mcgatetech (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://x.com/mcgatetech (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/privacy (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/about (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/careers (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/contact (blocked by robots.txt)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£à INGESTION COMPLETE: 1 high-quality docs extracted.
+xentraldesk-worker  | INFO:app.services.knowledge_service:≡ƒò╕∩╕Å SCRAPER DISCOVERED 1 DOCUMENTS
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document 76913b04-f119-4852-b07f-2e28a73dc4bd
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 3b479499-d430-4da8-9c38-f7ee4796b731: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document 76913b04-f119-4852-b07f-2e28a73dc4bd: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 1 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: 76913b04-f119-4852-b07f-2e28a73dc4bd Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-redis   | 1:C 01 Apr 2026 11:13:57.918 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-worker  | 19:23:07:  54.60s ΓåÉ f3958de50855471b8545416eb4962229:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker: 54.60s ΓåÉ f3958de50855471b8545416eb4962229:scrape_document_job ΓùÅ 
+xentraldesk-redis   | 1:C 01 Apr 2026 11:13:57.919 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 01 Apr 2026 11:13:57.919 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.921 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.926 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.928 * Server initialized
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.931 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.932 * RDB age 2102 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.932 * RDB memory usage when created 4.43 Mb
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.973 * Done loading RDB, keys loaded: 141, keys expired: 1.
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.973 * DB loaded from disk: 0.045 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 11:13:57.974 * Ready to accept connections tcp
+xentraldesk-redis   | 1:signal-handler (1775044492) Received SIGTERM scheduling shutdown...
+xentraldesk-redis   | 1:M 01 Apr 2026 11:54:52.614 * User requested shutdown...
+xentraldesk-redis   | 1:M 01 Apr 2026 11:54:52.615 * Saving the final RDB snapshot before exiting.
+xentraldesk-redis   | 1:M 01 Apr 2026 11:54:52.778 * DB saved on disk
+xentraldesk-redis   | 1:M 01 Apr 2026 11:54:52.779 # Redis is now ready to exit, bye bye...
+xentraldesk-redis   | 1:C 01 Apr 2026 12:00:32.545 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 01 Apr 2026 12:00:32.546 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 01 Apr 2026 12:00:32.546 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.546 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.550 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.552 * Server initialized
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.552 * Loading RDB produced by version 7.4.8
+xentraldesk-db      | 
+xentraldesk-db      | 2026-04-01 17:00:06.728 UTC [1] LOG:  starting PostgreSQL 16.13 (Debian 16.13-1.pgdg12+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+xentraldesk-db      | 2026-04-01 17:00:06.730 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+xentraldesk-db      | 2026-04-01 17:00:06.730 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+xentraldesk-db      | 2026-04-01 17:00:06.753 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+xentraldesk-db      | 2026-04-01 17:00:06.793 UTC [28] LOG:  database system was interrupted; last known up at 2026-04-01 12:22:24 UTC
+xentraldesk-db      | 2026-04-01 17:00:07.866 UTC [28] LOG:  database system was not properly shut down; automatic recovery in progress
+xentraldesk-db      | 2026-04-01 17:00:07.889 UTC [28] LOG:  redo starts at 0/245F1B0
+xentraldesk-db      | 2026-04-01 17:00:07.890 UTC [28] LOG:  invalid record length at 0/245F298: expected at least 24, got 0
+xentraldesk-db      | 2026-04-01 17:00:07.890 UTC [28] LOG:  redo done at 0/245F260 system usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.00 s
+xentraldesk-db      | 2026-04-01 17:00:07.944 UTC [26] LOG:  checkpoint starting: end-of-recovery immediate wait
+xentraldesk-db      | 2026-04-01 17:00:08.036 UTC [26] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.020 s, sync=0.015 s, total=0.106 s; sync files=3, longest=0.006 s, average=0.005 s; distance=0 kB, estimate=0 kB; lsn=0/245F298, redo lsn=0/245F298
+xentraldesk-db      | 2026-04-01 17:00:08.068 UTC [1] LOG:  database system is ready to accept connections
+xentraldesk-db      | 2026-04-01 17:05:07.099 UTC [26] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 17:05:07.413 UTC [26] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.214 s, sync=0.020 s, total=0.315 s; sync files=3, longest=0.011 s, average=0.007 s; distance=10 kB, estimate=10 kB; lsn=0/2461D38, redo lsn=0/2461D00
+xentraldesk-db      | 2026-04-01 17:10:07.394 UTC [26] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 17:10:10.630 UTC [26] LOG:  checkpoint complete: wrote 32 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=3.130 s, sync=0.053 s, total=3.237 s; sync files=28, longest=0.026 s, average=0.002 s; distance=136 kB, estimate=136 kB; lsn=0/2483FD8, redo lsn=0/2483FA0
+xentraldesk-db      | 2026-04-01 19:05:55.984 UTC [26] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 19:05:58.565 UTC [26] LOG:  checkpoint complete: wrote 26 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.547 s, sync=0.012 s, total=2.583 s; sync files=8, longest=0.006 s, average=0.002 s; distance=144 kB, estimate=144 kB; lsn=0/24A82E8, redo lsn=0/24A82B0
+xentraldesk-db      | 2026-04-01 19:10:55.568 UTC [26] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 19:10:58.428 UTC [26] LOG:  checkpoint complete: wrote 29 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.828 s, sync=0.016 s, total=2.860 s; sync files=27, longest=0.007 s, average=0.001 s; distance=133 kB, estimate=143 kB; lsn=0/24C9748, redo lsn=0/24C9710
+xentraldesk-db      | 2026-04-01 19:25:55.500 UTC [26] LOG:  checkpoint starting: time
+xentraldesk-db      | 2026-04-01 19:25:58.270 UTC [26] LOG:  checkpoint complete: wrote 28 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=2.720 s, sync=0.026 s, total=2.771 s; sync files=27, longest=0.014 s, average=0.001 s; distance=131 kB, estimate=142 kB; lsn=0/24EA718, redo lsn=0/24EA6E0
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.552 * RDB age 340 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.552 * RDB memory usage when created 4.90 Mb
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.580 * Done loading RDB, keys loaded: 151, keys expired: 0.
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.581 * DB loaded from disk: 0.029 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 12:00:32.581 * Ready to accept connections tcp
+xentraldesk-redis   | 1:signal-handler (1775045364) Received SIGTERM scheduling shutdown...
+xentraldesk-redis   | 1:M 01 Apr 2026 12:09:24.603 * User requested shutdown...
+xentraldesk-redis   | 1:M 01 Apr 2026 12:09:24.603 * Saving the final RDB snapshot before exiting.
+xentraldesk-redis   | 1:M 01 Apr 2026 12:09:24.672 * DB saved on disk
+xentraldesk-redis   | 1:M 01 Apr 2026 12:09:24.672 # Redis is now ready to exit, bye bye...
+xentraldesk-redis   | 1:C 01 Apr 2026 12:17:22.193 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 01 Apr 2026 12:17:22.193 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 01 Apr 2026 12:17:22.193 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.194 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.197 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.199 * Server initialized
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.200 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.200 * RDB age 478 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.200 * RDB memory usage when created 4.88 Mb
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.233 * Done loading RDB, keys loaded: 153, keys expired: 0.
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.234 * DB loaded from disk: 0.034 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 12:17:22.234 * Ready to accept connections tcp
+xentraldesk-redis   | 1:M 01 Apr 2026 15:14:16.747 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 01 Apr 2026 15:14:16.751 * Background saving started by pid 2059
+xentraldesk-redis   | 2059:C 01 Apr 2026 15:14:16.908 * DB saved on disk
+xentraldesk-redis   | 2059:C 01 Apr 2026 15:14:16.909 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
+xentraldesk-redis   | 1:M 01 Apr 2026 15:14:16.956 * Background saving terminated with success
+xentraldesk-redis   | 1:M 01 Apr 2026 16:14:17.027 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 01 Apr 2026 16:14:17.030 * Background saving started by pid 6388
+xentraldesk-redis   | 6388:C 01 Apr 2026 16:14:17.129 * DB saved on disk
+xentraldesk-redis   | 6388:C 01 Apr 2026 16:14:17.131 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+xentraldesk-redis   | 1:M 01 Apr 2026 16:14:17.134 * Background saving terminated with success
+xentraldesk-redis   | 1:C 01 Apr 2026 17:00:06.353 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+xentraldesk-redis   | 1:C 01 Apr 2026 17:00:06.354 * Redis version=7.4.8, bits=64, commit=00000000, modified=0, pid=1, just started
+xentraldesk-redis   | 1:C 01 Apr 2026 17:00:06.354 # Warning: no config file specified, using the default config. In order to specify a config file use redis-server /path/to/redis.conf
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.355 * monotonic clock: POSIX clock_gettime
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.362 * Running mode=standalone, port=6379.
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.365 * Server initialized
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.368 * Loading RDB produced by version 7.4.8
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.368 * RDB age 2749 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.368 * RDB memory usage when created 4.90 Mb
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.412 * Done loading RDB, keys loaded: 149, keys expired: 0.
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.412 * DB loaded from disk: 0.047 seconds
+xentraldesk-redis   | 1:M 01 Apr 2026 17:00:06.412 * Ready to accept connections tcp
+xentraldesk-redis   | 1:M 01 Apr 2026 18:36:37.623 * 1 changes in 3600 seconds. Saving...
+xentraldesk-redis   | 1:M 01 Apr 2026 18:36:37.757 * Background saving started by pid 3638
+xentraldesk-redis   | 3638:C 01 Apr 2026 18:36:40.124 * DB saved on disk
+xentraldesk-redis   | 3638:C 01 Apr 2026 18:36:40.125 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 1 MB
+xentraldesk-redis   | 1:M 01 Apr 2026 18:36:40.250 * Background saving terminated with success

@@ -1,0 +1,30 @@
+﻿xentraldesk-api  |     await self.app(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+xentraldesk-api  |     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+xentraldesk-api  |     raise exc
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+xentraldesk-api  |     await app(scope, receive, sender)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+xentraldesk-api  |     await self.app(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/routing.py", line 660, in __call__
+xentraldesk-api  |     await self.middleware_stack(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/routing.py", line 680, in app
+xentraldesk-api  |     await route.handle(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/routing.py", line 350, in handle
+xentraldesk-api  |     await self.app(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/fastapi/routing.py", line 160, in app
+xentraldesk-api  |     await wrap_app_handling_exceptions(app, session)(scope, receive, send)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+xentraldesk-api  |     raise exc
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+xentraldesk-api  |     await app(scope, receive, sender)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/fastapi/routing.py", line 157, in app
+xentraldesk-api  |     await func(session)
+xentraldesk-api  |   File "/usr/local/lib/python3.12/site-packages/fastapi/routing.py", line 764, in app
+xentraldesk-api  |     await dependant.call(**solved_result.values)
+xentraldesk-api  |   File "/app/app/api/websocket.py", line 109, in widget_websocket_endpoint
+xentraldesk-api  |     channel_id=conversation.channel_id,
+xentraldesk-api  |                ^^^^^^^^^^^^^^^^^^^^^^^
+xentraldesk-api  | AttributeError: 'Conversation' object has no attribute 'channel_id'
+xentraldesk-api  | INFO:     connection closed

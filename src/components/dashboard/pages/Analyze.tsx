@@ -1,0 +1,61 @@
+import React, { useState } from 'react';
+import { AnalyticsOverview } from './AnalyticsOverview';
+import { ConversationsAnalytics } from './ConversationsAnalytics';
+import { AgentPerformance } from './AgentPerformance';
+import { AIPerformance } from './AIPerformance';
+import { cn } from '@/src/lib/utils';
+import { motion } from 'framer-motion';
+
+export const Analyze = ({ workspaceId }: { workspaceId: string }) => {
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'conversations', label: 'Conversations' },
+    { id: 'agent-performance', label: 'Agent Performance' },
+    { id: 'ai-performance', label: 'AI Performance' },
+  ];
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'overview': return <AnalyticsOverview workspaceId={workspaceId} />;
+      case 'conversations': return <ConversationsAnalytics workspaceId={workspaceId} />;
+      case 'agent-performance': return <AgentPerformance workspaceId={workspaceId} />;
+      case 'ai-performance': return <AIPerformance workspaceId={workspaceId} />;
+      default: return <AnalyticsOverview workspaceId={workspaceId} />;
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full w-full bg-transparent overflow-hidden gap-2 p-2">
+      <div className="px-8 py-6 border border-border bg-card rounded-2xl shrink-0 shadow-sm">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Analyze</h1>
+          <div className="flex items-center gap-8">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  "pb-4 text-sm font-bold transition-all relative",
+                  activeTab === tab.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {tab.label}
+                {activeTab === tab.id && (
+                  <motion.div 
+                    layoutId="analyze-tab-indicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto no-scrollbar bg-card border border-border rounded-2xl">
+        {renderContent()}
+      </div>
+    </div>
+  );
+};

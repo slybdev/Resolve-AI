@@ -1,0 +1,100 @@
+﻿xentraldesk-worker  | 
+xentraldesk-worker  | ERROR:app.connectors.website_connector:Playwright fallback failed for https://mcgatetechnologies.com/terms
+xentraldesk-worker  | WARNING:trafilatura.core:discarding data: None
+xentraldesk-worker  | WARNING:app.services.extraction_service:Trafilatura returned low-value content for https://mcgatetechnologies.com/terms, using fallback.
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/terms (Insufficient content after removal of boiler-plate)
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Γ£ù No content extracted from: https://mcgatetechnologies.com/terms
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [4/7]: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/contact "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/contact, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | ERROR:app.services.browser_service:Playwright fetch failed for https://mcgatetechnologies.com/contact: Page.goto: Timeout 20000ms exceeded.
+xentraldesk-worker  | Call log:
+xentraldesk-worker  |   - navigating to "https://mcgatetechnologies.com/contact", waiting until "domcontentloaded"
+xentraldesk-worker  | 
+xentraldesk-worker  | ERROR:app.connectors.website_connector:Playwright fallback failed for https://mcgatetechnologies.com/contact
+xentraldesk-worker  | WARNING:trafilatura.core:discarding data: None
+xentraldesk-worker  | WARNING:app.services.extraction_service:Trafilatura returned low-value content for https://mcgatetechnologies.com/contact, using fallback.
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/contact (Insufficient content after removal of boiler-plate)
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Γ£ù No content extracted from: https://mcgatetechnologies.com/contact
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [5/7]: https://mcgatetechnologies.com/services
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/services "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/services, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/services
+xentraldesk-worker  | ERROR:app.services.browser_service:Playwright fetch failed for https://mcgatetechnologies.com/services: Page.goto: Timeout 20000ms exceeded.
+xentraldesk-worker  | Call log:
+xentraldesk-worker  |   - navigating to "https://mcgatetechnologies.com/services", waiting until "domcontentloaded"
+xentraldesk-worker  | 
+xentraldesk-worker  | ERROR:app.connectors.website_connector:Playwright fallback failed for https://mcgatetechnologies.com/services
+xentraldesk-worker  | WARNING:trafilatura.core:discarding data: None
+xentraldesk-worker  | WARNING:app.services.extraction_service:Trafilatura returned low-value content for https://mcgatetechnologies.com/services, using fallback.
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/services (Insufficient content after removal of boiler-plate)
+xentraldesk-worker  | WARNING:app.connectors.website_connector:Γ£ù No content extracted from: https://mcgatetechnologies.com/services
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [6/7]: https://mcgatetechnologies.com/about
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/about "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/about, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/about
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/about', 'mode': 'browser', 'depth': 0, 'duration_ms': 45809.61, 'chars': 1058}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£ô Extracted: Defining the Visionary Standard (1058 chars)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ₧ñ Processing target [7/7]: https://mcgatetechnologies.com/careers
+xentraldesk-worker  | INFO:httpx:HTTP Request: GET https://mcgatetechnologies.com/careers "HTTP/1.1 200 OK"
+xentraldesk-worker  | INFO:app.connectors.website_connector:ΓÜá∩╕Å SPA Detected at https://mcgatetechnologies.com/careers, triggering Playwright fallback.
+xentraldesk-worker  | INFO:app.services.browser_service:Browser fetching: https://mcgatetechnologies.com/careers
+xentraldesk-worker  | INFO:app.connectors.website_connector:{'event': 'page_ingested', 'url': 'https://mcgatetechnologies.com/careers', 'mode': 'browser', 'depth': 0, 'duration_ms': 42674.75, 'chars': 1014}
+xentraldesk-worker  | INFO:app.connectors.website_connector:Skipping https://mcgatetechnologies.com/careers (duplicate content)
+xentraldesk-worker  | INFO:app.connectors.website_connector:Γ£à TARGET INGESTION COMPLETE: 3/7 pages extracted.
+xentraldesk-worker  | INFO:app.services.knowledge_service:≡ƒò╕∩╕Å SCRAPER DISCOVERED 3 DOCUMENTS
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 2 cached, 0 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 2d463a37-8e36-455f-9c4e-6d9a8a876044: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [2/3]: Architecting the Future
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document d09be1a5-718e-4769-9a87-c3fe628621d4
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 0 cached, 2 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 2d463a37-8e36-455f-9c4e-6d9a8a876044: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document d09be1a5-718e-4769-9a87-c3fe628621d4: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ₧ñ Creating extra document [3/3]: Defining the Visionary Standard
+xentraldesk-worker  | INFO:app.services.ingestion_service:IngestionService: Starting ingestion for document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Status set to 'chunking'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Commit successful after chunking status
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Starting chunk deletion
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Chunk deletion complete
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Starting text chunking (TIKTOKEN_AVAILABLE=True)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: 2 chunks created (token-based)
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Status set to 'vectorizing'
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Starting embeddings (batch of 2 chunks)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Embedding cache initialized (Redis)
+xentraldesk-worker  | INFO:app.embeddings.gemini:Batch embedding: 0 cached, 2 new
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Got 2 vectors back
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: Committed 2 chunks to database
+xentraldesk-worker  | INFO:app.services.ingestion_service:Γ£ô Source 2d463a37-8e36-455f-9c4e-6d9a8a876044: All documents ready. Status set to idle.
+xentraldesk-worker  | INFO:app.services.ingestion_service:Document e18bb83b-fae2-4190-b0f7-6cb24f1d26c2: ingestion complete (ready)
+xentraldesk-worker  | INFO:app.services.knowledge_service:Γ£ô ALL 3 DOCUMENTS FROM https://mcgatetechnologies.com/ HAVE BEEN PROCESSED
+xentraldesk-worker  | INFO:app.worker:ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+xentraldesk-worker  | INFO:app.worker:Γöé Γ£ô SCRAPE COMPLETE                                   Γöé
+xentraldesk-worker  | INFO:app.worker:Γöé Document: e2e2ce45-98f9-43a2-aaed-4eaf1b9c19bd Γöé
+xentraldesk-worker  | INFO:app.worker:ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
+xentraldesk-worker  | 21:32:47: 290.17s ΓåÉ b636e287a0544b86b324e15883415a00:scrape_document_job ΓùÅ 
+xentraldesk-worker  | INFO:arq.worker:290.17s ΓåÉ b636e287a0544b86b324e15883415a00:scrape_document_job ΓùÅ 
