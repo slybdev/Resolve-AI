@@ -43,9 +43,16 @@ async def verify_widget_origin(workspace: Workspace, request: Request):
         base_domain = domain.split(":")[0]
         
         allowed = False
-        for allowed_pattern in workspace.allowed_domains:
-            # support exact match or wildcard (e.g. *.example.com)
-            if fnmatch.fnmatch(domain, allowed_pattern) or fnmatch.fnmatch(base_domain, allowed_pattern):
+        for pattern in workspace.allowed_domains:
+            # Clean the pattern: strip protocol and trailing slash/paths
+            clean_pattern = pattern
+            if "://" in pattern:
+                clean_pattern = urlparse(pattern).netloc
+            elif "/" in pattern:
+                clean_pattern = pattern.split("/")[0]
+
+            # Support exact match or wildcard (e.g. *.example.com)
+            if fnmatch.fnmatch(domain, clean_pattern) or fnmatch.fnmatch(base_domain, clean_pattern):
                 allowed = True
                 break
         
