@@ -1,6 +1,11 @@
 import uuid
 from typing import Optional, List
 from urllib.parse import urlparse
+import fnmatch
+import logging
+
+logger = logging.getLogger(__name__)
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,16 +28,34 @@ async def verify_widget_origin(workspace: Workspace, request: Request):
     origin = request.headers.get("Origin") or request.headers.get("Referer", "")
     if not origin:
         # If no origin/referer, we might want to block in production
+        # For now, we allow it (e.g. direct browser access to config)
         return
         
     try:
-        domain = urlparse(origin).netloc
-        # Allow exact match or base domain match (stripping port)
+        # Parse the domain from the origin or referer
+        parsed = urlparse(origin)
+        domain = parsed.netloc or parsed.path.split("/")[0] # fallback for some referer formats
+        
+        if not domain:
+            return
+
+        # Allow exact match or port-stripped match
         base_domain = domain.split(":")[0]
-        if domain not in workspace.allowed_domains and base_domain not in workspace.allowed_domains:
+        
+        allowed = False
+        for allowed_pattern in workspace.allowed_domains:
+            # support exact match or wildcard (e.g. *.example.com)
+            if fnmatch.fnmatch(domain, allowed_pattern) or fnmatch.fnmatch(base_domain, allowed_pattern):
+                allowed = True
+                break
+        
+        if not allowed:
+            logger.warning(f"Widget Origin Denied: {domain} not in {workspace.allowed_domains}")
             raise HTTPException(status_code=403, detail=f"Origin {domain} not allowed.")
+            
     except Exception as e:
         if isinstance(e, HTTPException): raise e
+        logger.error(f"Error validating origin {origin}: {e}")
         raise HTTPException(status_code=403, detail="Invalid Origin or Referer header.")
 
 @router.get("/config")

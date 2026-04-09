@@ -112,18 +112,12 @@ def create_app() -> FastAPI:
     )
 
     # ── CORS ──
-    origins = [
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-    ]
+    # We allow all origins globally but enforce domain whitelisting at the application layer 
+    # for the widget. This is safe because we use JWT Bearer tokens in headers, not cookies.
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
+        allow_origins=["*"],
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )
