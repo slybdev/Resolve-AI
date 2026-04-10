@@ -163,7 +163,7 @@ class APIClient {
       return this.request(`/tickets/${workspaceId}${queryString ? `?${queryString}` : ''}`);
     },
     get: (id: string) => this.request(`/tickets/detail/${id}`),
-    create: (data: any) => this.request('/tickets', {
+    create: (data: any) => this.request('/tickets/', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
