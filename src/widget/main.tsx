@@ -13,6 +13,11 @@ const workspaceKey = scriptTag?.getAttribute('data-xentraldesk-id') ||
                     (window as any).XentralDesk?.workspaceKey;
 
 if (workspaceKey) {
+  const scriptSrc = scriptTag?.getAttribute('src') || '';
+  const baseUrl = scriptSrc.includes('://') 
+    ? new URL(scriptSrc).origin 
+    : window.location.origin;
+
   // 1. Create Iframe Container
   const iframe = document.createElement('iframe');
   iframe.id = IFRAME_ID;
@@ -39,7 +44,7 @@ if (workspaceKey) {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1">
-          <link rel="stylesheet" href="http://localhost:3000/src/index.css">
+          <link rel="stylesheet" href="${baseUrl}/widget.css">
           <style>
             body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
             #${ROOT_ID} { position: absolute; bottom: 0; right: 0; width: 100%; height: 100%; }
@@ -72,6 +77,7 @@ if (workspaceKey) {
             primaryColor={primaryColor}
             title={title}
             theme={theme}
+            baseUrl={baseUrl}
             onResize={(w, h) => (window as any).XentralDesk_Resize(w, h)}
           />
         </React.StrictMode>

@@ -65,10 +65,21 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
+    # Allow the ResolveAI widget to be loaded by external websites
+    location /widget.js {
+        root /var/www/xentraldesk;
+        add_header Access-Control-Allow-Origin *;
+        add_header Access-Control-Allow-Methods "GET, OPTIONS";
+        add_header Cache-Control "no-cache"; # Recommended so updates reach users immediately
+        try_files $uri =404;
+    }
+
     location /api {
         proxy_pass http://localhost:8000;
         proxy_set_header Host $host;
-        # ... other proxy headers
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```

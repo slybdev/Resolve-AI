@@ -20,6 +20,7 @@ interface ChatWidgetProps {
   avatar?: string;
   theme?: 'light' | 'dark';
   isPreview?: boolean;
+  baseUrl?: string;
   onResize?: (width: string, height: string) => void;
 }
 
@@ -31,6 +32,7 @@ export const ChatWidgetPublic = ({
   avatar,
   theme: initialTheme = 'dark',
   isPreview = false,
+  baseUrl: propBaseUrl,
   onResize
 }: ChatWidgetProps) => {
   const [isOpen, setIsOpen] = useState(isPreview);
@@ -57,7 +59,8 @@ export const ChatWidgetPublic = ({
   const refreshInterval = useRef<NodeJS.Timeout | null>(null);
   const typingTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+  const baseUrl = propBaseUrl || (window.location.origin);
+  const API_BASE = import.meta.env.VITE_API_URL || `${baseUrl}/api/v1`;
 
   // 1. Resize Iframe when open state changes
   useEffect(() => {
@@ -434,9 +437,9 @@ export const ChatWidgetPublic = ({
                               "w-8 h-8 rounded-full flex items-center justify-center shadow-sm",
                               theme === 'dark' ? "bg-slate-800 border border-slate-700" : "bg-white border border-slate-200"
                             )}>
-                              {msg.sender_type === 'ai' ? (
-                                <img src="/bot-avatar.png" className="w-full h-full object-cover rounded-full" alt="AI" />
-                              ) : <User className="w-4 h-4 text-slate-500" />}
+                                {msg.sender_type === 'ai' ? (
+                                  <img src={`${baseUrl}/bot-avatar.png`} className="w-full h-full object-cover rounded-full" alt="AI" />
+                                ) : <User className="w-4 h-4 text-slate-500" />}
                             </div>
                           </div>
                         )}
@@ -500,7 +503,7 @@ export const ChatWidgetPublic = ({
                   className="flex items-center gap-3 mb-6"
                 >
                   <div className="w-8 h-8 rounded-full border border-primary/10 shadow-sm shrink-0 overflow-hidden">
-                    <img src="/bot-avatar.png" className="w-full h-full object-cover" alt="AI Typing" />
+                    <img src={`${baseUrl}/bot-avatar.png`} className="w-full h-full object-cover" alt="AI Typing" />
                   </div>
                   <div className={cn(
                     "px-4 py-2.5 rounded-2xl rounded-bl-none border flex items-center gap-1.5 relative overflow-hidden",
