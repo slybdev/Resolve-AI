@@ -10,7 +10,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from starlette.requests import Request
 from starlette.responses import Response
@@ -111,10 +110,6 @@ def create_app() -> FastAPI:
         redoc_url="/redoc",
         lifespan=lifespan,
     )
-
-    # ── Proxy Headers ──
-    # Trusting X-Forwarded-* headers from Nginx
-    app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
     # ── CORS ──
     # We allow all origins globally but enforce domain whitelisting at the application layer 
