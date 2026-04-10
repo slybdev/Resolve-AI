@@ -7,16 +7,25 @@ import '@/src/index.css';
 const IFRAME_ID = 'xentraldesk-widget-iframe';
 const ROOT_ID = 'xentraldesk-widget-root';
 
-const scriptTag = document.currentScript || document.querySelector('script[data-xentraldesk-id]');
+const scriptTag = document.currentScript || 
+                    document.querySelector('script[src*="widget.js"]') || 
+                    document.querySelector('script[data-xentraldesk-id]');
 const workspaceKey = scriptTag?.getAttribute('data-xentraldesk-id') || 
                     scriptTag?.getAttribute('data-xentraldesk-workspace-key') || 
                     (window as any).XentralDesk?.workspaceKey;
 
 if (workspaceKey) {
   const scriptSrc = scriptTag?.getAttribute('src') || '';
-  const baseUrl = scriptSrc.includes('://') 
-    ? new URL(scriptSrc).origin 
-    : window.location.origin;
+  let baseUrl = '';
+  
+  if (scriptSrc.includes('://')) {
+    baseUrl = new URL(scriptSrc).origin;
+  } else if (import.meta.env.PROD) {
+    // Hardcoded production fallback for reliability
+    baseUrl = 'https://xentraldesk.com';
+  } else {
+    baseUrl = window.location.origin;
+  }
 
   // 1. Create Iframe Container
   const iframe = document.createElement('iframe');

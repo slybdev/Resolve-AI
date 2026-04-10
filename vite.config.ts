@@ -43,7 +43,9 @@ export default defineConfig(({mode}) => {
             return chunkInfo.name === 'widget' ? '[name].js' : 'assets/[name]-[hash].js';
           },
           assetFileNames: (assetInfo) => {
-            if (assetInfo.name === 'main.css' && assetInfo.type === 'asset') return 'widget.css';
+            if ((assetInfo.name === 'main.css' || assetInfo.name === 'index.css') && assetInfo.type === 'asset') {
+              return 'widget.css';
+            }
             return 'assets/[name]-[hash][extname]';
           },
           chunkFileNames: 'assets/[name]-[hash].js',
