@@ -196,8 +196,6 @@ export const ChatWidgetPublic = ({
     const wsHost = apiOrigin.replace(/^https?/, wsProtocol);
     const wsUrl = `${wsHost}/api/v1/ws/widget/${convId}?token=${token}`;
     
-    console.log('[Widget WS] API_BASE =', API_BASE);
-    console.log('[Widget WS] Connecting to:', wsUrl);
     const socket = new WebSocket(wsUrl);
     ws.current = socket;
 

@@ -635,7 +635,7 @@ export const AllConversations = ({
           }
         }
 
-        console.log(`[Conversation] Message ${m.id} type=${m.message_type} body=${m.body?.substring(0, 50)} attachmentUrl=${attachmentUrl}`);
+
 
         return {
           id: m.id,
