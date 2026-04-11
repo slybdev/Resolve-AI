@@ -382,6 +382,7 @@ export const AllConversations = ({
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [isWsConnected, setIsWsConnected] = useState(false);
   const [activeConversationMetadata, setActiveConversationMetadata] = useState<any>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const { toast } = useToast();
@@ -527,6 +528,7 @@ export const AllConversations = ({
         ws = new WebSocket(wsUrl);
 
         ws.onopen = () => {
+          setIsWsConnected(true);
           console.log('[WS] Dashboard connected');
           // Keep-alive ping every 30s
           pingTimer = setInterval(() => {
@@ -554,12 +556,14 @@ export const AllConversations = ({
         };
 
         ws.onclose = () => {
+          setIsWsConnected(false);
           console.log('[WS] Dashboard disconnected, reconnecting in 3s...');
           clearInterval(pingTimer);
           reconnectTimer = setTimeout(connect, 3000);
         };
 
         ws.onerror = (err) => {
+          setIsWsConnected(false);
           console.error('[WS] Error:', err);
           ws?.close();
         };
@@ -590,7 +594,11 @@ export const AllConversations = ({
         api.conversations.get(selectedId).then(setActiveConversationMetadata).catch(console.error);
       }
 
-      const interval = setInterval(() => fetchMessages(selectedId), 3000); // Poll messages every 3s
+      const interval = setInterval(() => {
+        if (!isWsConnected) {
+          fetchMessages(selectedId);
+        }
+      }, 5000); // Slower fallback poll (5s) only if WS is disconnected
       return () => clearInterval(interval);
     }
   }, [selectedId, conversationsList]);
@@ -1382,14 +1390,31 @@ export const AllConversations = ({
                       return;
                     }
 
-                    console.log('[SendMessage] Sending:', { finalBody: finalBody?.substring(0, 80), messageType });
+                    // Optimistic Update
+                    const tempId = `temp-${Date.now()}`;
+                    const optMsg: Message = {
+                      id: tempId,
+                      sender: activeTab === 'note' ? 'human' : 'agent', // dashboard always sends as agent/human
+                      text: finalBody,
+                      type: messageType,
+                      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase(),
+                      isInternal: activeTab === 'note'
+                    };
+                    
+                    setMessages(prev => ({
+                      ...prev,
+                      [selectedId]: [...(prev[selectedId] || []), optMsg]
+                    }));
+                    setInputText(""); // Clear immediately for better feel
+
                     await api.conversations.sendMessage(
                       selectedId, 
                       finalBody, 
                       activeTab === 'note',
                       messageType
                     );
-                    setInputText(""); // Clear on success
+                    
+                    // The WebSocket or next fetch will replace it with the real one
                     fetchMessages(selectedId);
                   } catch (err) {
                     toast('Error', 'Failed to send message', 'error');
