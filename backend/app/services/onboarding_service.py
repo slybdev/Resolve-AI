@@ -63,13 +63,27 @@ async def setup_workspace(
     db.add(workspace)
     await db.flush()
 
-    # Add user as owner member
+    # 2. Add user as owner member
     member = WorkspaceMember(
         user_id=user.id,
         workspace_id=workspace.id,
         role="owner",
     )
     db.add(member)
+    
+    # 3. Create Default AI Configuration
+    from app.models.ai_configuration import AIConfiguration
+    ai_config = AIConfiguration(
+        workspace_id=workspace.id,
+        company_name=workspace.name,
+        company_description=company_description,
+        industry=industry or "technology",
+        personality="professional",
+        tone=ai_tone or "formal",
+        primary_goal="support"
+    )
+    db.add(ai_config)
+    
     await db.flush()
 
     return workspace

@@ -154,6 +154,7 @@ def create_app() -> FastAPI:
     from app.api.search import router as search_router
     from app.api.ai import router as ai_router
     from app.api.automations import router as automations_router
+    from app.api.analytics import router as analytics_router
     from app.api.dashboard import router as dashboard_router
 
     app.include_router(auth_router)
@@ -180,6 +181,7 @@ def create_app() -> FastAPI:
     app.include_router(search_router)
     app.include_router(ai_router)
     app.include_router(automations_router)
+    app.include_router(analytics_router)
 
     # ── Register Global Event Hooks ──
     from app.services.message_hooks import register_handler

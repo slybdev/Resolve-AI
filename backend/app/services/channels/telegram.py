@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.channel import Channel, ChannelType
 from app.models.message import Message
 from app.services.routing_service import routing_service
+from app.core.pubsub import pubsub_manager
 
 logger = logging.getLogger(__name__)
 
@@ -181,11 +182,7 @@ class TelegramService:
                 from app.core.config import get_settings
                 settings = get_settings()
                 attachment_url = f"{settings.BASE_URL}/{file_path}"
-                # If there's no text, use the URL as the body (or keep it as caption)
-                if not message_text:
-                    message_text = attachment_url
-                else:
-                    message_text = f"{message_text}\n\n{attachment_url}"
+                # Keep text as it is (caption or URL) but prioritize media_url field
 
         # Route to conversation
         new_message, _ = await routing_service.route_incoming_message(
@@ -200,17 +197,22 @@ class TelegramService:
             duration=tg_message.get("voice", {}).get("duration") if message_type == "voice" else None
         )
         
+        if new_message:
+            new_message.media_url = attachment_url
+            new_message.media_type = message_type if message_type in ["image", "video", "voice", "file", "sticker"] else None
+            await db.flush()
+
         # ── Real-Time Dashboard Push ──
         try:
-            from app.api.websocket import manager
-            await manager.broadcast_to_workspace(str(channel.workspace_id), {
+            await pubsub_manager.publish(f"ws:{channel.workspace_id}", {
                 "type": "message.new",
                 "conversation_id": str(new_message.conversation_id),
                 "message": {
                     "id": str(new_message.id),
-                    "body": message_text[:200],
+                    "body": new_message.body[:500],
                     "sender_type": "customer",
-                    "message_type": message_type,
+                    "message_type": new_message.message_type,
+                    "media_url": new_message.media_url,
                     "channel": "telegram",
                     "created_at": new_message.created_at.isoformat() if new_message.created_at else None,
                     "contact_name": f"{first_name} {last_name}".strip(),
@@ -274,7 +276,7 @@ class TelegramService:
                 logger.error(f"Error downloading Telegram file: {e}")
                 return None
 
-    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str, message_type: str = "text"):
+    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str, message_type: str = "text", media_url: Optional[str] = None):
         """
         Sends a message back to Telegram with retry + exponential backoff.
         """
@@ -290,8 +292,11 @@ class TelegramService:
             raise ValueError("Telegram token not configured")
 
         # Auto-detect message type from URL if type is "text" but body looks like a media URL
-        if message_type == "text" and text:
-            lower = text.lower().strip()
+        # Or use media_url if provided
+        media_to_send = media_url or text
+        
+        if message_type == "text" and media_to_send:
+            lower = str(media_to_send).lower().strip()
             if any(lower.endswith(ext) for ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp']):
                 message_type = "image"
                 logger.info("Auto-detected message_type as 'image' from URL extension")
@@ -313,7 +318,9 @@ class TelegramService:
         if message_type in api_method_map:
             method, field = api_method_map[message_type]
             url = f"https://api.telegram.org/bot{token}/{method}"
-            payload = {"chat_id": external_contact_id, field: text}
+            payload = {"chat_id": external_contact_id, field: media_to_send}
+            if text and text != media_to_send:
+                payload["caption"] = text
         else:
             # text
             if not text or not text.strip():

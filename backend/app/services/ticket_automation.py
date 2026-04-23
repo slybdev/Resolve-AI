@@ -35,7 +35,7 @@ async def widget_auto_ticket_handler(db: AsyncSession, message: Message):
     )
     channel = result.scalar_one_or_none()
     
-    if not channel or channel.channel_type != ChannelType.WIDGET:
+    if not channel or channel.type != ChannelType.WIDGET:
         return
 
     # 3. Check if ticket already exists for this conversation
@@ -64,4 +64,5 @@ async def widget_auto_ticket_handler(db: AsyncSession, message: Message):
 
 # Register the handler globally
 def initialize_ticket_automation():
-    register_handler(widget_auto_ticket_handler)
+    # register_handler(widget_auto_ticket_handler)
+    pass

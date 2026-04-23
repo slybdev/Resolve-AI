@@ -108,14 +108,20 @@ async def widget_websocket_endpoint(
                 
                 content = message.get("content")
                 client_id = message.get("client_id")
-                if not content:
+                media_url = message.get("media_url")
+                msg_type_incoming = message.get("message_type") or "text"
+                
+                if not content and not media_url:
                     continue
 
                 # 1. Persist Message
                 new_msg = Message(
                     conversation_id=conversation_id,
                     sender_type="customer",
-                    body=content,
+                    body=content or (f"[{msg_type_incoming.capitalize()}]" if media_url else ""),
+                    message_type=msg_type_incoming,
+                    media_url=media_url,
+                    media_type=msg_type_incoming if msg_type_incoming != "text" else None,
                     channel_id=channel.id if channel else None,
                     external_id=client_id or str(uuid.uuid4())
                 )
@@ -136,6 +142,8 @@ async def widget_websocket_endpoint(
                         "id": str(new_msg.id),
                         "body": new_msg.body,
                         "sender_type": "customer",
+                        "message_type": new_msg.message_type,
+                        "media_url": new_msg.media_url,
                         "created_at": new_msg.created_at.isoformat(),
                         "client_id": client_id
                     }
@@ -147,14 +155,17 @@ async def widget_websocket_endpoint(
 
                 # 4. Acknowledge to Widget (Self) - converts 'sending' to 'sent'
                 from app.models.ticket import Ticket
-                result = await db.execute(select(Ticket.id).where(Ticket.conversation_id == conversation_id))
-                ticket_id = result.scalar_one_or_none()
+                result = await db.execute(select(Ticket.id, Ticket.status).where(Ticket.conversation_id == conversation_id))
+                ticket_data = result.first()
+                ticket_id = ticket_data.id if ticket_data else None
+                ticket_status = ticket_data.status if ticket_data else None
 
                 await websocket.send_json({
                     "type": "message.ack",
                     "client_id": client_id,
                     "server_id": str(new_msg.id),
-                    "ticket_id": str(ticket_id) if ticket_id else None
+                    "ticket_id": str(ticket_id) if ticket_id else None,
+                    "ticket_status": ticket_status
                 })
 
                 # 5. Trigger AI/Automations

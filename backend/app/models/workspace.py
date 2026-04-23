@@ -34,6 +34,7 @@ class Workspace(Base):
     secret_key_created_at: Mapped[datetime | None] = mapped_column(nullable=True)
     previous_key_expires_at: Mapped[datetime | None] = mapped_column(nullable=True)
     allowed_domains: Mapped[list] = mapped_column(JSON, default=list, nullable=False)
+    session_timeout_hours: Mapped[int] = mapped_column(default=24, nullable=False)  # Configurable per workspace
 
     # Relationships
     owner = relationship("User", back_populates="owned_workspaces", lazy="selectin")
@@ -41,6 +42,7 @@ class Workspace(Base):
         "WorkspaceMember", back_populates="workspace", lazy="selectin"
     )
     invites = relationship("Invite", back_populates="workspace", lazy="selectin")
+    ai_config = relationship("AIConfiguration", back_populates="workspace", uselist=False, lazy="selectin")
 
 
 class WorkspaceMember(Base):

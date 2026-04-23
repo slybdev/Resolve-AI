@@ -365,7 +365,7 @@ class KnowledgeService:
     async def vector_search(
         db: AsyncSession,
         workspace_id: uuid.UUID,
-        user_id: uuid.UUID,
+        user_id: Optional[uuid.UUID],
         query: str,
         top_k: int = 5,
     ):
@@ -379,11 +379,13 @@ class KnowledgeService:
             .join(KnowledgeDocument, KnowledgeChunk.document_id == KnowledgeDocument.id)
             .join(KnowledgeEmbedding, KnowledgeChunk.id == KnowledgeEmbedding.chunk_id)
             .where(KnowledgeDocument.workspace_id == workspace_id)
-            .where(KnowledgeDocument.user_id == user_id)
             .where(KnowledgeDocument.status == "ready")
-            .order_by(KnowledgeEmbedding.vector.cosine_distance(query_vector))
-            .limit(top_k)
         )
+        
+        if user_id:
+            stmt = stmt.where(KnowledgeDocument.user_id == user_id)
+            
+        stmt = stmt.order_by(KnowledgeEmbedding.vector.cosine_distance(query_vector)).limit(top_k)
 
         result = await db.execute(stmt)
         return result.all()

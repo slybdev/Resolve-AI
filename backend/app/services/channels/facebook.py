@@ -153,7 +153,7 @@ class FacebookService:
                 
         return count
 
-    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, recipient_id: str, text: str):
+    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, recipient_id: str, text: str, message_type: str = "text", media_url: Optional[str] = None):
         """
         Sends a Facebook message back via Meta API.
         """
@@ -167,9 +167,28 @@ class FacebookService:
             raise ValueError("Facebook credentials not configured")
 
         url = f"https://graph.facebook.com/v19.0/me/messages?access_token={token}"
+        
+        message_payload = {}
+        if message_type in ["image", "video", "audio", "file"]:
+            media_to_send = media_url or text
+            type_map = {"image": "image", "video": "video", "audio": "audio", "file": "file"}
+            message_payload = {
+                "attachment": {
+                    "type": type_map.get(message_type, "file"),
+                    "payload": {
+                        "url": media_to_send,
+                        "is_selectable": True
+                    }
+                }
+            }
+            # Facebook doesn't support caption with media in the same object easily for all types
+            # but we can send a separate text message or try to combine if possible.
+        else:
+            message_payload = {"text": text}
+
         payload = {
             "recipient": {"id": recipient_id},
-            "message": {"text": text}
+            "message": message_payload
         }
 
         async with httpx.AsyncClient() as client:
@@ -177,6 +196,15 @@ class FacebookService:
             if response.status_code not in [200, 201]:
                 logger.error(f"Failed to send Facebook message: {response.text}")
                 return False
+            
+            # If we had media AND text, send the text separately
+            if message_type in ["image", "video", "audio", "file"] and text and text != media_url:
+                 payload = {
+                    "recipient": {"id": recipient_id},
+                    "message": {"text": text}
+                }
+                 await client.post(url, json=payload)
+
             return True
 
 facebook_service = FacebookService()

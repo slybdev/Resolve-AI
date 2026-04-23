@@ -5,6 +5,7 @@
 from app.models.invite import Invite  # noqa: F401
 from app.models.user import User  # noqa: F401
 from app.models.workspace import Workspace, WorkspaceMember  # noqa: F401
+from app.models.ai_configuration import AIConfiguration  # noqa: F401
 
 # Engineer A models (Milestone 2)
 from app.models.conversation import Conversation  # noqa: F401
@@ -37,3 +38,9 @@ from app.models.ticket import Ticket  # noqa: F401
 from app.models.ticket_update import TicketUpdate  # noqa: F401
 from app.models.ticket_tag import TicketTag  # noqa: F401
 from app.models.sla_policy import SLAPolicy, TicketSLATracking  # noqa: F401
+
+# Ratings & Analytics
+from app.models.rating import Rating  # noqa: F401
+
+# Identity & Engagement
+from app.models.visitor_session import VisitorSession  # noqa: F401

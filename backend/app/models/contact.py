@@ -5,8 +5,9 @@ Contact model — individual person in the CRM.
 import uuid
 from typing import TYPE_CHECKING, List, Optional
 
-from sqlalchemy import ForeignKey, String, Uuid, JSON
+from sqlalchemy import ForeignKey, String, Uuid, JSON, Boolean, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import datetime
 
 from app.db.base import Base
 
@@ -22,6 +23,13 @@ class Contact(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
     phone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    
+    # Tracking
+    visitor_id: Mapped[Optional[str]] = mapped_column(String(255), index=True, nullable=True)
+    
+    # GDPR / Privacy
+    consent_given: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    consent_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     
     workspace_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("workspaces.id"), nullable=False

@@ -8,6 +8,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.pubsub import pubsub_manager
+from app.models.conversation import Conversation
 
 from app.api import deps
 from app.core.dependencies import get_current_user, get_db
@@ -107,6 +109,25 @@ async def update_contact(
     db.add(contact)
     await db.commit()
     await db.refresh(contact)
+
+    # BROADCAST UPDATE to Dashboard
+    try:
+        conv_res = await db.execute(select(Conversation).where(Conversation.contact_id == contact.id))
+        conversations = conv_res.scalars().all()
+        
+        for conv in conversations:
+            payload = {
+                "type": "conversation.updated",
+                "conversation_id": str(conv.id),
+                "customerName": contact.name,
+                "customerEmail": contact.email,
+                "identified": True if contact.email else False,
+                "contact_id": str(contact.id)
+            }
+            await pubsub_manager.publish(f"ws:{contact.workspace_id}", payload)
+    except Exception as e:
+        logger.error(f"Failed to broadcast contact update: {e}")
+
     return contact
 
 

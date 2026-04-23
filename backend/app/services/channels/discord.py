@@ -96,7 +96,7 @@ class DiscordService:
         
         return True
 
-    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str, message_type: str = "text"):
+    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str, message_type: str = "text", media_url: Optional[str] = None):
         """
         Sends a message back to Discord.
         Prioritizes Bot API if token is present, else falls back to webhook_url for specific channel.
@@ -125,13 +125,13 @@ class DiscordService:
         async with httpx.AsyncClient() as client:
             headers = {"Authorization": f"Bot {token}"}
             
-            payload = {"content": text}
-            
             # For media messages where text is the URL, Discord's rich previews
             # will handle it automatically, but we can also use embeds for a cleaner look
-            if message_type in ["image", "video", "voice", "file"] and text:
-                # If we have both caption and URL, format it
-                pass # Currently the dashboard sends the URL as 'text'
+            if message_type in ["image", "video", "voice", "file"]:
+                media_to_send = media_url or text
+                payload["content"] = f"{text}\n{media_to_send}" if text and text != media_to_send else media_to_send
+            else:
+                payload["content"] = text
             
             # Send to the channel (assuming external_contact_id is the Discord Channel ID)
             # If it's a DM and we only have a User ID, we must first create a DM channel.

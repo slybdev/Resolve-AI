@@ -2,7 +2,7 @@
  * ResolveAI Widget Loader
  * This script bootstraps the chat widget.
  */
-(function() {
+(function () {
   const script = document.currentScript || document.querySelector('script[data-xentraldesk-key]') || document.querySelector('script[data-xentraldesk-id]');
   if (!script) {
     console.error('ResolveAI: No script tag found with data-xentraldesk-key or data-xentraldesk-id.');
@@ -36,7 +36,7 @@
   } else {
     // Production path
     const mainScript = document.createElement('script');
-    mainScript.src = `${baseUrl}/widget.js`; 
+    mainScript.src = `${baseUrl}/widget.js`;
     mainScript.async = true;
     document.head.appendChild(mainScript);
 

@@ -38,7 +38,10 @@ import {
   Mic,
   ArrowRight,
   Lock,
-  Inbox
+  Inbox,
+  Edit2,
+  Check,
+  Save
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { PromptInputBox } from '../../ui/ai-prompt-box';
@@ -146,8 +149,14 @@ interface Conversation {
   assigned_team_id?: string;
   avatar: string;
   channel: string;
+  primary_channel?: string;
+  channels_used?: string[];
   priority: string;
   routing_mode?: 'ai' | 'human' | 'offline';
+  identified?: boolean;
+  visitor_id?: string;
+  session_id?: string;
+  meta_data?: Record<string, any>;
 }
 
 interface Message {
@@ -155,10 +164,13 @@ interface Message {
   sender: 'customer' | 'ai' | 'human' | 'agent' | 'system';
   text: string;
   attachmentUrl?: string;
+  media_url?: string;
+  media_type?: string;
   type?: string;
   time: string;
-  avatar?: string;
-  isInternal?: boolean;
+  routing_mode: string;
+  identified?: boolean;
+  customerEmail?: string;
 }
 
 const formatTime = (date: Date) => {
@@ -441,6 +453,11 @@ export const AllConversations = ({
        fetchConversations();
     }
   };
+  const [isEditingContact, setIsEditingContact] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [isSavingContact, setIsSavingContact] = useState(false);
+
   const fetchSuggestions = useCallback(async (id: string) => {
     try {
       setIsSuggesting(true);
@@ -549,6 +566,21 @@ export const AllConversations = ({
               if (selectedId && data.conversation_id === selectedId) {
                 fetchMessages(selectedId);
               }
+            } else if (data.type === 'conversation.updated') {
+              // Reactive update for metadata/identity
+              setConversationsList(prev => prev.map(c => 
+                c.id === data.conversation_id 
+                  ? { ...c, identified: data.identified, customerName: data.customerName, customerEmail: data.customerEmail, contact_id: data.contact_id } 
+                  : c
+              ));
+              if (selectedId === data.conversation_id) {
+                setActiveConversationMetadata(prev => prev ? { 
+                  ...prev, 
+                  identified: data.identified, 
+                  customerName: data.customerName,
+                  contact_id: data.contact_id
+                } : null);
+              }
             }
           } catch (e) {
             console.error('[WS] Parse error:', e);
@@ -622,26 +654,8 @@ export const AllConversations = ({
       const mappedMessages: Message[] = data.map((m: any) => {
         const dateStr = m.created_at.endsWith('Z') || m.created_at.includes('+') ? m.created_at : `${m.created_at}Z`;
         
-        // Handle media messages that might have captions in the body
-        let text = m.body;
-        let attachmentUrl = "";
-        
-        if (m.message_type !== 'text' && m.message_type !== 'note') {
-          // Find the last URL (or /uploads/ path) in the body
-          const urlMatch = m.body.match(/(https?:\/\/[^\s]+)$|(\/uploads\/[^\s]+)$/);
-          if (urlMatch) {
-            attachmentUrl = urlMatch[0];
-            text = m.body.replace(attachmentUrl, "").trim().replace(/\n+$/, "");
-          } else {
-            attachmentUrl = m.body;
-            text = "";
-          }
-          // Fallback if attachmentUrl is still empty
-          if (!attachmentUrl && m.body && (m.body.startsWith('http') || m.body.startsWith('/uploads'))) {
-            attachmentUrl = m.body;
-            text = "";
-          }
-        }
+        const text = m.body;
+        const attachmentUrl = m.media_url || "";
 
 
 
@@ -649,8 +663,10 @@ export const AllConversations = ({
           id: m.id,
           sender: m.sender_type === 'agent' ? 'human' : m.sender_type,
           text: text,
-          attachmentUrl: attachmentUrl,
-          type: m.message_type,
+          attachmentUrl: m.media_url || attachmentUrl,
+          media_url: m.media_url,
+          media_type: m.media_type,
+          type: m.media_type || m.message_type,
           time: new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true }).toLowerCase(),
           avatar: m.sender_type === 'customer' ? conversationsList.find(c => c.id === id)?.avatar : undefined,
           isInternal: m.message_type === 'note'
@@ -767,7 +783,13 @@ export const AllConversations = ({
                   )} />
                   
                   <div className="relative shrink-0">
-                    <LetterAvatar name={chat.customerName} size="md" />
+                    {chat.identified ? (
+                      <LetterAvatar name={chat.customerName} size="md" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-border">
+                        <Globe className="w-5 h-5 text-muted-foreground" />
+                      </div>
+                    )}
                     <div className={cn(
                       "absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-card",
                       chat.status === 'open' ? "bg-green-500" : "bg-zinc-400"
@@ -777,9 +799,14 @@ export const AllConversations = ({
                   <div className="flex-1 min-w-0 py-0.5">
                     <div className="flex items-center justify-between mb-0.5">
                       <h4 className={cn(
-                        "text-sm font-bold truncate transition-colors",
+                        "text-sm font-bold truncate transition-colors flex items-center gap-2",
                         selectedId === chat.id ? "text-primary" : "text-foreground group-hover:text-primary/80"
-                      )}>{chat.customerName}</h4>
+                      )}>
+                        {chat.customerName}
+                        {!chat.identified && (
+                          <span className="px-1 py-0.5 bg-accent text-[7px] font-black uppercase tracking-widest rounded border border-border">Visitor</span>
+                        )}
+                      </h4>
                       <span className="text-[10px] text-muted-foreground font-medium shrink-0 ml-2">{chat.time}</span>
                     </div>
 
@@ -791,7 +818,9 @@ export const AllConversations = ({
                         <p className="text-xs text-muted-foreground truncate leading-relaxed">
                           {(() => {
                             const conversationMessages = messages[chat.id] || [];
-                            const lastNonInternal = [...conversationMessages].reverse().find(m => !m.isInternal);
+                            const lastNonInternal = [...conversationMessages]
+                              .reverse()
+                              .find(m => !m.isInternal && m.sender !== 'system');
                             if (lastNonInternal) {
                               const t = (lastNonInternal as any).type || 'text';
                               if (t === 'image') return 'Photo 📷';
@@ -832,13 +861,13 @@ export const AllConversations = ({
                     
                     <div className="flex items-center gap-2 mt-1.5 transition-opacity">
                       <div className="flex items-center gap-1 px-1.5 py-0.5 bg-accent/50 rounded text-[8px] font-black text-muted-foreground uppercase tracking-tighter">
-                        {chat.channel === 'website' && <Globe className="w-2.5 h-2.5" />}
-                        {chat.channel === 'whatsapp' && <MessageCircle className="w-2.5 h-2.5" />}
-                        {chat.channel === 'email' && <Mail className="w-2.5 h-2.5" />}
-                        {chat.channel === 'telegram' && <Send className="w-2.5 h-2.5" />}
-                        {chat.channel === 'slack' && <Hash className="w-2.5 h-2.5" />}
-                        {chat.channel === 'voice' && <Mic className="w-2.5 h-2.5" />}
-                        <span>{chat.channel}</span>
+                        {(chat.primary_channel === 'website' || chat.channel === 'website') && <Globe className="w-2.5 h-2.5" />}
+                        {(chat.primary_channel === 'whatsapp' || chat.channel === 'whatsapp') && <MessageCircle className="w-2.5 h-2.5" />}
+                        {(chat.primary_channel === 'email' || chat.channel === 'email') && <Mail className="w-2.5 h-2.5" />}
+                        {(chat.primary_channel === 'telegram' || chat.channel === 'telegram') && <Send className="w-2.5 h-2.5" />}
+                        {(chat.primary_channel === 'slack' || chat.channel === 'slack') && <Hash className="w-2.5 h-2.5" />}
+                        {(chat.primary_channel === 'voice' || chat.channel === 'voice') && <Mic className="w-2.5 h-2.5" />}
+                        <span>{chat.primary_channel || chat.channel}</span>
                       </div>
 
                       {(chat.assigned_to || chat.status === 'closed' || chat.status === 'resolved') && (
@@ -855,6 +884,21 @@ export const AllConversations = ({
                             : chat.assigned_to === currentUser?.id 
                               ? (chat.priority === 'pending' ? 'Action Required' : 'Owned') 
                               : 'Locked'}
+                        </div>
+                      )}
+                      
+                      {/* Technical Metadata Badges */}
+                      {chat.meta_data?.page && (
+                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-accent/30 rounded text-[7px] font-black text-muted-foreground uppercase tracking-tighter border border-border/50 truncate max-w-[80px]" title={`Current Page: ${chat.meta_data.page}`}>
+                          <FileText className="w-2 h-2" />
+                          <span className="truncate">{chat.meta_data.page.split('/').pop() || 'index'}</span>
+                        </div>
+                      )}
+                      
+                      {chat.meta_data?.utm_source && (
+                        <div className="flex items-center gap-1 px-1.5 py-0.5 bg-primary/5 rounded text-[7px] font-black text-primary uppercase tracking-tighter border border-primary/10">
+                          <Zap className="w-2 h-2" />
+                          <span>{chat.meta_data.utm_source}</span>
                         </div>
                       )}
                     </div>
@@ -896,21 +940,37 @@ export const AllConversations = ({
                 >
                   {isListOpen ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                 </button>
-                <div 
-                  className="flex items-center gap-3 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
-                  onClick={() => setIsDetailsOpen(true)}
-                  title="Show Customer Details"
-                >
-                  <LetterAvatar 
-                    name={activeConversationMetadata?.customerName || conversationsList.find(c => c.id === selectedId)?.customerName || '?'} 
-                    size="sm" 
-                  />
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-bold text-foreground truncate">
-                      {activeConversationMetadata?.customerName || conversationsList.find(c => c.id === selectedId)?.customerName}
-                    </h3>
+                  <div 
+                    className="flex items-center gap-3 min-w-0 cursor-pointer hover:opacity-80 transition-opacity"
+                    onClick={() => setIsDetailsOpen(true)}
+                    title="Show Customer Details"
+                  >
+                    {currentConversation?.identified ? (
+                      <LetterAvatar 
+                        name={activeConversationMetadata?.customerName || currentConversation?.customerName || '?'} 
+                        size="sm" 
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-border">
+                        <Globe className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-bold text-foreground truncate">
+                          {activeConversationMetadata?.customerName || currentConversation?.customerName}
+                        </h3>
+                        {!currentConversation?.identified && (
+                          <span className="px-1.5 py-0.5 bg-accent text-[7px] font-black uppercase tracking-widest rounded border border-border text-muted-foreground">Visitor</span>
+                        )}
+                      </div>
+                      {currentConversation?.meta_data?.ip_address && (
+                        <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tighter leading-none mt-0.5">
+                          {currentConversation.meta_data.ip_address} • {currentConversation.meta_data.timezone || 'UTC'}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
               </div>
 
               <div className="flex items-center gap-1.5 ml-4 shrink-0">
@@ -1049,7 +1109,7 @@ export const AllConversations = ({
               </div>
 
               <AnimatePresence mode="popLayout">
-                {(messages[selectedId] || []).map((msg) => (
+                {(messages[selectedId] || []).filter(m => m.sender !== 'system').map((msg) => (
                   <motion.div 
                     key={msg.id}
                     initial={{ opacity: 0, y: 10 }}
@@ -1064,9 +1124,9 @@ export const AllConversations = ({
                       <CollapsibleNote msg={msg} />
                     ) : msg.sender === 'system' ? (
                       <div className="flex flex-col items-center gap-1 my-2">
-                        <div className="px-4 py-1.5 rounded-full bg-accent/80 backdrop-blur-sm shadow-sm border border-border/50">
-                          <span className="text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground">
-                            {msg.text}
+                        <div className="px-4 py-1.5 rounded-full bg-accent dark:bg-accent/50 backdrop-blur-sm shadow-sm border border-border">
+                          <span className="text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground dark:text-muted-foreground/80">
+                            {msg.text || 'System Event'}
                           </span>
                         </div>
                         <span className="text-[9px] font-medium text-muted-foreground/60 tracking-wider">
@@ -1103,7 +1163,7 @@ export const AllConversations = ({
                           )}>
                             {msg.type === 'image' ? (
                               <div className="relative">
-                                {msg.text && (
+                                {msg.text && !(msg.sender === 'customer' && msg.text.startsWith('Uploaded ')) && (
                                   <div className="p-3 pb-1">
                                     <ExpandableMessage text={msg.text} sender={msg.sender} />
                                   </div>
@@ -1118,7 +1178,7 @@ export const AllConversations = ({
                               </div>
                             ) : msg.type === 'video' ? (
                               <div className="relative">
-                                {msg.text && (
+                                {msg.text && !(msg.sender === 'customer' && msg.text.startsWith('Uploaded ')) && (
                                   <div className="p-3 pb-1">
                                     <ExpandableMessage text={msg.text} sender={msg.sender} />
                                   </div>
@@ -1409,9 +1469,10 @@ export const AllConversations = ({
 
                     await api.conversations.sendMessage(
                       selectedId, 
-                      finalBody, 
+                      msg || "", 
                       activeTab === 'note',
-                      messageType
+                      messageType,
+                      files && files.length > 0 ? finalBody : undefined
                     );
                     
                     // The WebSocket or next fetch will replace it with the real one
@@ -1532,7 +1593,76 @@ export const AllConversations = ({
                 <div className="relative mb-4">
                   <LetterAvatar name={conversationsList.find(c => c.id === selectedId)?.customerName || '?'} size="lg" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground leading-tight">{conversationsList.find(c => c.id === selectedId)?.customerName}</h3>
+                <div className="group relative">
+                  {isEditingContact ? (
+                    <div className="space-y-2 px-4">
+                      <input 
+                        type="text" 
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="w-full bg-accent border border-primary/20 rounded-lg px-3 py-1.5 text-sm font-bold text-foreground text-center focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="Name"
+                        autoFocus
+                      />
+                      <input 
+                        type="email" 
+                        value={editEmail}
+                        onChange={(e) => setEditEmail(e.target.value)}
+                        className="w-full bg-accent border border-primary/20 rounded-lg px-3 py-1.5 text-[11px] font-medium text-primary text-center focus:outline-none focus:ring-1 focus:ring-primary"
+                        placeholder="Email"
+                      />
+                      <div className="flex items-center justify-center gap-2 mt-2">
+                        <button 
+                          onClick={async () => {
+                            if (!selectedId || !currentConversation?.contact_id || isSavingContact) return;
+                            try {
+                              setIsSavingContact(true);
+                              await api.contacts.update(currentConversation.contact_id, {
+                                name: editName,
+                                email: editEmail || null
+                              });
+                              toast("Profile Updated", "Customer information has been saved.", "success");
+                              setIsEditingContact(false);
+                            } catch (err: any) {
+                              toast("Save Failed", err.message, "error");
+                            } finally {
+                              setIsSavingContact(false);
+                            }
+                          }}
+                          disabled={isSavingContact}
+                          className="px-3 py-1 bg-primary text-primary-foreground rounded-lg text-[10px] font-bold hover:opacity-90 transition-all flex items-center gap-1.5"
+                        >
+                          {isSavingContact ? <Spinner size="xs" /> : <Check className="w-3 h-3" />}
+                          Save
+                        </button>
+                        <button 
+                          onClick={() => setIsEditingContact(false)}
+                          className="px-3 py-1 bg-accent text-muted-foreground rounded-lg text-[10px] font-bold hover:bg-accent/80 transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="text-lg font-bold text-foreground leading-tight">{currentConversation?.customerName}</h3>
+                      {currentConversation?.customerEmail && (
+                        <p className="text-[11px] text-primary font-medium mt-1">{currentConversation?.customerEmail}</p>
+                      )}
+                      <button 
+                        onClick={() => {
+                          setEditName(currentConversation?.customerName || '');
+                          setEditEmail(currentConversation?.customerEmail || '');
+                          setIsEditingContact(true);
+                        }}
+                        className="absolute -top-1 -right-6 p-1.5 opacity-30 group-hover:opacity-100 hover:bg-accent rounded-md transition-all text-muted-foreground"
+                        title="Edit Profile"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                      </button>
+                    </>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground mt-1">Contact Details</p>
                 <div className="flex items-center gap-2 mt-3">
                   <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[10px] font-bold uppercase tracking-wider">Customer</span>
@@ -1570,6 +1700,23 @@ export const AllConversations = ({
                   <button className="px-2.5 py-1 bg-accent/50 text-muted-foreground border border-dashed border-border rounded-lg text-[10px] font-bold hover:bg-accent hover:text-foreground transition-all">
                     + Add Tag
                   </button>
+                </div>
+              </div>
+
+              {/* Channels Used */}
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active Channels</h4>
+                <div className="flex flex-wrap gap-2">
+                  {(currentConversation?.channels_used || [currentConversation?.primary_channel || currentConversation?.channel]).filter(Boolean).map(ch => (
+                    <div key={ch} className="flex items-center gap-1.5 px-2 py-1 bg-accent/50 border border-border rounded-lg text-[10px] font-bold text-foreground">
+                      {ch === 'website' && <Globe className="w-3 h-3" />}
+                      {ch === 'whatsapp' && <MessageCircle className="w-3 h-3 text-green-500" />}
+                      {ch === 'telegram' && <Send className="w-3 h-3 text-blue-400" />}
+                      {ch === 'email' && <Mail className="w-3 h-3 text-amber-500" />}
+                      {ch === 'slack' && <Hash className="w-3 h-3 text-primary" />}
+                      <span className="capitalize">{ch}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 

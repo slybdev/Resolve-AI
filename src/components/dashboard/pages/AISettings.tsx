@@ -23,67 +23,21 @@ import { useToast } from '@/src/components/ui/Toast';
 
 export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string, onViewChange?: (view: string) => void }) => {
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
+  const [config, setConfig] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
-  
-  // Workspace / Identity State
-  const [workspace, setWorkspace] = useState<any>(null);
-  const [identity, setIdentity] = useState({
-    name: '',
-    industry: '',
-    description: ''
-  });
-
-  // Persona State
-  const [persona, setPersona] = useState({
-    agentName: '',
-    tone: 'professional',
-    customInstructions: ''
-  });
-
-  // Behavioral Settings
-  const [settings, setSettings] = useState({
-    showSources: true,
-    confidenceThreshold: 0.7,
-    strictMode: false,
-    isAIEnabled: false,
-    escalateOnSentiment: false,
-    escalateOnHandoff: true,
-    escalateOnKBMiss: false,
-    highRiskKeywords: "lawyer, refund, manager, legal"
-  });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchWorkspaceData();
+    fetchConfig();
   }, [workspaceId]);
 
-  const fetchWorkspaceData = async () => {
+  const fetchConfig = async () => {
     setIsLoading(true);
     try {
-      const data = await api.workspaces.get(workspaceId);
-      setWorkspace(data);
-      setIdentity({
-        name: data.name || '',
-        industry: data.industry || '',
-        description: data.company_description || ''
-      });
-      setPersona({
-        agentName: data.ai_agent_name || 'Resolve Assistant',
-        tone: data.ai_tone || 'professional',
-        customInstructions: data.ai_custom_instructions || ''
-      });
-      setSettings({
-        showSources: data.ai_settings?.showSources ?? true,
-        confidenceThreshold: data.ai_settings?.confidenceThreshold ?? 0.7,
-        strictMode: data.ai_settings?.strictMode ?? false,
-        isAIEnabled: data.is_ai_enabled ?? false,
-        escalateOnSentiment: data.ai_settings?.escalateOnSentiment ?? false,
-        escalateOnHandoff: data.ai_settings?.escalateOnHandoff ?? true,
-        escalateOnKBMiss: data.ai_settings?.escalateOnKBMiss ?? false,
-        highRiskKeywords: data.ai_settings?.highRiskKeywords ?? "lawyer, refund, manager, legal"
-      });
+      const data = await api.ai.getConfig(workspaceId);
+      setConfig(data);
     } catch (err: any) {
-      toast('Error', 'Failed to load AI settings', 'error');
+      toast('Error', 'Failed to load AI configuration', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -92,31 +46,25 @@ export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string,
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await api.workspaces.update(workspaceId, {
-        name: identity.name,
-        company_description: identity.description,
-        industry: identity.industry,
-        ai_agent_name: persona.agentName,
-        ai_tone: persona.tone,
-        ai_custom_instructions: persona.customInstructions,
-        ai_settings: {
-          showSources: settings.showSources,
-          confidenceThreshold: settings.confidenceThreshold,
-          strictMode: settings.strictMode,
-          escalateOnSentiment: settings.escalateOnSentiment,
-          escalateOnHandoff: settings.escalateOnHandoff,
-          escalateOnKBMiss: settings.escalateOnKBMiss,
-          highRiskKeywords: settings.highRiskKeywords
-        },
-        is_ai_enabled: settings.isAIEnabled
-      });
-      toast('Success', 'AI Agent profile updated successfully', 'success');
+      await api.ai.updateConfig(workspaceId, config);
+      toast('Success', 'AI Agent parameters calibrated successfully', 'success');
     } catch (err: any) {
-      toast('Error', err.message || 'Failed to update settings', 'error');
+      toast('Error', err.message || 'Failed to sync configuration', 'error');
     } finally {
       setIsSaving(false);
     }
   };
+
+  if (isLoading || !config) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-transparent">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Calibrating Neural Pathways...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -141,13 +89,13 @@ export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string,
             <h1 className="text-2xl font-black text-foreground tracking-tight">AI Control Room</h1>
             <div className="flex items-center gap-2">
               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Active Agent:</span>
-              <span className="text-[10px] font-black text-primary uppercase tracking-widest">{persona.agentName}</span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-widest">{config?.company_name || 'AI Assistant'}</span>
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <button 
-            onClick={fetchWorkspaceData}
+            onClick={fetchConfig}
             className="p-3 text-muted-foreground hover:bg-accent rounded-xl transition-colors active:rotate-180 duration-500"
             title="Reload Settings"
           >
@@ -170,7 +118,7 @@ export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string,
           {/* Left Column: Configuration */}
           <div className="col-span-12 lg:col-span-7 space-y-8">
             
-            {/* Identity Shield Section */}
+            {/* Identity & Context Section */}
             <section className="bg-card border border-border rounded-[2.5rem] p-8 shadow-sm space-y-6 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
                 <Building2 size={120} />
@@ -181,7 +129,7 @@ export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string,
                   <Building2 className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-foreground tracking-tight">Company Identity</h2>
+                  <h2 className="text-lg font-black text-foreground tracking-tight">Identity & Industry</h2>
                   <p className="text-xs text-muted-foreground">The foundational knowledge that makes your AI "yours".</p>
                 </div>
               </div>
@@ -189,46 +137,53 @@ export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string,
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Workspace Name</label>
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Company Name</label>
                     <input 
                       type="text" 
-                      value={identity.name}
-                      onChange={(e) => setIdentity({...identity, name: e.target.value})}
+                      value={config.company_name || ''}
+                      onChange={(e) => setConfig({...config, company_name: e.target.value})}
                       className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Industry</label>
                     <select 
-                      value={identity.industry}
-                      onChange={(e) => setIdentity({...identity, industry: e.target.value})}
+                      value={config.industry}
+                      onChange={(e) => setConfig({...config, industry: e.target.value})}
                       className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all appearance-none"
                     >
-                      <option value="SaaS">SaaS</option>
-                      <option value="E-commerce">E-commerce</option>
-                      <option value="Agency">Agency</option>
-                      <option value="Tech Support">Tech Support</option>
+                      <option value="saas">SaaS / Software</option>
+                      <option value="ecommerce">E-commerce</option>
+                      <option value="agency">Agency / Service</option>
+                      <option value="fintech">Fintech</option>
+                      <option value="health">Healthcare</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Company Deep Bio</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Brand Description</label>
                   <textarea 
-                    value={identity.description}
-                    onChange={(e) => setIdentity({...identity, description: e.target.value})}
+                    value={config.company_description || ''}
+                    onChange={(e) => setConfig({...config, company_description: e.target.value})}
                     placeholder="Describe your products, mission, and unique value proposition..."
-                    className="w-full bg-accent/30 border border-border rounded-[1.5rem] px-4 py-4 text-sm h-32 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all resize-none leading-relaxed"
+                    className="w-full bg-accent/30 border border-border rounded-[1.5rem] px-4 py-4 text-sm h-28 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all resize-none leading-relaxed"
                   />
-                  <div className="flex items-start gap-2 bg-blue-500/5 p-3 rounded-xl border border-blue-500/10">
-                    <Info className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-blue-500/80 leading-tight">This bio acts as the fallback context when your knowledge base doesn't have an exact answer.</p>
-                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Greeting Message</label>
+                  <textarea 
+                    value={config.greeting_message || ''}
+                    onChange={(e) => setConfig({...config, greeting_message: e.target.value})}
+                    placeholder="e.g. Hello! I'm your AI assistant for XentralDesk. How can I help?"
+                    className="w-full bg-accent/30 border border-border rounded-[1.5rem] px-4 py-3 text-sm h-20 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all resize-none font-medium"
+                  />
                 </div>
               </div>
             </section>
 
-            {/* AI Persona Section */}
+            {/* AI Persona & Goal Section */}
             <section className="bg-card border border-border rounded-[2.5rem] p-8 shadow-sm space-y-6 relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity pointer-events-none">
                 <Bot size={120} />
@@ -239,230 +194,177 @@ export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string,
                   <Bot className="w-5 h-5 text-purple-500" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-black text-foreground tracking-tight">AI Agent Persona</h2>
-                  <p className="text-xs text-muted-foreground">Customize how the AI talks and represents your brand.</p>
+                  <h2 className="text-lg font-black text-foreground tracking-tight">Persona & Performance</h2>
+                  <p className="text-xs text-muted-foreground">Adjust the AI's "brain" and conversational tone.</p>
                 </div>
               </div>
 
               <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Agent Name</label>
-                  <input 
-                    type="text" 
-                    value={persona.agentName}
-                    onChange={(e) => setPersona({...persona, agentName: e.target.value})}
-                    className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-inner"
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Tone & Voice</label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {['Professional', 'Friendly', 'Technical', 'Concise'].map(t => (
-                      <button
-                        key={t}
-                        onClick={() => setPersona({...persona, tone: t.toLowerCase()})}
-                        className={cn(
-                          "px-3 py-3 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
-                          persona.tone === t.toLowerCase() 
-                            ? "bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20" 
-                            : "bg-accent/30 border-border text-muted-foreground hover:bg-accent/50"
-                        )}
-                      >
-                        {t}
-                      </button>
-                    ))}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Base Personality</label>
+                    <select 
+                      value={config.personality}
+                      onChange={(e) => setConfig({...config, personality: e.target.value})}
+                      className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm font-bold appearance-none"
+                    >
+                      <option value="professional">🤵 Professional</option>
+                      <option value="friendly">👋 Friendly</option>
+                      <option value="technical">💻 Technical</option>
+                      <option value="casual">🤙 Casual</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Primary Goal</label>
+                    <select 
+                      value={config.primary_goal}
+                      onChange={(e) => setConfig({...config, primary_goal: e.target.value})}
+                      className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm font-bold appearance-none"
+                    >
+                      <option value="support">🛠️ Pure Support</option>
+                      <option value="sales">💰 Sales / Lead Gen</option>
+                      <option value="triage">📋 Triage & Routing</option>
+                    </select>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Behavioral Guardrails (The "Commandments")</label>
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Custom Behavioral Logic</label>
                   <textarea 
-                    value={persona.customInstructions}
-                    onChange={(e) => setPersona({...persona, customInstructions: e.target.value})}
-                    placeholder="e.g. NEVER mention competitors. ALWAYS apologize for long wait times. Use emoji sparingly."
-                    className="w-full bg-accent/30 border border-border rounded-[1.5rem] px-4 py-4 text-sm h-40 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all resize-none leading-relaxed font-mono"
+                    value={config.system_prompt_template || ''}
+                    onChange={(e) => setConfig({...config, system_prompt_template: e.target.value})}
+                    placeholder="Optional: Provide a full system prompt template to override defaults..."
+                    className="w-full bg-accent/30 border border-border rounded-[1.5rem] px-4 py-4 text-sm h-32 focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all resize-none leading-relaxed font-mono text-[11px]"
                   />
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-3.5 h-3.5 text-green-500" />
-                    <p className="text-[10px] text-muted-foreground">These rules are injected into every query and cannot be bypassed by users.</p>
+                    <p className="text-[10px] text-muted-foreground italic">Leave empty to use the dynamic engine's optimized prompts.</p>
                   </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Guardrails Card */}
+            <section className="bg-card border border-border rounded-[2.5rem] p-8 shadow-sm space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-red-500/10 rounded-xl">
+                  <ShieldCheck className="w-5 h-5 text-red-500" />
+                </div>
+                <h2 className="text-lg font-black text-foreground tracking-tight">Guardrails & Topics</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Blocked Topics (Comma separated)</label>
+                  <input 
+                    type="text" 
+                    value={config.blocked_topics?.join(', ') || ''}
+                    onChange={(e) => setConfig({...config, blocked_topics: e.target.value.split(',').map(s => s.trim())})}
+                    placeholder="e.g. sex, violence, politics, crypto"
+                    className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Escalation Keywords</label>
+                  <input 
+                    type="text" 
+                    value={config.escalation_keywords?.join(', ') || ''}
+                    onChange={(e) => setConfig({...config, escalation_keywords: e.target.value.split(',').map(s => s.trim())})}
+                    placeholder="e.g. lawyer, legal, court, threat, worst"
+                    className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 transition-all"
+                  />
                 </div>
               </div>
             </section>
           </div>
 
-          {/* Right Column: Dynamic Settings & Health */}
+          {/* Right Column: Collection & Neural Parameters */}
           <div className="col-span-12 lg:col-span-5 space-y-8">
             
-            {/* Guardrails Card */}
+            {/* Identity Collection Policy */}
             <section className="bg-card border border-border rounded-[2.5rem] p-8 shadow-sm space-y-6">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-yellow-500/10 rounded-xl">
-                    <Zap className="w-5 h-5 text-yellow-500" />
-                  </div>
-                  <h2 className="text-lg font-black text-foreground tracking-tight">AI Automation</h2>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-yellow-500/10 rounded-xl">
+                  <Zap className="w-5 h-5 text-yellow-500" />
                 </div>
+                <h2 className="text-lg font-black text-foreground tracking-tight">Identity Collection</h2>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-5 bg-primary/10 rounded-3xl border-2 border-primary/20 group hover:border-primary/50 transition-all shadow-lg shadow-primary/5">
-                  <div className="space-y-0.5">
-                    <h3 className="text-sm font-black text-foreground uppercase tracking-tight">AI First Line Response</h3>
-                    <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">AI handles new chats until an agent takes over.</p>
-                  </div>
-                  <button 
-                    onClick={() => setSettings({...settings, isAIEnabled: !settings.isAIEnabled})}
-                    className={cn(
-                      "w-14 h-7 rounded-full transition-all relative overflow-hidden",
-                      settings.isAIEnabled ? "bg-primary shadow-lg shadow-primary/30" : "bg-neutral-800"
-                    )}
+              <div className="space-y-4 pt-2">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Email Collection Trigger</label>
+                  <select 
+                    value={config.collect_email_trigger}
+                    onChange={(e) => setConfig({...config, collect_email_trigger: e.target.value})}
+                    className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm font-bold appearance-none"
                   >
-                    <div className={cn(
-                      "absolute top-1 w-5 h-5 rounded-full bg-white transition-all shadow-md",
-                      settings.isAIEnabled ? "left-8" : "left-1"
-                    )} />
-                  </button>
+                    <option value="on_support_request">On Support Request</option>
+                    <option value="always">Always (First Turn)</option>
+                    <option value="never">Never (AI alone)</option>
+                  </select>
                 </div>
 
-                <div className="flex items-center justify-between p-4 bg-accent/20 rounded-2xl border border-border group hover:border-primary/30 transition-all">
-                  <div className="space-y-0.5">
-                    <h3 className="text-xs font-bold text-foreground">Source Transparency</h3>
-                    <p className="text-[10px] text-muted-foreground">Show users where info came from.</p>
-                  </div>
-                  <button 
-                    onClick={() => setSettings({...settings, showSources: !settings.showSources})}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-all relative overflow-hidden",
-                      settings.showSources ? "bg-primary" : "bg-neutral-800"
-                    )}
-                  >
-                    <div className={cn(
-                      "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
-                      settings.showSources ? "left-7" : "left-1"
-                    )} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-accent/20 rounded-2xl border border-border group hover:border-red-500/30 transition-all">
-                  <div className="space-y-0.5">
-                    <h3 className="text-xs font-bold text-foreground">Strict Context Mode</h3>
-                    <p className="text-[10px] text-muted-foreground">Block non-knowledge base chats.</p>
-                  </div>
-                  <button 
-                    onClick={() => setSettings({...settings, strictMode: !settings.strictMode})}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-all relative",
-                      settings.strictMode ? "bg-red-500 shadow-lg shadow-red-500/20" : "bg-neutral-800"
-                    )}
-                  >
-                    <div className={cn(
-                      "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
-                      settings.strictMode ? "left-7" : "left-1"
-                    )} />
-                  </button>
-                </div>
-
-                <div className="space-y-4 pt-2">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-xs font-bold text-foreground">Confidence Threshold</h3>
-                    <span className="text-[10px] font-mono font-bold text-primary">{Math.round(settings.confidenceThreshold * 100)}%</span>
-                  </div>
-                  <input 
-                    type="range" 
-                    min="0" 
-                    max="1" 
-                    step="0.05"
-                    value={settings.confidenceThreshold}
-                    onChange={(e) => setSettings({...settings, confidenceThreshold: parseFloat(e.target.value)})}
-                    className="w-full h-1.5 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-primary"
-                  />
-                  <p className="text-[10px] text-muted-foreground text-center">Lowering threshold makes AI more "talkative" but riskier.</p>
+                <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                  <p className="text-[10px] text-primary/80 font-bold leading-tight">
+                    Recommended: "On Support Request" keeps the greeting frictionless but ensures identification before ticket creation.
+                  </p>
                 </div>
               </div>
             </section>
 
-            {/* Autonomous Escalation Card */}
-            <section className="bg-card border border-border rounded-[2.5rem] p-8 shadow-sm space-y-6">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-red-500/10 rounded-xl">
-                    <ShieldCheck className="w-5 h-5 text-red-500" />
-                  </div>
-                  <h2 className="text-lg font-black text-foreground tracking-tight">Autonomous Escalation</h2>
+             {/* Neural Parameters */}
+             <section className="bg-card border border-border rounded-[2.5rem] p-8 shadow-sm space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-500/10 rounded-xl">
+                  <BrainCircuit className="w-5 h-5 text-blue-500" />
                 </div>
+                <h2 className="text-lg font-black text-foreground tracking-tight">Neural Controls</h2>
               </div>
-              <p className="text-xs text-muted-foreground mt-[-1rem]">Automatically create tickets and route to agents based on AI detection.</p>
 
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-accent/20 rounded-2xl border border-border group hover:border-red-500/30 transition-all">
-                  <div className="space-y-0.5">
-                    <h3 className="text-xs font-bold text-foreground">Escalate on Frustration</h3>
-                    <p className="text-[10px] text-muted-foreground">Creates ticket if negative sentiment is detected.</p>
+              <div className="space-y-6 pt-2">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-foreground">Conversation Memory</h3>
+                    <span className="text-[10px] font-mono font-bold text-primary">{config.max_context_messages} Messages</span>
                   </div>
-                  <button 
-                    onClick={() => setSettings({...settings, escalateOnSentiment: !settings.escalateOnSentiment})}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-all relative overflow-hidden",
-                      settings.escalateOnSentiment ? "bg-red-500 shadow-lg shadow-red-500/20" : "bg-neutral-800"
-                    )}
-                  >
-                    <div className={cn(
-                      "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
-                      settings.escalateOnSentiment ? "left-7" : "left-1"
-                    )} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-accent/20 rounded-2xl border border-border group hover:border-primary/30 transition-all">
-                  <div className="space-y-0.5">
-                    <h3 className="text-xs font-bold text-foreground">Escalate on Handoff Intent</h3>
-                    <p className="text-[10px] text-muted-foreground">Triggers when user asks for a "real person".</p>
-                  </div>
-                  <button 
-                    onClick={() => setSettings({...settings, escalateOnHandoff: !settings.escalateOnHandoff})}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-all relative overflow-hidden",
-                      settings.escalateOnHandoff ? "bg-primary shadow-lg shadow-primary/20" : "bg-neutral-800"
-                    )}
-                  >
-                    <div className={cn(
-                      "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
-                      settings.escalateOnHandoff ? "left-7" : "left-1"
-                    )} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between p-4 bg-accent/20 rounded-2xl border border-border group hover:border-yellow-500/30 transition-all">
-                  <div className="space-y-0.5">
-                    <h3 className="text-xs font-bold text-foreground">Escalate on KB Miss</h3>
-                    <p className="text-[10px] text-muted-foreground">Creates ticket if the AI doesn't know the answer.</p>
-                  </div>
-                  <button 
-                    onClick={() => setSettings({...settings, escalateOnKBMiss: !settings.escalateOnKBMiss})}
-                    className={cn(
-                      "w-12 h-6 rounded-full transition-all relative overflow-hidden",
-                      settings.escalateOnKBMiss ? "bg-yellow-500 text-black shadow-lg shadow-yellow-500/20" : "bg-neutral-800"
-                    )}
-                  >
-                    <div className={cn(
-                      "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
-                      settings.escalateOnKBMiss ? "left-7" : "left-1"
-                    )} />
-                  </button>
-                </div>
-
-                <div className="space-y-2 pt-2">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest ml-1">High-Risk Keywords</label>
                   <input 
-                    type="text" 
-                    value={settings.highRiskKeywords}
-                    onChange={(e) => setSettings({...settings, highRiskKeywords: e.target.value})}
-                    placeholder="e.g. refund, lawyer, cancel"
-                    className="w-full bg-accent/30 border border-border rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-inner"
+                    type="range" min="1" max="50" step="1"
+                    value={config.max_context_messages}
+                    onChange={(e) => setConfig({...config, max_context_messages: parseInt(e.target.value)})}
+                    className="w-full h-1.5 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-primary"
                   />
-                  <p className="text-[10px] text-muted-foreground ml-1">Comma-separated words that instantly trigger a ticket.</p>
+                  <p className="text-[10px] text-muted-foreground leading-tight">Deepers memory consumes more tokens but allows better followup awareness.</p>
+                </div>
+
+                <div className="space-y-4 pt-2">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-foreground">Retrieval Density (Top-K)</h3>
+                    <span className="text-[10px] font-mono font-bold text-primary">{config.rag_top_k} Chunks</span>
+                  </div>
+                  <input 
+                    type="range" min="1" max="10" step="1"
+                    value={config.rag_top_k}
+                    onChange={(e) => setConfig({...config, rag_top_k: parseInt(e.target.value)})}
+                    className="w-full h-1.5 bg-neutral-800 rounded-full appearance-none cursor-pointer accent-primary"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-accent/20 rounded-2xl border border-border group hover:border-primary/30 transition-all cursor-pointer"
+                  onClick={() => setConfig({...config, rag_enabled: !config.rag_enabled})}
+                >
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold text-foreground">Knowledge Base RAG</h3>
+                    <p className="text-[10px] text-muted-foreground">Inject company docs into replies.</p>
+                  </div>
+                  <div className={cn(
+                    "w-10 h-5 rounded-full transition-all relative",
+                    config.rag_enabled ? "bg-primary" : "bg-neutral-800"
+                  )}>
+                    <div className={cn(
+                      "absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
+                      config.rag_enabled ? "left-5.5" : "left-0.5"
+                    )} />
+                  </div>
                 </div>
               </div>
             </section>
@@ -504,12 +406,12 @@ export const AISettings = ({ workspaceId, onViewChange }: { workspaceId: string,
             {/* Quick Test Action */}
             <button 
               onClick={() => onViewChange ? onViewChange('test') : window.location.href = window.location.pathname + '?view=test'}
-              className="w-full bg-accent/50 border border-border hover:border-primary/50 py-6 rounded-[2.5rem] group flex flex-col items-center gap-2 transition-all active:scale-[0.98]"
+              className="w-full bg-card border border-border hover:border-primary/50 py-6 rounded-[2.5rem] group flex flex-col items-center gap-2 transition-all active:scale-[0.98] shadow-sm"
             >
               <div className="p-3 bg-primary/10 rounded-2xl group-hover:bg-primary/20 transition-colors">
                 <MessageSquare className="w-6 h-6 text-primary" />
               </div>
-              <span className="text-sm font-black text-foreground tracking-tight">Open Playground</span>
+              <span className="text-sm font-black text-foreground tracking-tight">Open Neural Playground</span>
               <p className="text-xs text-muted-foreground">Test your behavior rules live</p>
             </button>
           </div>

@@ -334,10 +334,10 @@ class APIClient {
       this.request(`/conversations/${conversation_id}`),
     getMessages: (conversation_id: string) => 
       this.request(`/conversations/${conversation_id}/messages`),
-    sendMessage: (conversation_id: string, body: string, is_internal: boolean = false, message_type: string = "text") => 
+    sendMessage: (conversation_id: string, body: string, is_internal: boolean = false, message_type: string = "text", media_url?: string) => 
       this.request(`/conversations/${conversation_id}/messages`, {
         method: 'POST',
-        body: JSON.stringify({ body, is_internal, message_type }),
+        body: JSON.stringify({ body, is_internal, message_type, media_url }),
       }),
     update: (conversation_id: string, data: { status?: string, assigned_to?: string, priority?: string }) =>
       this.request(`/conversations/${conversation_id}`, {
@@ -520,16 +520,21 @@ class APIClient {
 
   // AI
   ai = {
-    query: (workspaceId: string, query: string, folderId?: string, conversationId?: string) => 
+    query: (workspaceId: string, query: string, folder_id?: string, conversation_id?: string) => 
       this.request('/ai/query', {
         method: 'POST',
         body: JSON.stringify({
           workspace_id: workspaceId,
           query: query,
-          folder_id: folderId,
-          conversation_id: conversationId,
+          folder_id: folder_id,
+          conversation_id: conversation_id,
         }),
       }),
+    getConfig: (workspaceId: string) => this.request(`/ai/config/${workspaceId}`),
+    updateConfig: (workspaceId: string, data: any) => this.request(`/ai/config/${workspaceId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
   };
 
   // WhatsApp QR Bridge
@@ -615,6 +620,14 @@ class APIClient {
       list: (workspaceId: string, ruleId?: string) => 
         this.request(`/automations/logs?workspace_id=${workspaceId}${ruleId ? `&rule_id=${ruleId}` : ''}`),
     },
+  };
+
+  // Analytics
+  analytics = {
+    getAgentPerformance: (workspaceId: string, days: number = 30) => 
+      this.request(`/analytics/${workspaceId}/agents?days=${days}`),
+    getCSAT: (workspaceId: string, days: number = 30) => 
+      this.request(`/analytics/${workspaceId}/csat?days=${days}`),
   };
 }
 

@@ -7,6 +7,8 @@ class MessageCreate(BaseModel):
     body: str
     message_type: str = "text"
     is_internal: bool = False
+    media_url: Optional[str] = None
+    media_type: Optional[str] = None
 
 class MessageRead(BaseModel):
     id: UUID
@@ -16,6 +18,8 @@ class MessageRead(BaseModel):
     created_at: datetime
     sender_id: Optional[UUID] = None
     is_read: bool = False
+    media_url: Optional[str] = None
+    media_type: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -36,6 +40,10 @@ class ConversationRead(BaseModel):
     assigned_to: Optional[UUID] = None
     updated_at: Optional[datetime] = None
     routing_mode: str = "human"
+    identified: bool = False
+    customerEmail: Optional[str] = None
+    primary_channel: Optional[str] = None
+    channels_used: Optional[List[str]] = []
 
     class Config:
         from_attributes = True

@@ -87,35 +87,8 @@ class AIHandler:
 
         response_text = None
         
-        # --- Autonomous Escalation Evaluation ---
+        # --- AI Orchestration ---
         ai_settings = workspace.ai_settings or {}
-        should_escalate = False
-        escalation_reason = ""
-        user_text = message.body.lower()
-
-        if ai_settings.get("escalateOnHandoff", True):
-            is_handoff_intent = await AIService.evaluate_rule_condition(
-                workspace.id,
-                "The user is explicitly asking to speak to a human, a real person, an agent, a representative, or requesting to be escalated or transferred to customer support.",
-                message.body,
-                openai_client,
-                gemini_client
-            )
-            if is_handoff_intent:
-                should_escalate = True
-                escalation_reason = "Customer explicitly requested human routing."
-
-        if not should_escalate and ai_settings.get("highRiskKeywords", ""):
-            risk_keywords = [k.strip().lower() for k in ai_settings["highRiskKeywords"].split(",") if k.strip()]
-            if any(k in user_text for k in risk_keywords):
-                should_escalate = True
-                escalation_reason = "Customer message contained high-risk keyword."
-        
-        if not should_escalate and ai_settings.get("escalateOnSentiment", False):
-            sentiment_score = await AIService.detect_frustration(message.body, openai_client, gemini_client)
-            if sentiment_score >= 0.8:
-                should_escalate = True
-                escalation_reason = "High customer frustration detected."
 
         async def execute_escalation(reason: str, reply: str):
             logger.info(f"AIHandler: Triggering autonomous escalation. Reason: {reason}")
@@ -135,6 +108,24 @@ class AIHandler:
                 
                 # FIX: Check for existing ticket to avoid DuplicateResults error in conversations.py
                 ex_ticket = await TicketService.get_ticket_by_conversation(db, conversation.id)
+                
+                # NEW: Identity Gating
+                if not conversation.identified:
+                    logger.info(f"AIHandler: Escalation requested for UNIDENTIFIED visitor. Gating creation. (Conv: {conversation.id})")
+                    ticket_pending_context = {
+                        "title": triage_data.get("suggested_title", "Escalated Support Request"),
+                        "summary": triage_data.get("summary", reason),
+                        "priority": triage_data.get("suggested_priority", "high"),
+                        "assigned_team_id": str(team_id) if team_id else None,
+                        "created_by_ai": True
+                    }
+                    conversation.pending_ticket_data = ticket_pending_context
+                    db.add(conversation)
+                    await db.commit() # 关键修复：立即提交，确保后续工具调用可见
+                    # Tactical Play: We no longer return a hard-coded string. 
+                    # We let the AI finish its response turn which should naturally ask for the missing info.
+                    return reply 
+
                 if not ex_ticket:
                     ticket_req = TicketCreate(
                         conversation_id=conversation.id,
@@ -179,11 +170,9 @@ class AIHandler:
                 logger.error(f"Failed to smoothly execute escalation: {e}")
                 return "I've notified my human team to step in."
 
+        ai_res = None
         try:
-            if should_escalate:
-                response_text = await execute_escalation(escalation_reason, "I've escalated this issue to our team and opened a support ticket for you. An agent will follow up shortly.")
-                
-            elif mode == "offline_collection":
+            if mode == "offline_collection":
                 # Execute Offline State Machine
                 response_text = await AIService.process_offline_collection(
                     db=db,
@@ -193,38 +182,44 @@ class AIHandler:
                     gemini_client=gemini_client
                 )
             elif mode == "ai":
-                # Execute Standard RAG Pipeline
-                ai_res = await AIService.query(
+                # Execute Modern Agent Loop (Memory + Intent + RAG)
+                ai_res = await AIService.process_message(
                     db=db,
-                    user_id=None, # System query
                     workspace_id=conversation.workspace_id,
-                    query_text=message.body,
-                    conversation_id=conversation.id
+                    conversation_id=conversation.id,
+                    user_text=message.body,
+                    openai_client=openai_client,
+                    gemini_client=gemini_client
                 )
                 
-                confidence = float(ai_res.get("confidence_score", 1.0))
-                if ai_settings.get("escalateOnKBMiss", False) and confidence < 0.4:
-                    response_text = await execute_escalation(
-                        "Knowledge Base Miss (Low Confidence)", 
-                        "I don't have that specific information, but I've escalated your issue and opened a priority support ticket for you. An agent will step in shortly."
-                    )
-                else:
+                if isinstance(ai_res, dict):
                     response_text = ai_res.get("answer")
+                    # Save reasoning to user message
+                    message.intent = ai_res.get("intent")
+                    message.confidence = ai_res.get("confidence")
+                    message.metadata_json = {"intent": ai_res.get("intent"), "kb_chunks": ai_res.get("kb_chunks")}
                     
-                    # Respect Show Sources toggle
-                    if ai_settings.get("showSources", True) and ai_res.get("sources"):
-                        sources_list = []
-                        seen_titles = set()
-                        for s in ai_res.get("sources"):
-                            if s["title"] not in seen_titles:
-                                sources_list.append(s["title"])
-                                seen_titles.add(s["title"])
-                        
-                        if sources_list:
-                            sources_md = "\n\n**Sources:**\n"
-                            for title in sources_list[:2]:
-                                sources_md += f"- 📄 {title}\n"
-                            response_text += sources_md
+                    confidence = float(ai_res.get("confidence", 1.0))
+                    
+                    # 1. Manual keyword/risk check (Tactical Play: Escalate on Risk)
+                    risk_keywords = [k.strip().lower() for k in ai_settings.get("highRiskKeywords", "").split(",") if k.strip()]
+                    user_text = message.body.lower()
+                    if any(k in user_text for k in risk_keywords):
+                        response_text = await execute_escalation("High-risk keyword detected.", response_text)
+
+                    # 2. Intent-based escalation (Tactical Play: Contextual Handoff)
+                    elif ai_res.get("intent") == "support_request" and any(k in user_text for k in ["human", "agent", "person", "speak to", "talk to"]):
+                        # Allow AI to respond with the "Context Collector" prompt, then trigger escalation logic
+                        response_text = await execute_escalation("Customer explicitly requested human routing.", response_text)
+
+                    # 3. Confidence-based escalation
+                    elif ai_settings.get("escalateOnKBMiss", False) and confidence < 0.4:
+                        response_text = await execute_escalation(
+                            "Knowledge Base Miss (Low Confidence)", 
+                            "I don't have that specific information, but I've escalated your issue and opened a priority support ticket for you. An agent will step in shortly."
+                        )
+                else:
+                    response_text = ai_res # Fallback for string returns
             
             if response_text:
                 # 5. Create AI Message
@@ -233,7 +228,10 @@ class AIHandler:
                     sender_type="ai",
                     body=response_text,
                     channel_id=message.channel_id,
-                    message_type="text"
+                    message_type="text",
+                    intent=ai_res.get("intent") if isinstance(ai_res, dict) else None,
+                    confidence=ai_res.get("confidence") if isinstance(ai_res, dict) else None,
+                    metadata_json=ai_res if isinstance(ai_res, dict) else None
                 )
                 db.add(ai_message)
                 # Flush to trigger secondary hooks and get IDs

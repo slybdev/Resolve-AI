@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.channel import Channel, ChannelType
 from app.models.message import Message
 from app.services.routing_service import routing_service
-from app.api.websocket import manager
+from app.core.pubsub import pubsub_manager
 
 logger = logging.getLogger(__name__)
 
@@ -93,34 +93,33 @@ class WhatsAppService:
         msg_type = msg.get("type", "text")
         
         # 1. Deduplication
-        # Check if message already exists in DB
         result = await db.execute(select(Message).where(Message.external_id == message_id))
         if result.scalar_one_or_none():
             logger.debug(f"[WhatsApp] Duplicate message skipped: {message_id}")
             return
 
-        # 2. Extract Content
+        # 2. Extract Content & Handle Media
         body = ""
-        metadata = {}
+        media_url = None
+        media_id = None
         
         if msg_type == "text":
             body = msg.get("text", {}).get("body", "")
         elif msg_type == "image":
             body = msg.get("image", {}).get("caption") or "[Image]"
-            metadata["media_id"] = msg.get("image", {}).get("id")
+            media_id = msg.get("image", {}).get("id")
         elif msg_type == "video":
             body = msg.get("video", {}).get("caption") or "[Video]"
-            metadata["media_id"] = msg.get("video", {}).get("id")
-        elif msg_type == "audio":
+            media_id = msg.get("video", {}).get("id")
+        elif msg_type == "audio" or msg_type == "voice":
             body = "[Audio]"
-            metadata["media_id"] = msg.get("audio", {}).get("id")
+            media_id = msg.get(msg_type, {}).get("id")
         elif msg_type == "document":
             body = msg.get("document", {}).get("filename") or "[Document]"
-            metadata["media_id"] = msg.get("document", {}).get("id")
+            media_id = msg.get("document", {}).get("id")
         elif msg_type == "button":
             body = msg.get("button", {}).get("text", "")
         elif msg_type == "interactive":
-            # Handle list replies or button replies
             interactive = msg.get("interactive", {})
             if interactive.get("type") == "button_reply":
                 body = interactive.get("button_reply", {}).get("title", "")
@@ -128,6 +127,18 @@ class WhatsAppService:
                 body = interactive.get("list_reply", {}).get("title", "")
         else:
             body = f"[{msg_type.capitalize()} Message]"
+
+        # Download media if present
+        if media_id:
+            token = channel.config.get("access_token") or channel.config.get("api_key")
+            local_path = await self._download_media(media_id, token)
+            if local_path:
+                from app.core.config import get_settings
+                settings = get_settings()
+                media_url = f"{settings.BASE_URL}/{local_path}"
+                # If it's just a placeholder body, update it to the URL
+                if body.startswith("[") and body.endswith("]"):
+                    body = media_url
 
         # 3. Identify Contact Name
         push_name = contact_map.get(from_number, "WhatsApp User")
@@ -141,34 +152,79 @@ class WhatsAppService:
                 contact_name=push_name,
                 message_text=body,
                 external_message_id=message_id,
-                message_type=msg_type,
-                metadata=metadata
+                message_type=msg_type
             )
             
-            # 5. Real-Time WebSocket Broadcast
             if message:
-                await manager.broadcast_to_workspace(
-                    workspace_id=channel.workspace_id,
-                    message={
-                        "type": "message.new",
-                        "workspace_id": str(channel.workspace_id),
-                        "channel_id": str(channel.id),
-                        "conversation_id": str(message.conversation_id),
-                        "message": {
-                            "id": str(message.id),
-                            "body": message.body,
-                            "direction": message.direction,
-                            "type": message.type,
-                            "created_at": message.created_at.isoformat()
-                        }
+                # Update with media fields
+                message.media_url = media_url
+                message.media_type = msg_type if msg_type in ["image", "video", "audio", "voice", "document"] else None
+                await db.flush()
+
+                # 5. Real-Time WebSocket Broadcast
+                await pubsub_manager.publish(f"ws:{channel.workspace_id}", {
+                    "type": "message.new",
+                    "conversation_id": str(message.conversation_id),
+                    "message": {
+                        "id": str(message.id),
+                        "body": message.body,
+                        "sender_type": "customer",
+                        "message_type": message.message_type,
+                        "media_url": message.media_url,
+                        "created_at": message.created_at.isoformat()
                     }
-                )
+                })
                 logger.info(f"[WhatsApp] New message processed and broadcasted: {message_id}")
 
         except Exception as e:
             logger.error(f"[WhatsApp] Error routing message {message_id}: {str(e)}")
 
-    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, to: str, text: str, message_type: str = "text"):
+    async def _download_media(self, media_id: str, token: str) -> Optional[str]:
+        """
+        Downloads media from Meta Cloud API and saves it locally.
+        """
+        import os
+        import uuid
+        
+        async with httpx.AsyncClient() as client:
+            try:
+                # 1. Get media URL
+                headers = {"Authorization": f"Bearer {token}"}
+                res = await client.get(f"https://graph.facebook.com/v19.0/{media_id}", headers=headers)
+                if res.status_code != 200:
+                    logger.error(f"[WhatsApp] Failed to get media info: {res.text}")
+                    return None
+                
+                media_info = res.json()
+                download_url = media_info.get("url")
+                mime_type = media_info.get("mime_type", "")
+                
+                # 2. Download actual binary
+                res = await client.get(download_url, headers=headers)
+                if res.status_code != 200:
+                    logger.error(f"[WhatsApp] Failed to download media binary: {res.status_code}")
+                    return None
+                
+                # 3. Save to disk
+                ext = ".bin"
+                if "image" in mime_type: ext = "." + mime_type.split("/")[-1]
+                elif "video" in mime_type: ext = "." + mime_type.split("/")[-1]
+                elif "audio" in mime_type: ext = ".ogg" # WhatsApp usually sends ogg
+                elif "pdf" in mime_type: ext = ".pdf"
+                
+                filename = f"wa_{uuid.uuid4()}{ext}"
+                os.makedirs("uploads", exist_ok=True)
+                local_path = os.path.join("uploads", filename)
+                
+                with open(local_path, "wb") as f:
+                    f.write(res.content)
+                
+                return f"uploads/{filename}"
+            except Exception as e:
+                logger.error(f"[WhatsApp] Media download failed: {str(e)}")
+                return None
+
+    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, to: str, text: str, message_type: str = "text", media_url: Optional[str] = None):
         """
         Sends a WhatsApp message via Meta Graph API with retry logic.
         """
@@ -183,7 +239,7 @@ class WhatsAppService:
         if not token or not phone_id:
             raise ValueError("WhatsApp account not fully configured (missing token or phone_id)")
 
-        url = f"https://graph.facebook.com/v17.0/{phone_id}/messages"
+        url = f"https://graph.facebook.com/v19.0/{phone_id}/messages"
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json"
@@ -199,9 +255,25 @@ class WhatsAppService:
         if message_type == "text":
             payload["type"] = "text"
             payload["text"] = {"body": text}
+        elif message_type == "image":
+            payload["type"] = "image"
+            payload["image"] = {"link": media_url or text}
+            if text and text != media_url:
+                payload["image"]["caption"] = text
+        elif message_type == "video":
+            payload["type"] = "video"
+            payload["video"] = {"link": media_url or text}
+            if text and text != media_url:
+                payload["video"]["caption"] = text
+        elif message_type == "audio":
+            payload["type"] = "audio"
+            payload["audio"] = {"link": media_url or text}
+        elif message_type == "document":
+            payload["type"] = "document"
+            payload["document"] = {"link": media_url or text}
+            if text and text != media_url:
+                payload["document"]["caption"] = text
         else:
-            # Handle media (simplified: if mediaUrl is provided in text, or text is a media ID)
-            # This is a basic implementation; more complex media handling should be added here
             payload["type"] = "text"
             payload["text"] = {"body": text}
 

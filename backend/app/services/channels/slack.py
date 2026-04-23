@@ -95,7 +95,7 @@ class SlackService:
         await db.commit()
         return True
 
-    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str):
+    async def send_message(self, db: AsyncSession, channel_id: uuid.UUID, external_contact_id: str, text: str, media_url: Optional[str] = None):
         """
         Sends a message back to Slack.
         """
@@ -110,9 +110,18 @@ class SlackService:
 
         url = "https://slack.com/api/chat.postMessage"
         headers = {"Authorization": f"Bearer {token}"}
+        
+        # If media_url is present, append it to the text or use blocks for better rendering
+        full_text = text
+        if media_url:
+            if text:
+                full_text = f"{text}\n{media_url}"
+            else:
+                full_text = media_url
+
         payload = {
             "channel": external_contact_id, # Can be user ID for DM
-            "text": text
+            "text": full_text
         }
 
         async with httpx.AsyncClient() as client:

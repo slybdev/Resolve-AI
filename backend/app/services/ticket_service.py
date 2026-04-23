@@ -79,6 +79,22 @@ class TicketService:
         
         if suggestions:
             ticket.ai_metadata = suggestions
+            
+            # Auto-assign if currently unassigned and AI suggests a team
+            suggested_team_id = suggestions.get("suggested_team_id")
+            if suggested_team_id and suggested_team_id != "null" and not ticket.assigned_team_id:
+                try:
+                    ticket.assigned_team_id = uuid.UUID(str(suggested_team_id))
+                    logger.info(f"TicketService: AI Auto-assigned ticket {ticket_id} to team {ticket.assigned_team_id}")
+                    # Log the assignment change
+                    db.add(TicketUpdate(
+                        ticket_id=ticket.id,
+                        update_type="assignment",
+                        note=f"AI auto-assigned ticket to {suggestions.get('suggested_team_name', 'suggested team')}."
+                    ))
+                except Exception as e:
+                    logger.error(f"TicketService: AI Auto-assignment failed: {e}")
+
             # Log that AI analysis was performed
             db.add(TicketUpdate(
                 ticket_id=ticket.id,
@@ -188,10 +204,9 @@ class TicketService:
                 select(TeamMember.team_id)
                 .where(TeamMember.user_id == user_id)
             )
-            # Tickets assigned to their teams OR unassigned (but in workspace)
+            # Tickets assigned to their teams only (admins see unassigned tickets)
             query = query.where(
-                (Ticket.assigned_team_id.in_(user_teams_subquery)) | 
-                (Ticket.assigned_team_id.is_(None))
+                Ticket.assigned_team_id.in_(user_teams_subquery)
             )
         
         if team_id:
@@ -270,7 +285,60 @@ class TicketService:
                 if conv:
                     conv.assigned_to = None
                     conv.routing_mode = "ai"
+                    conv.closed_at = datetime.now()
                     db.add(conv)
+            
+            # Broadcast 'Agent left' and rating prompt to widget
+            if ticket.conversation_id and ticket.assigned_user_id:
+                from app.core.pubsub import pubsub_manager
+                from app.models.message import Message
+                agent_name = "Agent"
+                if ticket.assigned_user:
+                    agent_name = ticket.assigned_user.full_name or "Agent"
+                
+                # 1. Add System Message: Left
+                sys_msg = Message(
+                    conversation_id=ticket.conversation_id,
+                    sender_type="system",
+                    message_type="system",
+                    body=f"{agent_name} left the chat"
+                )
+                db.add(sys_msg)
+                await db.flush()
+                
+                # 2. Broadcast 'Left' notification
+                left_event = {
+                    "type": "message.new",
+                    "conversation_id": str(ticket.conversation_id),
+                    "message": {
+                        "id": str(sys_msg.id),
+                        "sender_type": "system",
+                        "body": sys_msg.body,
+                        "created_at": datetime.now().isoformat(),
+                        "message_type": "system"
+                    }
+                }
+                await pubsub_manager.publish(f"conv:{ticket.conversation_id}", left_event)
+
+                # 3. Broadcast rating prompt
+                rating_event = {
+                    "type": "rating.prompt",
+                    "ticket_id": str(ticket.id),
+                    "agent_id": str(ticket.assigned_user_id),
+                    "agent_name": agent_name,
+                    "rated_entity_type": "agent",
+                    "conversation_id": str(ticket.conversation_id)
+                }
+                await pubsub_manager.publish(f"conv:{ticket.conversation_id}", rating_event)
+                
+                # 4. Broadcast Ticket Status Update
+                status_event = {
+                    "type": "ticket.updated",
+                    "ticket_id": str(ticket.id),
+                    "status": ticket.status,
+                    "conversation_id": str(ticket.conversation_id)
+                }
+                await pubsub_manager.publish(f"conv:{ticket.conversation_id}", status_event)
                     
         elif "status" in update_data:
             ticket.resolved_at = None
@@ -593,4 +661,47 @@ class TicketService:
         db.add(ticket)
         await db.commit()
         await db.refresh(ticket)
+
+        # Broadcast 'Agent left' and rating prompt for the agent who was handling
+        if ticket.conversation_id and old_user_id:
+            from app.core.pubsub import pubsub_manager
+            from app.models.message import Message
+            user_res = await db.execute(select(User.full_name).where(User.id == old_user_id))
+            agent_name = user_res.scalar_one_or_none() or "Agent"
+
+            # 1. Add System Message: Left
+            sys_msg = Message(
+                conversation_id=ticket.conversation_id,
+                sender_type="system",
+                message_type="system",
+                body=f"{agent_name} left the chat"
+            )
+            db.add(sys_msg)
+            await db.flush()
+            
+            # 2. Broadcast 'Left' notification
+            left_event = {
+                "type": "message.new",
+                "conversation_id": str(ticket.conversation_id),
+                "message": {
+                    "id": str(sys_msg.id),
+                    "sender_type": "system",
+                    "body": sys_msg.body,
+                    "created_at": datetime.now().isoformat(),
+                    "message_type": "system"
+                }
+            }
+            await pubsub_manager.publish(f"conv:{ticket.conversation_id}", left_event)
+
+            # 3. Broadcast rating prompt
+            rating_event = {
+                "type": "rating.prompt",
+                "ticket_id": str(ticket.id),
+                "agent_id": str(old_user_id),
+                "agent_name": agent_name,
+                "rated_entity_type": "agent",
+                "conversation_id": str(ticket.conversation_id)
+            }
+            await pubsub_manager.publish(f"conv:{ticket.conversation_id}", rating_event)
+
         return ticket

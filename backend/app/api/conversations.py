@@ -56,9 +56,10 @@ async def list_conversations(
         c = row[0]
         t = row[1]
         
-        # Sort messages by created_at to get the TRULY last message
+        # Sort messages by created_at to get the last NON-SYSTEM message for preview
         messages_list = list(c.messages)
-        sorted_msgs = sorted(messages_list, key=lambda x: x.created_at)
+        content_msgs = [m for m in messages_list if m.sender_type != "system"]
+        sorted_msgs = sorted(content_msgs, key=lambda x: x.created_at)
         last_msg = sorted_msgs[-1] if sorted_msgs else None
         
         # Calculate unread count (messages from customer/ai that are not read)
@@ -86,7 +87,7 @@ async def list_conversations(
         enriched.append({
             "id": str(c.id),
             "contact_id": str(c.contact_id) if c.contact_id else None,
-            "customerName": c.contact.name if c.contact else "Anonymous",
+            "customerName": c.contact.name if c.contact and c.contact.name else "Anonymous",
             "lastMessage": last_msg_text,
             "time": last_msg.created_at.strftime("%H:%M") if last_msg else (c.updated_at.strftime("%H:%M") if c.updated_at else "Now"),
             "isAI": last_msg.sender_type == "ai" if last_msg else False,
@@ -98,7 +99,11 @@ async def list_conversations(
             "assigned_team_id": str(t.assigned_team_id) if t and t.assigned_team_id else None,
             "assigned_to": str(t.assigned_user_id) if t and t.assigned_user_id else None,
             "updated_at": c.updated_at.isoformat() if c.updated_at else None,
-            "routing_mode": await routing_service.calculate_routing_mode(db, c)
+            "routing_mode": await routing_service.calculate_routing_mode(db, c),
+            "identified": c.identified or (c.contact and c.contact.email is not None),
+            "customerEmail": c.contact.email if c.contact else None,
+            "primary_channel": c.primary_channel,
+            "channels_used": c.channels_used or []
         })
     
     return enriched
@@ -162,7 +167,7 @@ async def get_conversation(
     return {
         "id": str(c.id),
         "contact_id": str(c.contact_id) if c.contact_id else None,
-        "customerName": c.contact.name if c.contact else "Anonymous",
+        "customerName": c.contact.name if c.contact and c.contact.name else "Anonymous",
         "lastMessage": last_msg_text,
         "time": last_msg.created_at.strftime("%H:%M") if last_msg else "Now",
         "isAI": last_msg.sender_type == "ai" if last_msg else False,
@@ -174,7 +179,11 @@ async def get_conversation(
         "assigned_team_id": str(t.assigned_team_id) if t and t.assigned_team_id else None,
         "assigned_to": str(t.assigned_user_id) if t and t.assigned_user_id else None,
         "updated_at": c.updated_at.isoformat() if c.updated_at else None,
-        "routing_mode": routing_mode
+        "routing_mode": routing_mode,
+        "identified": c.identified or (c.contact and c.contact.email is not None),
+        "customerEmail": c.contact.email if c.contact else None,
+        "primary_channel": c.primary_channel,
+        "channels_used": c.channels_used or []
     }
 
 @router.get("/{conversation_id}/messages", response_model=List[MessageRead])
@@ -225,7 +234,9 @@ async def get_conversation_messages(
             "message_type": m.message_type,
             "created_at": m.created_at.isoformat(),
             "sender_id": str(m.sender_id) if m.sender_id else None,
-            "is_read": m.is_read
+            "is_read": m.is_read,
+            "media_url": m.media_url,
+            "media_type": m.media_type
         }
         for m in messages
     ]
@@ -272,127 +283,55 @@ async def send_message(
                 detail=f"This conversation is currently locked by {ticket.assigned_user.full_name if ticket.assigned_user else 'another agent'}."
             )
 
-    # 2. Add message to database
-    # Find the last incoming message to identify the channel
-    last_in_res = await db.execute(
-        select(Message).where(
-            Message.conversation_id == conversation_id,
-            Message.sender_type == "customer"
-        ).order_by(desc(Message.created_at))
-    )
-    last_incoming = last_in_res.scalars().first()
-    channel_id = last_incoming.channel_id if last_incoming else None
-
-    message = Message(
+    # 2. Add message to database & Send to channel via ChannelManager
+    from app.services.channels.channel_manager import channel_manager
+    message = await channel_manager.send_message(
+        db=db,
         conversation_id=conversation_id,
+        body=payload.body,
         sender_id=current_user.id,
         sender_type="agent",
-        body=payload.body,
-        message_type=payload.message_type if (not payload.is_internal and payload.message_type) else "text" if not payload.is_internal else "note",
-        channel_id=channel_id
+        message_type=payload.message_type or "text",
+        media_url=payload.media_url,
+        media_type=payload.media_type,
+        is_internal=payload.is_internal
     )
-    db.add(message)
-    await db.flush()
+
+    if not message:
+        raise HTTPException(status_code=500, detail="Failed to send/store message")
 
     # Update conversation updated_at
     conversation.updated_at = datetime.now()
     
-    # 3. If not internal, send to channel
-    if not payload.is_internal:
-        channel = await db.get(Channel, channel_id) if channel_id else None
-        
-        # For Chat Widget, send to active WebSocket session
-        if channel and (channel.type.value == "widget" or channel.type.value == "website"):
-            from app.core.pubsub import pubsub_manager
-            event_data = {
-                "type": "message.new",
-                "conversation_id": str(conversation_id),
-                "message": {
-                    "id": str(message.id),
-                    "sender_type": "agent",
-                    "body": payload.body,
-                    "created_at": message.created_at.isoformat(),
-                    "message_type": message.message_type
-                }
+    # 3. Handle Real-Time Broadcasts
+    from app.core.pubsub import pubsub_manager
+    
+    # Broadcast to Dashboard (Always)
+    await pubsub_manager.publish(f"ws:{conversation.workspace_id}", {
+        "type": "conversation.updated",
+        "conversation_id": str(conversation.id),
+        "identified": True,
+        "customerName": conversation.contact.name if conversation.contact else "Anonymous",
+        "customerEmail": conversation.contact.email if conversation.contact else None,
+        "contact_id": str(conversation.contact_id) if conversation.contact_id else None
+    })
+
+    # Broadcast to Visitor (if Widget and not internal)
+    if not payload.is_internal and conversation.primary_channel in ["widget", "website"]:
+        event_data = {
+            "type": "message.new",
+            "conversation_id": str(conversation_id),
+            "message": {
+                "id": str(message.id),
+                "sender_type": "agent",
+                "body": payload.body,
+                "created_at": message.created_at.isoformat(),
+                "message_type": message.message_type,
+                "media_url": message.media_url,
+                "media_type": message.media_type
             }
-            # 1. Broadcast to visitor (Widget)
-            await pubsub_manager.publish(f"conv:{conversation_id}", event_data)
-            # 2. Broadcast to dashboard (Agents)
-            await pubsub_manager.publish(f"ws:{conversation.workspace_id}", event_data)
-
-        # Telegram
-        elif channel and channel.type.value == "telegram":
-            contact = conversation.contact
-            if contact:
-                chat_id = contact.channel_data.get("telegram_id")
-                if chat_id:
-                    from app.services.channels.telegram import telegram_service
-                    await telegram_service.send_message(db, channel.id, chat_id, payload.body, payload.message_type)
-        
-        # Discord
-        elif channel and channel.type.value == "discord":
-            contact = conversation.contact
-            if contact:
-                # Use the discord_id (Channel ID) from channel_data
-                discord_channel_id = contact.channel_data.get("discord_id")
-                if discord_channel_id:
-                    from app.services.channels.discord import discord_service
-                    await discord_service.send_message(db, channel.id, discord_channel_id, payload.body, payload.message_type)
-        
-        # Slack
-        elif channel and channel.type.value == "slack":
-            contact = conversation.contact
-            if contact:
-                slack_user_id = contact.channel_data.get("slack_id")
-                if slack_user_id:
-                    from app.services.channels.slack import slack_service
-                    await slack_service.send_message(db, channel.id, slack_user_id, payload.body)
-                    
-        # Email
-        elif channel and channel.type.value == "email":
-            contact = conversation.contact
-            if contact:
-                email_address = contact.channel_data.get("email_id")
-                if email_address:
-                    from app.services.channels.email import email_service
-                    
-                    thread_id = last_incoming.external_id if last_incoming else None
-                    subject = "Re: Support Request"
-                    if last_incoming and last_incoming.body:
-                        # Try to find "Subject: " in the first few lines
-                        body_start = last_incoming.body[:500]
-                        subject_match = re.search(r"^Subject:\s*(.*)$", body_start, re.MULTILINE | re.IGNORECASE)
-                        if subject_match:
-                            original_subject = subject_match.group(1).strip()
-                            if not original_subject.lower().startswith("re:"):
-                                subject = f"Re: {original_subject}"
-                            else:
-                                subject = original_subject
-                        elif last_incoming.message_type == "text" and last_incoming.body:
-                             # If no Subject: prefix, use a snippet of the first line
-                             first_line = last_incoming.body.split('\n')[0].strip()
-                             if len(first_line) > 50:
-                                 first_line = first_line[:47] + "..."
-                             subject = f"Re: {first_line}"
-
-                    await email_service.send_email(
-                        db, channel.id, email_address, subject, payload.body, thread_id=thread_id
-                    )
-
-        # WhatsApp
-        elif channel and channel.type.value == "whatsapp":
-            contact = conversation.contact
-            if contact:
-                phone_number = contact.channel_data.get("phone_number")
-                if not phone_number:
-                    # Fallback to whatsapp_id (the JID)
-                    phone_number = contact.channel_data.get("whatsapp_id")
-                
-                if phone_number:
-                    from app.services.channels.whatsapp import whatsapp_service
-                    await whatsapp_service.send_message(
-                        db, channel.id, phone_number, payload.body, payload.message_type or "text"
-                    )
+        }
+        await pubsub_manager.publish(f"conv:{conversation_id}", event_data)
 
     # 4. Satisfy SLA if this is a Support Ticket response
     from app.services.ticket_service import TicketService
@@ -439,46 +378,97 @@ async def update_conversation(
     if not c:
         raise HTTPException(status_code=404, detail="Conversation not found")
 
+    old_assigned_to = c.assigned_to
+    old_routing_mode = getattr(c, 'routing_mode', 'ai')
+    
     update_data = conv_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(c, field, value)
     
-    # Sync routing_mode when assignment changes
-    if "assigned_to" in update_data:
-        if update_data["assigned_to"]:
-            if str(c.assigned_to) != str(update_data["assigned_to"]):
-                c.routing_mode = "human"
-                
-                # Fetch agent name
-                agent_res = await db.execute(select(User.full_name).where(User.id == update_data["assigned_to"]))
-                agent_name = agent_res.scalar_one_or_none() or "An agent"
-                
-                from app.models.message import Message
-                from app.core.pubsub import pubsub_manager
-                sys_msg = Message(
-                    conversation_id=c.id,
-                    sender_type="system",
-                    message_type="system",
-                    body=f"{agent_name} joined the chat"
-                )
-                db.add(sys_msg)
-                await db.flush()
-                
-                event_data = {
-                    "type": "message.new",
-                    "conversation_id": str(c.id),
-                    "message": {
-                        "id": str(sys_msg.id),
-                        "sender_type": "system",
-                        "body": sys_msg.body,
-                        "created_at": datetime.now().isoformat(),
-                        "message_type": "system"
-                    }
+    # Sync routing_mode and send notification when assignment occurs or takeover happens
+    if "assigned_to" in update_data and update_data["assigned_to"]:
+        # Send notification if it's a NEW assignment OR we are taking over from AI
+        is_new_assignment = str(old_assigned_to) != str(update_data["assigned_to"])
+        was_ai_mode = (old_routing_mode == 'ai')
+        
+        if is_new_assignment or was_ai_mode:
+            c.assigned_to = update_data["assigned_to"]
+            c.routing_mode = "human"
+            
+            # Fetch agent name
+            agent_res = await db.execute(select(User.full_name).where(User.id == update_data["assigned_to"]))
+            agent_name = agent_res.scalar_one_or_none() or "An agent"
+            
+            from app.models.message import Message
+            from app.core.pubsub import pubsub_manager
+            sys_msg = Message(
+                conversation_id=c.id,
+                sender_type="system",
+                message_type="system",
+                body=f"{agent_name} joined the chat"
+            )
+            db.add(sys_msg)
+            await db.flush()
+            
+            event_data = {
+                "type": "message.new",
+                "conversation_id": str(c.id),
+                "message": {
+                    "id": str(sys_msg.id),
+                    "sender_type": "system",
+                    "body": sys_msg.body,
+                    "created_at": datetime.now().isoformat(),
+                    "message_type": "system"
                 }
-                await pubsub_manager.publish(f"ws:{c.workspace_id}", event_data)
-                await pubsub_manager.publish(f"conv:{c.id}", event_data)
-        else:
-            c.routing_mode = "ai"
+            }
+            # Broadcast to both widget and dashboard
+            await pubsub_manager.publish(f"ws:{c.workspace_id}", event_data)
+            await pubsub_manager.publish(f"conv:{c.id}", event_data)
+    elif "assigned_to" in update_data and not update_data["assigned_to"]:
+        c.assigned_to = None
+        c.routing_mode = "ai"
+        
+        # Broadcast 'Agent left' and rating prompt if someone was assigned
+        if old_assigned_to:
+            from app.models.message import Message
+            from app.core.pubsub import pubsub_manager
+            
+            user_res = await db.execute(select(User.full_name).where(User.id == old_assigned_to))
+            agent_name = user_res.scalar_one_or_none() or "Agent"
+            
+            # 1. Add System Message: Left
+            sys_msg = Message(
+                conversation_id=c.id,
+                sender_type="system",
+                message_type="system",
+                body=f"{agent_name} left the chat"
+            )
+            db.add(sys_msg)
+            await db.flush()
+            
+            # 2. Broadcast 'Left' notification
+            left_event = {
+                "type": "message.new",
+                "conversation_id": str(c.id),
+                "message": {
+                    "id": str(sys_msg.id),
+                    "sender_type": "system",
+                    "body": sys_msg.body,
+                    "created_at": datetime.now().isoformat(),
+                    "message_type": "system"
+                }
+            }
+            await pubsub_manager.publish(f"conv:{c.id}", left_event)
+
+            # 3. Broadcast rating prompt
+            rating_event = {
+                "type": "rating.prompt",
+                "agent_id": str(old_assigned_to),
+                "agent_name": agent_name,
+                "rated_entity_type": "agent",
+                "conversation_id": str(c.id)
+            }
+            await pubsub_manager.publish(f"conv:{c.id}", rating_event)
     
     db.add(c)
     await db.commit()

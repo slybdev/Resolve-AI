@@ -31,14 +31,15 @@ if (workspaceKey) {
   const iframe = document.createElement('iframe');
   iframe.id = IFRAME_ID;
   iframe.style.position = 'fixed';
-  iframe.style.bottom = '0';
-  iframe.style.right = '0';
+  iframe.style.bottom = '1.5rem';
+  iframe.style.right = '1.5rem';
   iframe.style.width = '100px';  // Small initially (launcher size)
   iframe.style.height = '100px';
   iframe.style.border = 'none';
   iframe.style.zIndex = '999999';
   iframe.style.colorScheme = 'none';
-  iframe.style.transition = 'width 0.2s, height 0.2s';
+  iframe.style.background = 'transparent';
+  iframe.style.transition = 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1), height 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
   iframe.setAttribute('allow', 'camera; microphone; clipboard-read; clipboard-write');
   
   document.body.appendChild(iframe);
@@ -53,7 +54,7 @@ if (workspaceKey) {
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1">
-          <link rel="stylesheet" href="${baseUrl}/widget.css">
+          <link rel="stylesheet" href="${import.meta.env.DEV ? baseUrl + '/src/index.css' : baseUrl + '/widget.css'}">
           <style>
             body { margin: 0; padding: 0; overflow: hidden; background: transparent; }
             #${ROOT_ID} { position: absolute; bottom: 0; right: 0; width: 100%; height: 100%; }

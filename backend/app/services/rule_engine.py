@@ -548,18 +548,26 @@ class RuleEngine:
             logger.warning(f"RuleEngine: Conversation {conversation_id} not found, cannot create ticket")
             return
 
-        # 5. Create ticket
-        # Safe access to meta_data (which we just added to the model)
-        customer_name = "Web Visitor"
-        if hasattr(conv, "meta_data") and conv.meta_data:
-            customer_name = conv.meta_data.get("customer_name", "Web Visitor")
-        elif hasattr(conv, "contact") and conv.contact:
-            customer_name = conv.contact.name or "Web Visitor"
+        # 5. Gate by Identity
+        if not conv.identified:
+            logger.info(f"RuleEngine: Identity check failed for action_create_ticket. Gating creation for conv {conversation_id}.")
+            conv.pending_ticket_data = {
+                "title": title or f"Ticket for: Web Visitor",
+                "priority": priority,
+                "assigned_team_id": str(assigned_team_id) if assigned_team_id else None,
+                "created_by_ai": True
+            }
+            db.add(conv)
+            
+            # Optionally notify the user via a system message
+            await self.action_send_message(db, event, "I'm setting up a support ticket for you. To complete the request and connect you with our team, please provide your name and email address.")
+            return
 
+        # 6. Create ticket
         ticket_in = TicketCreate(
             workspace_id=uuid.UUID(workspace_id),
             conversation_id=uuid.UUID(conversation_id),
-            title=title or f"Ticket for: {customer_name}",
+            title=title or f"Ticket for: Web Visitor",
             priority=priority,
             status="open",
             assigned_team_id=assigned_team_id,

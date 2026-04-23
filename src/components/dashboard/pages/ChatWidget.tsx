@@ -14,6 +14,7 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [allowedDomains, setAllowedDomains] = useState<string[]>([]);
   const [newDomain, setNewDomain] = useState('');
+  const [requireIdentity, setRequireIdentity] = useState(false);
   const { toast } = useToast();
 
   const [workspaceKey, setWorkspaceKey] = useState<string | null>(null);
@@ -28,6 +29,7 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
         if (data.settings?.welcome_message) setWelcomeMessage(data.settings.welcome_message);
         if (data.theme) setTheme(data.theme);
         if (data.allowed_domains) setAllowedDomains(data.allowed_domains);
+        if (data.require_identity_pre_chat) setRequireIdentity(data.require_identity_pre_chat);
       })
       .catch(err => console.error('Failed to fetch widget config:', err));
   }, [workspaceId]);
@@ -42,7 +44,8 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
           title: title,
           welcome_message: welcomeMessage
         },
-        allowed_domains: allowedDomains
+        allowed_domains: allowedDomains,
+        require_identity_pre_chat: requireIdentity
       });
       toast('Saved!', 'Widget configuration updated successfully.', 'success');
     } catch (error) {
@@ -192,6 +195,28 @@ export const ChatWidget = ({ workspaceId }: { workspaceId: string }) => {
                       className="w-full px-5 py-4 bg-accent/30 border border-border rounded-[1.5rem] text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 h-32 resize-none transition-all leading-relaxed"
                       placeholder="Enter a friendly welcome message..."
                     />
+                  </div>
+                </div>
+
+                {/* Identity Gating */}
+                <div className="pt-6 border-t border-border/50">
+                  <div className="flex items-center justify-between p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                    <div className="space-y-1">
+                      <h4 className="text-[11px] font-black text-foreground uppercase tracking-wider">Gate Chat with Identity Form</h4>
+                      <p className="text-[10px] text-muted-foreground font-medium">Require visitors to provide Name & Email before starting a chat.</p>
+                    </div>
+                    <button 
+                      onClick={() => setRequireIdentity(!requireIdentity)}
+                      className={cn(
+                        "w-12 h-6 rounded-full transition-all relative",
+                        requireIdentity ? "bg-primary shadow-lg shadow-primary/20" : "bg-muted"
+                      )}
+                    >
+                      <div className={cn(
+                        "absolute top-1 w-4 h-4 rounded-full bg-white transition-all shadow-sm",
+                        requireIdentity ? "left-7" : "left-1"
+                      )} />
+                    </button>
                   </div>
                 </div>
               </div>

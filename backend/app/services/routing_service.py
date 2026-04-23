@@ -119,6 +119,16 @@ class RoutingService:
             await db.flush()
             await db.refresh(conversation)
 
+        # --- Multi-Channel Tracking ---
+        conversation.primary_channel = channel_type
+        if conversation.channels_used is None:
+            conversation.channels_used = []
+        if channel_type not in conversation.channels_used:
+            # Re-assignment to trigger JSON change detection in some SQLA setups
+            new_channels = list(conversation.channels_used)
+            new_channels.append(channel_type)
+            conversation.channels_used = new_channels
+
         # --- Dynamic Mode Update ---
         # Current routing state determines how the message is handled
         old_mode = conversation.routing_mode

@@ -1,39 +1,80 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Star, Heart, Search, Plus, Filter, MoreHorizontal, 
   BarChart3, MessageSquare, Zap, Clock, Smile, Frown,
-  Meh, TrendingUp, Users, ShieldCheck, AlertCircle
+  Meh, TrendingUp, Users, ShieldCheck, AlertCircle,
+  Loader2, Bot, User
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/src/lib/utils';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, BarChart, Bar, Cell 
 } from 'recharts';
+import { api } from '@/src/lib/api';
 
-const sentimentData = [
-  { name: 'Mon', positive: 65, neutral: 25, negative: 10 },
-  { name: 'Tue', positive: 70, neutral: 20, negative: 10 },
-  { name: 'Wed', positive: 60, neutral: 30, negative: 10 },
-  { name: 'Thu', positive: 75, neutral: 15, negative: 10 },
-  { name: 'Fri', positive: 80, neutral: 15, negative: 5 },
-  { name: 'Sat', positive: 85, neutral: 10, negative: 5 },
-  { name: 'Sun', positive: 90, neutral: 5, negative: 5 },
-];
+interface CSATSummary {
+  avg_score: number | null;
+  total_ratings: number;
+  period_days: number;
+}
 
-const csatScores = [
-  { score: '5 Stars', count: 1240, color: '#10b981' },
-  { score: '4 Stars', count: 450, color: '#34d399' },
-  { score: '3 Stars', count: 120, color: '#f59e0b' },
-  { score: '2 Stars', count: 45, color: '#f97316' },
-  { score: '1 Star', count: 12, color: '#ef4444' },
-];
+interface ScoreDist {
+  score: number;
+  count: number;
+}
+
+interface DailyTrend {
+  date: string;
+  avg_score: number | null;
+  count: number;
+}
+
+interface EntityStats {
+  avg_score: number | null;
+  count: number;
+}
 
 export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'surveys' | 'sentiment'>('overview');
+  const [days, setDays] = useState(30);
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{
+    summary: CSATSummary,
+    score_distribution: ScoreDist[],
+    daily_trend: DailyTrend[],
+    entity_comparison: Record<string, EntityStats>
+  } | null>(null);
+
+  const fetchCSAT = async () => {
+    setLoading(true);
+    try {
+      const result = await api.analytics.getCSAT(workspaceId, days);
+      if (result) {
+        setData(result);
+      }
+    } catch (err) {
+      console.error('Failed to fetch CSAT data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (workspaceId) {
+      fetchCSAT();
+    }
+  }, [workspaceId, days]);
+
+  const scoreColors = ['#ef4444', '#f97316', '#f59e0b', '#34d399', '#10b981'];
 
   return (
-    <div className="h-full flex flex-col bg-transparent overflow-hidden gap-2 p-2">
+    <div className="h-full flex flex-col bg-transparent overflow-hidden gap-2 p-2 relative">
+      {loading && !data && (
+        <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-[100] flex items-center justify-center">
+          <Loader2 className="w-10 h-10 text-primary animate-spin" />
+        </div>
+      )}
+
       {/* Header */}
       <div className="p-6 border border-border flex items-center justify-between bg-card rounded-2xl shadow-sm">
         <div>
@@ -81,66 +122,83 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-card border border-border rounded-2xl shadow-sm">
+      <div className={cn(
+        "flex-1 overflow-y-auto p-8 no-scrollbar bg-card border border-border rounded-2xl shadow-sm transition-opacity duration-300",
+        loading ? "opacity-60" : "opacity-100"
+      )}>
         {activeTab === 'overview' && (
           <div className="space-y-8">
             {/* Top Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {[
-                { label: 'Avg. CSAT', value: '4.8', icon: Star, change: '+0.2' },
-                { label: 'Response Rate', value: '42%', icon: Users, change: '+5%' },
-                { label: 'Positive Sentiment', value: '82%', icon: Smile, change: '+12%' },
-                { label: 'Resolution Rate', value: '94%', icon: ShieldCheck, change: '+2%' },
-              ].map((stat, i) => (
-                <div key={i} className="bg-card border border-border p-6 rounded-3xl shadow-sm">
-                  <div className="flex items-center justify-between mb-4">
-                    <stat.icon className="w-5 h-5 text-primary" />
-                    <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">{stat.change}</span>
-                  </div>
-                  <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-                  <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">{stat.label}</div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-card border border-border p-6 rounded-3xl shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <Star className="w-5 h-5 text-primary" />
+                  <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">Live</span>
                 </div>
-              ))}
+                <div className="text-2xl font-bold text-foreground">{data?.summary.avg_score || 'N/A'}</div>
+                <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Avg. CSAT</div>
+              </div>
+              <div className="bg-card border border-border p-6 rounded-3xl shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <MessageSquare className="w-5 h-5 text-blue-500" />
+                </div>
+                <div className="text-2xl font-bold text-foreground">{data?.summary.total_ratings || 0}</div>
+                <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Total Feedbacks</div>
+              </div>
+              <div className="bg-card border border-border p-6 rounded-3xl shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <Clock className="w-5 h-5 text-purple-500" />
+                </div>
+                <div className="text-2xl font-bold text-foreground">{days} Days</div>
+                <div className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Reporting Period</div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Sentiment Chart */}
+              {/* Daily Trend Chart */}
               <div className="bg-card border border-border rounded-3xl p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-primary" />
-                    Sentiment Trends
+                    CSAT Trends
                   </h3>
-                  <select className="bg-accent/50 border border-border rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider focus:outline-none">
-                    <option>Last 7 Days</option>
-                    <option>Last 30 Days</option>
+                  <select 
+                    value={days}
+                    onChange={(e) => setDays(Number(e.target.value))}
+                    className="bg-accent/50 border border-border rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider focus:outline-none"
+                  >
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
                   </select>
                 </div>
                 <div className="h-[250px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={sentimentData}>
+                    <AreaChart data={data?.daily_trend || []}>
                       <defs>
-                        <linearGradient id="colorPos" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.1}/>
-                          <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                        <linearGradient id="colorCSAT" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="rgb(59, 130, 246)" stopOpacity={0.1}/>
+                          <stop offset="95%" stopColor="rgb(59, 130, 246)" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(128,128,128,0.1)" />
                       <XAxis 
-                        dataKey="name" 
+                        dataKey="date" 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{ fontSize: 10, fill: '#888' }} 
+                        tick={{ fontSize: 10, fill: '#888' }}
+                        tickFormatter={(val) => new Date(val).toLocaleDateString([], { month: 'short', day: 'numeric' })}
                       />
                       <YAxis 
+                        domain={[0, 5]}
                         axisLine={false} 
                         tickLine={false} 
                         tick={{ fontSize: 10, fill: '#888' }} 
                       />
                       <Tooltip 
-                        contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '12px', fontSize: '10px' }}
+                        contentStyle={{ backgroundColor: 'rgb(24, 24, 27)', border: '1px solid rgb(39, 39, 42)', borderRadius: '12px', fontSize: '10px' }}
+                        labelFormatter={(label) => new Date(label).toLocaleDateString([], { dateStyle: 'medium' })}
                       />
-                      <Area type="monotone" dataKey="positive" stroke="#10b981" fillOpacity={1} fill="url(#colorPos)" />
+                      <Area type="monotone" dataKey="avg_score" name="Avg Score" stroke="rgb(59, 130, 246)" fillOpacity={1} fill="url(#colorCSAT)" strokeWidth={2} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
@@ -156,7 +214,7 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
                 </div>
                 <div className="h-[250px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={csatScores} layout="vertical">
+                    <BarChart data={data?.score_distribution || []} layout="vertical">
                       <XAxis type="number" hide />
                       <YAxis 
                         dataKey="score" 
@@ -164,14 +222,15 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
                         axisLine={false} 
                         tickLine={false} 
                         tick={{ fontSize: 10, fill: '#888' }} 
+                        tickFormatter={(val) => `${val} Stars`}
                       />
                       <Tooltip 
-                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                        contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333', borderRadius: '12px', fontSize: '10px' }}
+                        cursor={{ fill: 'rgba(255,255,255,0.02)' }}
+                        contentStyle={{ backgroundColor: 'rgb(24, 24, 27)', border: '1px solid rgb(39, 39, 42)', borderRadius: '12px', fontSize: '10px' }}
                       />
                       <Bar dataKey="count" radius={[0, 4, 4, 0]}>
-                        {csatScores.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        {(data?.score_distribution || []).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={scoreColors[entry.score - 1]} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -180,41 +239,41 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
               </div>
             </div>
 
-            {/* Recent Feedback */}
+            {/* AI vs Human Performance */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-foreground">Recent Customer Feedback</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { user: 'Alex Rivera', rating: 5, comment: "The AI agent handled my complex billing issue perfectly. Saved me 20 minutes of waiting!", sentiment: 'positive' },
-                  { user: 'Sarah Chen', rating: 4, comment: "Great experience, but the voice agent was a bit slow to respond.", sentiment: 'neutral' },
-                  { user: 'Marcus Thorne', rating: 2, comment: "Bot couldn't understand my tracking number. Had to wait for a human.", sentiment: 'negative' },
-                ].map((feedback, i) => (
-                  <div key={i} className="bg-card border border-border p-6 rounded-3xl space-y-4 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-[10px] font-bold">
-                          {feedback.user[0]}
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-500" />
+                AI vs Human Performance
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {['agent', 'ai'].map((type) => {
+                  const stats = data?.entity_comparison[type];
+                  return (
+                    <div key={type} className="bg-card border border-border p-6 rounded-3xl flex items-center justify-between shadow-sm group hover:border-primary/30 transition-all">
+                      <div className="flex items-center gap-4">
+                        <div className={cn(
+                          "w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg transition-transform group-hover:scale-110",
+                          type === 'ai' ? "bg-purple-500/10 text-purple-500" : "bg-blue-500/10 text-blue-500"
+                        )}>
+                          {type === 'ai' ? <Bot className="w-6 h-6" /> : <User className="w-6 h-6" />}
                         </div>
-                        <span className="text-xs font-bold text-foreground">{feedback.user}</span>
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                            {type === 'ai' ? 'Artificial Intelligence' : 'Human Agents'}
+                          </p>
+                          <h4 className="text-lg font-bold text-foreground capitalize">{type === 'ai' ? 'AI Assistant' : 'Human Support'}</h4>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={cn("w-3 h-3", i < feedback.rating ? "text-primary fill-primary" : "text-muted")} />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-muted-foreground leading-relaxed italic">"{feedback.comment}"</p>
-                    <div className="flex items-center gap-2 pt-2 border-t border-border">
-                      <div className={cn(
-                        "px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider",
-                        feedback.sentiment === 'positive' ? "bg-emerald-500/10 text-emerald-500" : 
-                        feedback.sentiment === 'neutral' ? "bg-orange-500/10 text-orange-500" : "bg-red-500/10 text-red-500"
-                      )}>
-                        {feedback.sentiment}
+                      <div className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                          <span className="text-2xl font-black text-foreground">{stats?.avg_score || 'N/A'}</span>
+                        </div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">{stats?.count || 0} Feedbacks</p>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -234,12 +293,12 @@ export const CSAT = ({ workspaceId }: { workspaceId: string }) => {
                       <MessageSquare className="w-5 h-5" />
                     </div>
                     <div className={cn(
-                      "w-10 h-5 rounded-full relative transition-colors cursor-pointer",
+                      "w-10 h-5 rounded-full px-1 flex items-center transition-colors cursor-pointer",
                       survey.active ? "bg-primary" : "bg-muted"
                     )}>
                       <div className={cn(
-                        "absolute top-1 w-3 h-3 rounded-full bg-white transition-all",
-                        survey.active ? "right-1" : "left-1"
+                        "w-3 h-3 rounded-full bg-white transition-all transform",
+                        survey.active ? "translate-x-4" : "translate-x-0"
                       )} />
                     </div>
                   </div>
