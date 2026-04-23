@@ -41,7 +41,9 @@ import {
   Inbox,
   Edit2,
   Check,
-  Save
+  Save,
+  Instagram,
+  Facebook
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { PromptInputBox } from '../../ui/ai-prompt-box';
@@ -787,7 +789,16 @@ export const AllConversations = ({
                       <LetterAvatar name={chat.customerName} size="md" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-border">
-                        <Globe className="w-5 h-5 text-muted-foreground" />
+                        {(() => {
+                          const chan = chat.primary_channel || chat.channel;
+                          if (chan === 'telegram') return <Send className="w-5 h-5 text-blue-500" />;
+                          if (chan === 'whatsapp') return <MessageCircle className="w-5 h-5 text-green-500" />;
+                          if (chan === 'email') return <Mail className="w-5 h-5 text-primary" />;
+                          if (chan === 'slack') return <Hash className="w-5 h-5 text-purple-500" />;
+                          if (chan === 'instagram') return <Instagram className="w-5 h-5 text-pink-500" />;
+                          if (chan === 'facebook') return <Facebook className="w-5 h-5 text-blue-600" />;
+                          return <Globe className="w-5 h-5 text-muted-foreground" />;
+                        })()}
                       </div>
                     )}
                     <div className={cn(
@@ -803,9 +814,6 @@ export const AllConversations = ({
                         selectedId === chat.id ? "text-primary" : "text-foreground group-hover:text-primary/80"
                       )}>
                         {chat.customerName}
-                        {!chat.identified && (
-                          <span className="px-1 py-0.5 bg-accent text-[7px] font-black uppercase tracking-widest rounded border border-border">Visitor</span>
-                        )}
                       </h4>
                       <span className="text-[10px] text-muted-foreground font-medium shrink-0 ml-2">{chat.time}</span>
                     </div>
@@ -952,7 +960,16 @@ export const AllConversations = ({
                       />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center border border-border">
-                        <Globe className="w-4 h-4 text-muted-foreground" />
+                        {(() => {
+                          const chan = currentConversation?.primary_channel || currentConversation?.channel;
+                          if (chan === 'telegram') return <Send className="w-4 h-4 text-blue-500" />;
+                          if (chan === 'whatsapp') return <MessageCircle className="w-4 h-4 text-green-500" />;
+                          if (chan === 'email') return <Mail className="w-4 h-4 text-primary" />;
+                          if (chan === 'slack') return <Hash className="w-4 h-4 text-purple-500" />;
+                          if (chan === 'instagram') return <Instagram className="w-4 h-4 text-pink-500" />;
+                          if (chan === 'facebook') return <Facebook className="w-4 h-4 text-blue-600" />;
+                          return <Globe className="w-4 h-4 text-muted-foreground" />;
+                        })()}
                       </div>
                     )}
                     <div className="min-w-0">
@@ -960,9 +977,6 @@ export const AllConversations = ({
                         <h3 className="text-sm font-bold text-foreground truncate">
                           {activeConversationMetadata?.customerName || currentConversation?.customerName}
                         </h3>
-                        {!currentConversation?.identified && (
-                          <span className="px-1.5 py-0.5 bg-accent text-[7px] font-black uppercase tracking-widest rounded border border-border text-muted-foreground">Visitor</span>
-                        )}
                       </div>
                       {currentConversation?.meta_data?.ip_address && (
                         <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tighter leading-none mt-0.5">

@@ -93,6 +93,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
   useEffect(() => {
     if (testMode === 'waiting' && workspaceId) {
       const connect = async () => {
+        let isDone = false;
         try {
           const { token } = await api.dashboard.getWsToken(workspaceId);
           const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -106,6 +107,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
             try {
               const data = JSON.parse(event.data);
               if (data.type === 'message.new') {
+                isDone = true;
                 setReceivedTestMsg(data.message.body);
                 setTestMode('success');
                 toast('Message Received!', `Verified integration: "${data.message.body}"`, 'success');
@@ -116,7 +118,7 @@ export const ChannelPage = ({ type, title, icon: Icon, description, workspaceId 
           };
 
           ws.onclose = () => {
-            if (testMode === 'waiting') {
+            if (!isDone) {
               setTestMode('failed');
               toast('Test Tool Disconnected', 'Please retry the test.', 'error');
             }
