@@ -100,10 +100,11 @@ async def list_conversations(
             "assigned_to": str(t.assigned_user_id) if t and t.assigned_user_id else None,
             "updated_at": c.updated_at.isoformat() if c.updated_at else None,
             "routing_mode": await routing_service.calculate_routing_mode(db, c),
-            "identified": c.identified or (c.contact and c.contact.email is not None),
+            "identified": bool(c.identified) or (c.contact is not None and c.contact.email is not None),
             "customerEmail": c.contact.email if c.contact else None,
             "primary_channel": c.primary_channel,
-            "channels_used": c.channels_used or []
+            "channels_used": c.channels_used or [],
+            "meta_data": c.meta_data or {}
         })
     
     return enriched
@@ -180,10 +181,11 @@ async def get_conversation(
         "assigned_to": str(t.assigned_user_id) if t and t.assigned_user_id else None,
         "updated_at": c.updated_at.isoformat() if c.updated_at else None,
         "routing_mode": routing_mode,
-        "identified": c.identified or (c.contact and c.contact.email is not None),
+        "identified": bool(c.identified) or (c.contact is not None and c.contact.email is not None),
         "customerEmail": c.contact.email if c.contact else None,
         "primary_channel": c.primary_channel,
-        "channels_used": c.channels_used or []
+        "channels_used": c.channels_used or [],
+        "meta_data": c.meta_data or {}
     }
 
 @router.get("/{conversation_id}/messages", response_model=List[MessageRead])

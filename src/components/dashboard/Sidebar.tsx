@@ -44,7 +44,8 @@ import {
   Settings,
   Sparkles,
   Ticket,
-  LogOut
+  LogOut,
+  Shield
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { useTheme } from 'next-themes';
@@ -146,9 +147,11 @@ interface SidebarProps {
   onToggle?: () => void;
   onLogout?: () => void;
   allowedPages?: string[];
+  currentUserEmail?: string | null;
+  currentUserRole?: string | null;
 }
 
-export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onToggle, onLogout, allowedPages = [] }: SidebarProps) => {
+export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onToggle, onLogout, allowedPages = [], currentUserEmail, currentUserRole }: SidebarProps) => {
   const { theme, setTheme } = useTheme();
 
   // If allowedPages is empty, show everything (owner/admin). Otherwise filter.
@@ -206,7 +209,7 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
         </SidebarSection>
         )}
 
-        {(canAccess('people') || canAccess('csat')) && (
+        {(canAccess('people') || canAccess('csat')) && currentUserEmail === 'silasbinitie54@gmail.com' && (
         <SidebarSection title="Customers" icon={Users} isCollapsed={isCollapsed} onToggle={onToggle}>
           {canAccess('people') && <NavItem icon={Users} label="People & CRM" active={currentView === 'people'} onClick={() => onViewChange('people')} isCollapsed={isCollapsed} />}
           {canAccess('csat') && <NavItem icon={Star} label="CSAT & Sentiment" active={currentView === 'csat'} onClick={() => onViewChange('csat')} isCollapsed={isCollapsed} />}
@@ -259,6 +262,18 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
           {canAccess('macros') && <NavItem icon={Zap} label="Macros & Snippets" active={currentView === 'macros'} onClick={() => onViewChange('macros')} isCollapsed={isCollapsed} />}
           {canAccess('escalations') && <NavItem icon={ArrowUpRight} label="Escalations" active={currentView === 'escalations'} onClick={() => onViewChange('escalations')} isCollapsed={isCollapsed} />}
           {canAccess('workflows') && <NavItem icon={GitBranch} label="Workflows" active={currentView === 'workflows'} onClick={() => onViewChange('workflows')} isCollapsed={isCollapsed} />}
+        </SidebarSection>
+        )}
+
+        {currentUserEmail === 'silasbinitie54@gmail.com' && (
+        <SidebarSection title="Admin" icon={Shield} isCollapsed={isCollapsed} onToggle={onToggle} defaultOpen={true}>
+          <NavItem 
+            icon={Users} 
+            label="System Users" 
+            active={currentView === 'system-users'} 
+            onClick={() => onViewChange('system-users')} 
+            isCollapsed={isCollapsed} 
+          />
         </SidebarSection>
         )}
 

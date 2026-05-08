@@ -26,6 +26,11 @@ interface TicketData {
   status: 'open' | 'in_progress' | 'resolved' | 'closed';
   priority: 'low' | 'medium' | 'high' | 'critical';
   assigned_team_id: string | null;
+  assigned_user_id: string | null;
+  assigned_team?: {
+    id: string;
+    name: string;
+  } | null;
   created_at: string;
   customer_name?: string;
   sla_tracking?: {
@@ -181,7 +186,7 @@ export const TicketsDashboard = ({
         {[
           { 
             label: 'Unassigned', 
-            value: tickets.filter(t => !t.assigned_team_id && t.status !== 'resolved').length.toString().padStart(2, '0'), 
+            value: tickets.filter(t => !t.assigned_user_id && t.status !== 'resolved').length.toString().padStart(2, '0'), 
             icon: Users, 
             color: 'text-orange-500' 
           },
@@ -297,7 +302,7 @@ export const TicketsDashboard = ({
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
                         <Users className="w-3 h-3" />
-                        <span>Security Team</span>
+                        <span>{ticket.assigned_team?.name || 'Unassigned'}</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-medium">
                         <Clock className="w-3 h-3" />

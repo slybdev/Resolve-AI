@@ -15,8 +15,10 @@ class Campaign(Base):
     message: Mapped[str] = mapped_column(String(5000), nullable=False)
     
     audience_filters: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
+    config: Mapped[dict] = mapped_column(JSON, default=dict, nullable=True)  # Type-specific: news CTA, tour steps, checklist items
     
     status: Mapped[str] = mapped_column(String(50), default="draft", nullable=False)  # draft, scheduled, running, paused, completed
+    type: Mapped[str] = mapped_column(String(50), default="news", nullable=False) # banner, news, tour, checklist
     channel: Mapped[str] = mapped_column(String(50), default="email", nullable=False)
     
     scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

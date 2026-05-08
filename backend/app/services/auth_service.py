@@ -144,3 +144,9 @@ async def refresh(
         raise AuthError("User not found or disabled", status_code=401)
 
     return _build_tokens(str(user.id))
+
+
+async def list_all_users(db: AsyncSession) -> list[User]:
+    """List all registered users in the system."""
+    result = await db.execute(select(User).order_by(User.full_name))
+    return list(result.scalars().all())

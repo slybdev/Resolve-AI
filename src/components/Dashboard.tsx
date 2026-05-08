@@ -35,6 +35,7 @@ import { Macros } from './dashboard/pages/Macros';
 import { CSAT } from './dashboard/pages/CSAT';
 import { News } from './dashboard/pages/News';
 import { BusinessHours } from './dashboard/pages/BusinessHours';
+import { CampaignBuilder } from './dashboard/pages/CampaignBuilder';
 import { WebsiteChatChannel } from './dashboard/pages/channels/WebsiteChatChannel';
 import { EmailChannel } from './dashboard/pages/channels/EmailChannel';
 import { WhatsAppChannel } from './dashboard/pages/channels/WhatsAppChannel';
@@ -45,6 +46,7 @@ import { DiscordChannel } from './dashboard/pages/channels/DiscordChannel';
 import { SlackChannel } from './dashboard/pages/channels/SlackChannel';
 import { VoiceAIChannel } from './dashboard/pages/channels/VoiceAIChannel';
 import { CommandPalette } from './dashboard/CommandPalette';
+import { SystemUsers } from './dashboard/pages/SystemUsers';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -59,6 +61,7 @@ const Dashboard = () => {
   const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [allowedPages, setAllowedPages] = useState<string[]>([]);
   const [currentMemberRole, setCurrentMemberRole] = useState<string | null>(null);
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('ticket_id');
@@ -66,6 +69,10 @@ const Dashboard = () => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('conversation_id');
+  });
+  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('campaign_id');
   });
 
   useEffect(() => {
@@ -108,9 +115,13 @@ const Dashboard = () => {
           const member = await api.team.currentMember(wsId);
           setAllowedPages(member?.allowed_pages || []);
           setCurrentMemberRole(member?.role || null);
+          setCurrentUserEmail(member?.user?.email || null);
         } catch {
           setAllowedPages([]); // Owner / admin — full access
           setCurrentMemberRole('owner'); // Fallback for workspace creator
+          // Fetch current user email as fallback
+          const user = await api.auth.me();
+          setCurrentUserEmail(user?.email || null);
         }
       }
     } catch (err) {
@@ -137,11 +148,15 @@ const Dashboard = () => {
           searchParams.set('conversation_id', id);
           searchParams.delete('ticket_id');
       } else {
-          searchParams.delete('ticket_id');
-          searchParams.delete('conversation_id');
-          if (view === 'all-conversations') {
-              setSelectedConversationId(null);
-          }
+          setSelectedConversationId(null);
+      }
+      
+      if (view === 'campaign-builder' && id) {
+          setSelectedCampaignId(id);
+          searchParams.set('campaign_id', id);
+      } else if (view !== 'campaign-builder') {
+          searchParams.delete('campaign_id');
+          setSelectedCampaignId(null);
       }
       
       window.history.pushState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
@@ -161,6 +176,7 @@ const Dashboard = () => {
         searchParams.set('view', prevView);
         if (prevView !== 'ticket-detail') searchParams.delete('ticket_id');
         if (prevView !== 'all-conversations') searchParams.delete('conversation_id');
+        if (prevView !== 'campaign-builder') searchParams.delete('campaign_id');
         window.history.pushState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
       }
     } else {
@@ -225,10 +241,15 @@ const Dashboard = () => {
       case 'assigned-to-me': return <AssignedToMe workspaceId={workspaceId} onSelectTicket={(id) => handleViewChange('ticket-detail', id)} />;
       case 'unassigned': return <Unassigned workspaceId={workspaceId} />;
       case 'urgent-sla': return <UrgentSLA workspaceId={workspaceId} />;
-      case 'people': return <People workspaceId={workspaceId} />;
-      case 'csat': return <CSAT workspaceId={workspaceId} />;
-      case 'outbound': return <Outbound workspaceId={workspaceId} />;
-      case 'product-tours': return <Outbound workspaceId={workspaceId} />;
+      case 'people': 
+        if (currentUserEmail !== 'silasbinitie54@gmail.com') return <div className="p-8 text-center text-muted-foreground">Access denied. Administrator privileges required.</div>;
+        return <People workspaceId={workspaceId} />;
+      case 'csat': 
+        if (currentUserEmail !== 'silasbinitie54@gmail.com') return <div className="p-8 text-center text-muted-foreground">Access denied. Administrator privileges required.</div>;
+        return <CSAT workspaceId={workspaceId} />;
+      case 'outbound': return <Outbound workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
+      case 'campaign-builder': return <CampaignBuilder workspaceId={workspaceId} campaignId={selectedCampaignId} onBack={handleBack} />;
+      case 'product-tours': return <Outbound workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
       case 'news': return <News workspaceId={workspaceId} />;
       case 'help-center': return <HelpCenter workspaceId={workspaceId} />;
       case 'website-chat': return <WebsiteChatChannel workspaceId={workspaceId} />;
@@ -255,6 +276,7 @@ const Dashboard = () => {
       case 'chat-widget': return <ChatWidget workspaceId={workspaceId} />;
       case 'billing': return <Billing workspaceId={workspaceId} />;
       case 'api-keys': return <APIKeys workspaceId={workspaceId} />;
+      case 'system-users': return <SystemUsers workspaceId={workspaceId} />;
       default: return (
         <AllConversations 
           workspaceId={workspaceId} 
@@ -277,6 +299,8 @@ const Dashboard = () => {
           onToggle={toggleSidebar}
           onLogout={handleLogout}
           allowedPages={allowedPages}
+          currentUserEmail={currentUserEmail}
+          currentUserRole={currentMemberRole}
         />
       </div>
 

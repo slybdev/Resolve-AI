@@ -63,6 +63,11 @@ class AIService:
         if not conversation:
             return "Internal error: Conversation not found."
 
+        # AI should not reply to system/admin conversations
+        if conversation.meta_data and conversation.meta_data.get("is_system"):
+            logger.info(f"AIService: Skipping response for system conversation {conversation_id}")
+            return "AI response disabled for this conversation."
+
         # 2. Get Configuration
         config_result = await db.execute(select(AIConfiguration).where(AIConfiguration.workspace_id == workspace_id))
         ai_config = config_result.scalar_one_or_none()
@@ -363,7 +368,14 @@ CONTEXT:
         return {
             "answer": answer,
             "intent": intent,
-            "sources": [{"document_id": r["id"], "title": r.get("title", "Document"), "score": r.get("score")} for r in results],
+            "sources": [
+                {
+                    "document_id": r["id"], 
+                    "title": r.get("title", "Document"), 
+                    "snippet": r.get("text"),
+                    "score": r.get("score", 1.0)
+                } for r in results
+            ],
             "confidence_score": 0.85
         }
 

@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Paperclip, Bot, User, Check, ArrowLeft } from 'lucide-react';
+import { MessageCircle, X, Send, Paperclip, Bot, User, Check, ArrowLeft, Megaphone } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/src/lib/utils';
 import { WidgetHomeScreen } from './WidgetHomeScreen';
 import { RatingPrompt } from './RatingPrompt';
 import { PreChatForm } from './PreChatForm';
+import { WidgetTourOverlay } from './WidgetTourOverlay';
 
 interface Message {
   id: string;
@@ -101,6 +102,8 @@ export const ChatWidgetPublic = ({
   const [hasInitialized, setHasInitialized] = useState(false);
   const [requireIdentityPreChat, setRequireIdentityPreChat] = useState(false);
   const [isInitializingConv, setIsInitializingConv] = useState(false);
+  const [activeCampaigns, setActiveCampaigns] = useState<any[]>([]);
+  const [dismissedCampaigns, setDismissedCampaigns] = useState<string[]>([]);
 
   // Rating state
   const [showRating, setShowRating] = useState(false);
@@ -140,6 +143,11 @@ export const ChatWidgetPublic = ({
         if (data.require_identity_pre_chat) setRequireIdentityPreChat(data.require_identity_pre_chat);
       })
       .catch(err => console.error('Widget Config Error:', err));
+
+    fetch(`${API_BASE}/widget/campaigns?workspace_key=${workspaceKey}`)
+      .then(res => res.ok ? res.json() : Promise.reject())
+      .then(data => setActiveCampaigns(data))
+      .catch(err => console.error('Campaigns Fetch Error:', err));
   }, [workspaceKey, isPreview]);
 
   // 3. Initialize Identity & Session
@@ -190,6 +198,15 @@ export const ChatWidgetPublic = ({
           const parsed = JSON.parse(savedIdentity);
           if (parsed.name) setVisitorName(parsed.name);
           if (parsed.email) setVisitorEmail(parsed.email);
+        } catch (e) {}
+      }
+
+      // Restore dismissed campaigns
+      const dismissedKey = `xd_dismissed_${workspaceKey}`;
+      const savedDismissed = localStorage.getItem(dismissedKey);
+      if (savedDismissed) {
+        try {
+          setDismissedCampaigns(JSON.parse(savedDismissed));
         } catch (e) {}
       }
 
@@ -632,6 +649,16 @@ export const ChatWidgetPublic = ({
     setRatingData(null);
   };
 
+  const handleDismissCampaign = (id: string) => {
+    const newDismissed = [...dismissedCampaigns, id];
+    setDismissedCampaigns(newDismissed);
+    localStorage.setItem(`xd_dismissed_${workspaceKey}`, JSON.stringify(newDismissed));
+  };
+
+  // Filter campaigns
+  const visibleCampaigns = activeCampaigns.filter(c => !dismissedCampaigns.includes(c.id));
+  const activeTour = visibleCampaigns.find(c => c.type === 'tour');
+
   return (
     <div className={cn(
       "absolute bottom-0 right-0 w-full h-full z-[99999] font-sans antialiased flex flex-col items-end justify-end",
@@ -649,7 +676,25 @@ export const ChatWidgetPublic = ({
             )}
           >
             {/* Screen Router */}
-            {screen === 'home' ? (
+            <div className="flex-1 flex flex-col relative overflow-hidden">
+              {/* Active Campaigns / Banners */}
+              {activeCampaigns.filter(c => c.type === 'banner').map(banner => (
+                <div 
+                  key={banner.id}
+                  className="bg-primary/10 border-b border-primary/20 p-3 flex items-center gap-3 animate-in slide-in-from-top duration-500 relative z-[60]"
+                >
+                  <Megaphone className="w-4 h-4 text-primary shrink-0" />
+                  <p className="text-[11px] font-medium text-primary leading-tight">{banner.message}</p>
+                  <button 
+                    onClick={() => setActiveCampaigns(prev => prev.filter(c => c.id !== banner.id))}
+                    className="p-1 hover:bg-primary/10 rounded-full transition-colors ml-auto"
+                  >
+                    <X className="w-3 h-3 text-primary/50" />
+                  </button>
+                </div>
+              ))}
+              
+              {screen === 'home' ? (
               <WidgetHomeScreen
                 title={title}
                 primaryColor={primaryColor}
@@ -661,6 +706,9 @@ export const ChatWidgetPublic = ({
                 isConnected={hasInitialized} // Use initialization status for home screen to avoid 'Connecting...' flicker
                 avatar={avatar}
                 baseUrl={baseUrl}
+                newsCampaigns={visibleCampaigns.filter(c => c.type === 'news')}
+                checklistCampaigns={visibleCampaigns.filter(c => c.type === 'checklist')}
+                onDismissCampaign={handleDismissCampaign}
               />
             ) : (screen === 'chat' && requireIdentityPreChat && !conversationId && !isPreview) ? (
               <div className="flex-1 flex flex-col bg-inherit overflow-hidden">
@@ -988,6 +1036,22 @@ export const ChatWidgetPublic = ({
                 </AnimatePresence>
               </>
             )}
+            </div>
+
+            {/* Tour Overlay */}
+            <AnimatePresence>
+              {activeTour && (
+                <WidgetTourOverlay
+                  id={activeTour.id}
+                  name={activeTour.name}
+                  config={activeTour.config}
+                  theme={theme}
+                  primaryColor={primaryColor}
+                  onComplete={handleDismissCampaign}
+                  onDismiss={handleDismissCampaign}
+                />
+              )}
+            </AnimatePresence>
           </motion.div>
         )}
       </AnimatePresence>

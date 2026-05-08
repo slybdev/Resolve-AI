@@ -6,7 +6,8 @@ import {
   Megaphone, Plus, Search, Filter, MoreHorizontal, 
   Layout, MessageSquare, Zap, Eye, MousePointer2,
   Clock, CheckCircle2, AlertCircle, Settings,
-  ArrowRight, ExternalLink, BarChart3, Globe, X
+  ArrowRight, ExternalLink, BarChart3, Globe, X,
+  Trash2, Pause, Play
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/src/lib/utils';
@@ -15,7 +16,7 @@ interface Campaign {
   id: string;
   name: string;
   type: 'banner' | 'news' | 'tour' | 'checklist';
-  status: 'active' | 'paused' | 'draft';
+  status: 'running' | 'paused' | 'draft';
   reach: string;
   ctr: string;
   lastUpdated: string;
@@ -23,12 +24,10 @@ interface Campaign {
 
 // mockCampaigns removed, using real data from API
 
-export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
+export const Outbound = ({ workspaceId, onSelectCampaign }: { workspaceId: string, onSelectCampaign: (id: string | null) => void }) => {
   const [activeTab, setActiveTab] = useState<'campaigns' | 'templates' | 'analytics'>('campaigns');
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newCampaign, setNewCampaign] = useState({ name: '', type: 'news' as const });
   const { toast } = useToast();
 
   const fetchCampaigns = useCallback(async () => {
@@ -39,8 +38,8 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
       const mapped: Campaign[] = data.map((c: any) => ({
         id: c.id,
         name: c.name,
-        type: 'news', // Defaulting for now
-        status: c.status === 'running' ? 'active' : c.status === 'scheduled' ? 'paused' : 'active',
+        type: c.type || 'news',
+        status: c.status || 'draft',
         reach: (c.sent_count || 0).toLocaleString(),
         ctr: '0%', // Placeholder
         lastUpdated: new Date(c.created_at).toLocaleDateString()
@@ -58,24 +57,27 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
     fetchCampaigns();
   }, [fetchCampaigns]);
 
-  const handleCreateCampaign = async () => {
-    if (!newCampaign.name) {
-      toast("Validation Error", "Please provide a campaign name.", "error");
-      return;
-    }
 
+
+  const handleUpdateStatus = async (id: string, currentStatus: string) => {
+    const newStatus = currentStatus === 'running' ? 'paused' : 'running';
     try {
-      await api.automations.campaigns.create(workspaceId, {
-        name: newCampaign.name,
-        status: 'scheduled',
-        audience_filters: {}
-      });
-      toast("Campaign Created", "Your campaign has been scheduled.", "success");
-      setIsModalOpen(false);
-      setNewCampaign({ name: '', type: 'news' });
+      await api.automations.campaigns.update(id, { status: newStatus });
+      toast("Success", `Campaign ${newStatus === 'running' ? 'activated' : 'paused'}.`, "success");
       fetchCampaigns();
     } catch (error: any) {
-      toast("Error", "Failed to create campaign: " + error.message, "error");
+      toast("Error", "Failed to update campaign: " + error.message, "error");
+    }
+  };
+
+  const handleDeleteCampaign = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this campaign?")) return;
+    try {
+      await api.automations.campaigns.delete(id);
+      toast("Deleted", "Campaign removed successfully.", "success");
+      fetchCampaigns();
+    } catch (error: any) {
+      toast("Error", "Failed to delete campaign: " + error.message, "error");
     }
   };
 
@@ -96,7 +98,7 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
             Preview on Site
           </button>
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => onSelectCampaign(null)}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20"
           >
             <Plus className="w-4 h-4" />
@@ -142,7 +144,11 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
                 { label: 'Tours', icon: MousePointer2, desc: 'Guided walkthroughs of features.' },
                 { label: 'Checklists', icon: CheckCircle2, desc: 'Onboarding tasks for users.' },
               ].map((type) => (
-                <div key={type.label} className="bg-card border border-border p-4 rounded-2xl hover:border-primary/50 transition-all cursor-pointer group shadow-sm">
+                <div 
+                  key={type.label} 
+                  onClick={() => onSelectCampaign(null)}
+                  className="bg-card border border-border p-4 rounded-2xl hover:border-primary/50 transition-all cursor-pointer group shadow-sm"
+                >
                   <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-3 group-hover:scale-110 transition-transform">
                     <type.icon className="w-5 h-5" />
                   </div>
@@ -178,7 +184,10 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
                   ) : (
                     campaigns.map((campaign) => (
                       <tr key={campaign.id} className="hover:bg-accent/10 transition-colors group">
-                        <td className="px-6 py-4">
+                        <td 
+                          className="px-6 py-4 cursor-pointer"
+                          onClick={() => onSelectCampaign(campaign.id)}
+                        >
                           <div>
                             <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{campaign.name}</div>
                             <div className="text-[10px] text-muted-foreground flex items-center gap-2">
@@ -192,10 +201,10 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
                         <td className="px-6 py-4">
                           <span className={cn(
                             "px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider",
-                            campaign.status === 'active' ? "bg-emerald-500/10 text-emerald-500" : 
+                            campaign.status === 'running' ? "bg-emerald-500/10 text-emerald-500" : 
                             campaign.status === 'draft' ? "bg-orange-500/10 text-orange-500" : "bg-muted text-muted-foreground"
                           )}>
-                            {campaign.status}
+                            {campaign.status === 'running' ? 'active' : campaign.status}
                           </span>
                         </td>
                         <td className="px-6 py-4">
@@ -205,9 +214,22 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
                           <div className="text-xs font-medium text-foreground">{campaign.ctr}</div>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button className="p-2 hover:bg-accent rounded-lg transition-all">
-                            <MoreHorizontal className="w-4 h-4 text-muted-foreground" />
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button 
+                              onClick={() => handleUpdateStatus(campaign.id, campaign.status)}
+                              className="p-2 hover:bg-accent rounded-lg transition-all text-muted-foreground hover:text-primary"
+                              title={campaign.status === 'running' ? 'Pause' : 'Start'}
+                            >
+                              {campaign.status === 'running' ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteCampaign(campaign.id)}
+                              className="p-2 hover:bg-destructive/10 rounded-lg transition-all text-muted-foreground hover:text-destructive"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))
@@ -274,80 +296,6 @@ export const Outbound = ({ workspaceId }: { workspaceId: string }) => {
         )}
       </div>
 
-      {/* Create Campaign Modal */}
-      <AnimatePresence>
-        {isModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-md">
-            <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-card border border-border w-full max-w-lg rounded-3xl shadow-2xl flex flex-col overflow-hidden"
-            >
-              <div className="p-6 border-b border-border flex items-center justify-between bg-accent/50">
-                <div className="flex items-center gap-3">
-                  <Megaphone className="w-5 h-5 text-primary" />
-                  <h2 className="text-lg font-bold text-foreground">Create New Campaign</h2>
-                </div>
-                <button 
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 hover:bg-accent rounded-full text-muted-foreground transition-all"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-8 space-y-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Campaign Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Summer Sale Announcement"
-                    value={newCampaign.name}
-                    onChange={(e) => setNewCampaign({ ...newCampaign, name: e.target.value })}
-                    className="w-full bg-accent/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Campaign Type</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {['banner', 'news', 'tour', 'checklist'].map((type) => (
-                      <button
-                        key={type}
-                        onClick={() => setNewCampaign({ ...newCampaign, type: type as any })}
-                        className={cn(
-                          "px-4 py-3 rounded-xl border text-xs font-bold capitalize transition-all",
-                          newCampaign.type === type 
-                            ? "bg-primary/10 border-primary text-primary" 
-                            : "bg-accent/30 border-border text-muted-foreground hover:border-primary/20"
-                        )}
-                      >
-                        {type}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-6 border-t border-border flex items-center justify-end gap-3 bg-accent/50">
-                <button 
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-2 text-sm font-bold text-muted-foreground hover:text-foreground"
-                >
-                  Cancel
-                </button>
-                <button 
-                  onClick={handleCreateCampaign}
-                  className="px-8 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 shadow-lg shadow-primary/20"
-                >
-                  Create Campaign
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };

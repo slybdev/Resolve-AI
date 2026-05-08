@@ -3,6 +3,7 @@ Auth schemas — request/response models for authentication endpoints.
 """
 
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, EmailStr, Field
 
@@ -47,8 +48,23 @@ class UserResponse(BaseModel):
     is_active: bool
     avatar_url: str | None = None
     oauth_provider: str | None = None
+    created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ActivityItem(BaseModel):
+    action: str
+    timestamp: datetime
+    icon_type: str  # 'message', 'arrow', 'user', 'card'
+
+
+class UserAdminResponse(UserResponse):
+    workspace_name: str | None = None
+    plan: str | None = None
+    total_value: float = 0.0
+    location: str | None = "Remote"
+    activity_timeline: list[ActivityItem] = []
 
 
 class AuthResponse(BaseModel):

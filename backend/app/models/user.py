@@ -33,3 +33,6 @@ class User(Base):
     memberships = relationship(
         "WorkspaceMember", back_populates="user", lazy="selectin"
     )
+    assigned_contacts = relationship(
+        "Contact", back_populates="assigned_agent", lazy="selectin"
+    )

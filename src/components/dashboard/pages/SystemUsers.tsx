@@ -5,31 +5,30 @@ import {
   Mail, Phone, MapPin, Calendar, Tag, ExternalLink,
   MessageSquare, Clock, Star, Shield, Zap, ArrowUpRight,
   ChevronRight, MoreVertical, Plus, UserPlus, FileText,
-  Activity, CreditCard, Globe
+  Activity, CreditCard, Globe, Megaphone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/src/lib/utils';
 import { LetterAvatar } from '../../ui/Avatar';
+import { useToast } from '@/src/components/ui/Toast';
+import { Spinner } from '@/src/components/ui/ios-spinner';
+import { X } from 'lucide-react';
 
 
 interface Customer {
   id: string;
   name: string;
   email: string;
-  phone: string | null;
   avatar: string;
-  status: string;
-  lifecycle_stage: string;
-  plan: string;
+  status: 'active' | 'away' | 'offline';
+  plan: 'Free' | 'Pro' | 'Enterprise';
   lastSeen: string;
   totalSpend: string;
   conversations: number;
-  openTickets: number;
   sentiment: 'positive' | 'neutral' | 'negative';
   tags: string[];
   company: string;
   location: string;
-  title: string | null;
 }
 
 const mockCustomers: Customer[] = [
@@ -113,46 +112,57 @@ const SegmentItem = ({ label, count, active, onClick, icon: Icon }: any) => (
   </button>
 );
 
-export const People = ({ workspaceId }: { workspaceId: string }) => {
+export const SystemUsers = ({ workspaceId }: { workspaceId: string }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [activeSegment, setActiveSegment] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
-  const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [stats, setStats] = useState<any>(null);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [isBroadcastModalOpen, setIsBroadcastModalOpen] = useState(false);
+  const [modalText, setModalText] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    fetchCustomers();
-    fetchStats();
-  }, [workspaceId, activeSegment, activeTag]);
+    fetchUsers();
+  }, [workspaceId, activeSegment]);
 
-  const fetchCustomers = async () => {
+  const fetchUsers = async () => {
     setIsLoading(true);
     try {
-      const response = await api.contacts.list(workspaceId, {
-        segment: activeSegment !== 'all' ? activeSegment : undefined,
-        tag: activeTag || undefined
-      });
-      const formatted = response.items.map((item: any) => ({
-        ...item,
-        avatar: item.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random`,
-        status: item.status || 'prospect',
-        lifecycle_stage: item.lifecycle_stage || 'lead',
-        plan: item.custom_fields?.plan || 'Free',
-        lastSeen: item.last_seen_at ? new Date(item.last_seen_at).toLocaleDateString() : 'Never',
-        totalSpend: `$${(item.lifetime_value || 0).toLocaleString()}`,
-        conversations: item.total_conversations || 0,
-        openTickets: item.open_tickets_count || 0,
-        sentiment: item.satisfaction_score && item.satisfaction_score >= 4 ? 'positive' : item.satisfaction_score && item.satisfaction_score <= 2 ? 'negative' : 'neutral',
-        tags: item.tags?.map((t: any) => t.name) || [],
-        company: item.company?.name || 'Independent',
-        location: item.timezone || 'Remote',
-        title: item.title || null
+      const users = await api.auth.listUsers();
+      // Transform backend User data to the CRM interface
+      const formatted = users.map((user: any) => ({
+        id: user.id,
+        name: user.full_name,
+        email: user.email,
+        avatar: user.avatar_url || `https://picsum.photos/seed/${user.id}/100/100`,
+        status: user.is_active ? 'active' : 'offline',
+        plan: user.plan,
+        lastSeen: 'Just now',
+        totalSpend: `$${user.total_value}`,
+        conversations: 0,
+        sentiment: 'neutral',
+        company: user.workspace_name,
+        location: user.location,
+        joinedAt: new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        timeline: user.activity_timeline.map((item: any) => ({
+          action: item.action,
+          time: new Date(item.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          icon: item.icon_type === 'message' ? MessageSquare : 
+                item.icon_type === 'arrow' ? ArrowUpRight : 
+                item.icon_type === 'user' ? Users : CreditCard,
+          color: item.icon_type === 'message' ? 'text-blue-500' : 
+                 item.icon_type === 'arrow' ? 'text-purple-500' : 
+                 item.icon_type === 'user' ? 'text-emerald-500' : 'text-amber-500'
+        })),
+        tags: [user.is_superuser ? 'SuperAdmin' : 'User']
       }));
       setCustomers(formatted);
-      setTotalCount(response.total);
+      setTotalCount(formatted.length);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -160,19 +170,54 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
     }
   };
 
-  const fetchStats = async () => {
+  const handleSegmentClick = (segment: string) => {
+    setActiveSegment(segment);
+  };
+
+  const handleSendMessage = async () => {
+    if (!selectedCustomer || !modalText.trim() || isSending) return;
+    setIsSending(true);
     try {
-      const data = await api.contacts.stats(workspaceId);
-      setStats(data);
-      if (data.segments?.all) setTotalCount(data.segments.all);
-    } catch (err) {
-      console.error('Failed to fetch stats:', err);
+      await api.auth.sendMessage(selectedCustomer.id, modalText);
+      toast("Message Sent", `Your message has been delivered to ${selectedCustomer.name}.`, "success");
+      setIsMessageModalOpen(false);
+      setModalText("");
+    } catch (err: any) {
+      toast("Error", err.message || "Failed to send message", "error");
+    } finally {
+      setIsSending(false);
     }
   };
 
-  const handleSegmentClick = (segment: string) => {
-    setActiveSegment(segment);
-    setActiveTag(null);
+  const handleSendEmail = async () => {
+    if (!selectedCustomer || !modalText.trim() || isSending) return;
+    setIsSending(true);
+    try {
+      await api.auth.sendEmail(selectedCustomer.id, modalText);
+      toast("Email Sent", `Your email has been sent to ${selectedCustomer.email}.`, "success");
+      setIsEmailModalOpen(false);
+      setModalText("");
+    } catch (err: any) {
+      toast("Error", err.message || "Failed to send email", "error");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleBroadcast = async () => {
+    if (!modalText.trim() || isSending) return;
+    setIsSending(true);
+    try {
+      const promises = customers.map(c => api.auth.sendMessage(c.id, modalText));
+      await Promise.all(promises);
+      toast("Broadcast Sent", `Your message has been delivered to ${customers.length} users.`, "success");
+      setIsBroadcastModalOpen(false);
+      setModalText("");
+    } catch (err: any) {
+      toast("Error", err.message || "Failed to broadcast message", "error");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleTagClick = (tag: string) => {
@@ -187,33 +232,26 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
         <div>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 px-4">Segments</h2>
           <div className="space-y-1">
-            <SegmentItem label="All People" count={stats?.segments?.all || 0} active={activeSegment === 'all' && !activeTag} onClick={() => handleSegmentClick('all')} icon={Users} />
-            <SegmentItem label="Active Now" count={stats?.segments?.active || 0} active={activeSegment === 'active'} onClick={() => handleSegmentClick('active')} icon={Activity} />
-            <SegmentItem label="New Users" count={stats?.segments?.new || 0} active={activeSegment === 'new'} onClick={() => handleSegmentClick('new')} icon={UserPlus} />
-            <SegmentItem label="High Value" count={stats?.segments?.high_value || 0} active={activeSegment === 'high-value'} onClick={() => handleSegmentClick('high-value')} icon={CreditCard} />
-            <SegmentItem label="Slipped Away" count={stats?.segments?.slipped || 0} active={activeSegment === 'slipped'} onClick={() => handleSegmentClick('slipped')} icon={Clock} />
+            <SegmentItem label="All People" count={totalCount} active={activeSegment === 'all'} onClick={() => handleSegmentClick('all')} icon={Users} />
+            <SegmentItem label="Active Now" count={0} active={activeSegment === 'active'} onClick={() => handleSegmentClick('active')} icon={Activity} />
+            <SegmentItem label="New Users" count={0} active={activeSegment === 'new'} onClick={() => handleSegmentClick('new')} icon={UserPlus} />
           </div>
         </div>
 
         <div>
-          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 px-4">Tags</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-6 px-4">Roles</h2>
           <div className="space-y-1">
-            {['VIP', 'Beta Tester', 'Enterprise', 'Churn Risk'].map(tag => (
+            {['SuperAdmin', 'User'].map(tag => (
               <button 
                 key={tag} 
-                onClick={() => handleTagClick(tag)}
                 className={cn(
-                  "w-full flex items-center justify-between px-4 py-2 text-sm font-bold transition-colors group",
-                  activeTag === tag ? "text-primary" : "text-muted-foreground hover:text-white"
+                  "w-full flex items-center justify-between px-4 py-2 text-sm font-bold transition-colors group text-muted-foreground hover:text-white"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <Tag className={cn("w-3.5 h-3.5 opacity-50 group-hover:opacity-100", activeTag === tag && "opacity-100")} />
+                  <Shield className={cn("w-3.5 h-3.5 opacity-50 group-hover:opacity-100")} />
                   {tag}
                 </div>
-                {stats?.tags?.[tag] !== undefined && (
-                  <span className="text-[10px] opacity-50 group-hover:opacity-100">{stats.tags[tag]}</span>
-                )}
               </button>
             ))}
           </div>
@@ -230,10 +268,17 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
         {/* Header */}
         <div className="p-8 border-b border-border flex items-center justify-between bg-card">
           <div>
-            <h1 className="text-3xl font-black text-white tracking-tighter mb-1">People & CRM</h1>
-            <p className="text-muted-foreground text-sm font-medium">Manage your customer relationships and interaction history.</p>
+            <h1 className="text-3xl font-black text-white tracking-tighter mb-1">System Users</h1>
+            <p className="text-muted-foreground text-sm font-medium">Manage all users who have created an account on the platform.</p>
           </div>
           <div className="flex items-center gap-3">
+            <button 
+              onClick={() => setIsBroadcastModalOpen(true)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest hover:bg-primary/20 transition-all border border-primary/20"
+            >
+              <Megaphone className="w-4 h-4" />
+              Broadcast
+            </button>
             <button className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/5 text-white text-xs font-black uppercase tracking-widest hover:bg-white/10 transition-all border border-white/10">
               <Download className="w-4 h-4" />
               Export
@@ -308,7 +353,7 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
                         <LetterAvatar name={customer.name} size="md" className="rounded-2xl border border-white/10" />
                         <div className={cn(
                           "absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-[#050505]",
-                          customer.status === 'active' ? "bg-emerald-500" : customer.status === 'churned' ? "bg-red-500" : customer.status === 'prospect' ? "bg-amber-500" : "bg-white/20"
+                          customer.status === 'active' ? "bg-emerald-500" : customer.status === 'away' ? "bg-amber-500" : "bg-white/20"
                         )} />
                       </div>
                       <div>
@@ -383,10 +428,18 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
                   <p className="text-muted-foreground text-sm font-medium">{selectedCustomer.email}</p>
                 </div>
                 <div className="flex items-center justify-center gap-3">
-                  <button className="p-3.5 bg-white text-black rounded-2xl hover:bg-white/90 transition-all shadow-lg">
+                  <button 
+                    onClick={() => setIsMessageModalOpen(true)}
+                    className="p-3.5 bg-white text-black rounded-2xl hover:bg-white/90 transition-all shadow-lg"
+                    title="Direct Message"
+                  >
                     <MessageSquare className="w-5 h-5" />
                   </button>
-                  <button className="p-3.5 bg-white/5 text-white rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
+                  <button 
+                    onClick={() => setIsEmailModalOpen(true)}
+                    className="p-3.5 bg-white/5 text-white rounded-2xl border border-white/10 hover:bg-white/10 transition-all"
+                    title="Direct Email"
+                  >
                     <Mail className="w-5 h-5" />
                   </button>
                   <button className="p-3.5 bg-white/5 text-white rounded-2xl border border-white/10 hover:bg-white/10 transition-all">
@@ -398,16 +451,12 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-white/[0.02] p-5 rounded-3xl border border-white/5">
-                  <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">Lifetime Value</div>
+                  <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">Total Value</div>
                   <div className="text-xl font-black text-white">{selectedCustomer.totalSpend}</div>
                 </div>
                 <div className="bg-white/[0.02] p-5 rounded-3xl border border-white/5">
                   <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">Conversations</div>
                   <div className="text-xl font-black text-white">{selectedCustomer.conversations}</div>
-                </div>
-                <div className="bg-white/[0.02] p-5 rounded-3xl border border-white/5 col-span-2">
-                  <div className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-2">Open Tickets</div>
-                  <div className="text-xl font-black text-white">{selectedCustomer.openTickets}</div>
                 </div>
               </div>
 
@@ -419,7 +468,7 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
                     { label: 'Company', value: selectedCustomer.company, icon: Globe },
                     { label: 'Location', value: selectedCustomer.location, icon: MapPin },
                     { label: 'Plan', value: selectedCustomer.plan, icon: CreditCard },
-                    { label: 'Joined', value: 'Oct 12, 2023', icon: Calendar },
+                    { label: 'Joined', value: (selectedCustomer as any).joinedAt, icon: Calendar },
                   ].map((attr) => (
                     <div key={attr.label} className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.01] border border-white/5">
                       <div className="flex items-center gap-3">
@@ -451,12 +500,7 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
               <div className="space-y-6">
                 <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.3em]">Interaction Timeline</h4>
                 <div className="space-y-6 relative before:absolute before:left-4 before:top-2 before:bottom-2 before:w-px before:bg-white/5">
-                  {[
-                    { action: 'Opened conversation', time: '2 mins ago', icon: MessageSquare, color: 'text-blue-500' },
-                    { action: 'Viewed pricing page', time: '1 hour ago', icon: ArrowUpRight, color: 'text-purple-500' },
-                    { action: 'Updated profile settings', time: 'Yesterday', icon: Users, color: 'text-emerald-500' },
-                    { action: 'Subscription renewed', time: '3 days ago', icon: CreditCard, color: 'text-amber-500' },
-                  ].map((activity, i) => (
+                  {(selectedCustomer as any).timeline?.map((activity: any, i: number) => (
                     <div key={i} className="flex gap-6 relative z-10">
                       <div className={cn("w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0 border border-white/5", activity.color)}>
                         <activity.icon className="w-3.5 h-3.5" />
@@ -467,6 +511,9 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
                       </div>
                     </div>
                   ))}
+                  {(!(selectedCustomer as any).timeline || (selectedCustomer as any).timeline.length === 0) && (
+                    <div className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest px-4">No recent activity</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -478,6 +525,89 @@ export const People = ({ workspaceId }: { workspaceId: string }) => {
               </button>
             </div>
           </motion.div>
+        )}
+      </AnimatePresence>
+      {/* Messaging Modals */}
+      <AnimatePresence>
+        {(isMessageModalOpen || isEmailModalOpen || isBroadcastModalOpen) && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setIsMessageModalOpen(false);
+                setIsEmailModalOpen(false);
+                setIsBroadcastModalOpen(false);
+              }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="relative w-full max-w-md bg-card border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-black text-white tracking-tight">
+                      {isBroadcastModalOpen ? "Broadcast Message" : isMessageModalOpen ? "Send Message" : "Send Direct Email"}
+                    </h3>
+                    <p className="text-xs text-muted-foreground font-medium mt-1">
+                      {isBroadcastModalOpen 
+                        ? `Sending to all ${customers.length} platform users.`
+                        : isMessageModalOpen 
+                          ? `This will appear in ${selectedCustomer?.name}'s dashboard.` 
+                          : `Sending a direct email to ${selectedCustomer?.email}.`}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setIsMessageModalOpen(false);
+                      setIsEmailModalOpen(false);
+                      setIsBroadcastModalOpen(false);
+                    }}
+                    className="p-2 hover:bg-white/5 rounded-xl text-muted-foreground transition-all"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="bg-white/5 p-4 rounded-3xl border border-white/10 focus-within:border-primary/50 transition-all">
+                    <textarea 
+                      value={modalText}
+                      onChange={(e) => setModalText(e.target.value)}
+                      placeholder={isEmailModalOpen ? "Write your email content..." : "Type your message (e.g. feature announcement, ad)..."}
+                      className="w-full bg-transparent border-none focus:ring-0 text-sm text-white placeholder:text-muted-foreground/50 min-h-[150px] resize-none no-scrollbar font-medium"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  {!isEmailModalOpen && (
+                    <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/10 rounded-xl">
+                      <Shield className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[10px] font-black text-primary uppercase tracking-widest">Sent as Xentral Desk</span>
+                    </div>
+                  )}
+
+                  <button 
+                    onClick={isBroadcastModalOpen ? handleBroadcast : isMessageModalOpen ? handleSendMessage : handleSendEmail}
+                    disabled={isSending || !modalText.trim()}
+                    className="w-full py-4 bg-white text-black rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-white/10 hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                  >
+                    {isSending ? <Spinner size="sm" /> : (
+                      <>
+                        {isEmailModalOpen ? <Mail className="w-4 h-4" /> : <MessageSquare className="w-4 h-4" />}
+                        {isBroadcastModalOpen ? "Blast Message" : isMessageModalOpen ? "Send Message" : "Send Email"}
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

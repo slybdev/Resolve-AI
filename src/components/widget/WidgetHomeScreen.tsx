@@ -1,7 +1,9 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Send, Clock, ChevronRight, ArrowLeft } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
+import { WidgetNewsCard } from './WidgetNewsCard';
+import { WidgetChecklist } from './WidgetChecklist';
 
 interface ConversationHistoryItem {
   conversation_id: string;
@@ -23,6 +25,9 @@ interface WidgetHomeScreenProps {
   isConnected: boolean;
   avatar?: string;
   baseUrl: string;
+  newsCampaigns?: any[];
+  checklistCampaigns?: any[];
+  onDismissCampaign?: (id: string) => void;
 }
 
 export const WidgetHomeScreen = ({
@@ -35,7 +40,10 @@ export const WidgetHomeScreen = ({
   onClose,
   isConnected,
   avatar,
-  baseUrl
+  baseUrl,
+  newsCampaigns = [],
+  checklistCampaigns = [],
+  onDismissCampaign
 }: WidgetHomeScreenProps) => {
 
   const formatTimeAgo = (dateStr: string) => {
@@ -105,9 +113,25 @@ export const WidgetHomeScreen = ({
 
       {/* Content */}
       <div className={cn(
-        "flex-1 overflow-y-auto p-5 space-y-5 no-scrollbar",
+        "flex-1 overflow-y-auto p-5 space-y-6 no-scrollbar",
         theme === 'dark' ? "bg-[#1a1c1e]" : "bg-slate-50/50"
       )}>
+        {/* News Campaigns */}
+        <AnimatePresence>
+          {newsCampaigns.map((news) => (
+            <WidgetNewsCard
+              key={news.id}
+              id={news.id}
+              name={news.name}
+              message={news.message}
+              config={news.config}
+              theme={theme}
+              primaryColor={primaryColor}
+              onDismiss={onDismissCampaign || (() => {})}
+            />
+          ))}
+        </AnimatePresence>
+
         {/* Start New Chat Card */}
         <div>
           <p className={cn(
@@ -223,6 +247,20 @@ export const WidgetHomeScreen = ({
             </div>
           </div>
         )}
+
+        {/* Checklist Campaigns */}
+        <div className="space-y-4">
+          {checklistCampaigns.map((checklist) => (
+            <WidgetChecklist
+              key={checklist.id}
+              id={checklist.id}
+              name={checklist.name}
+              config={checklist.config}
+              theme={theme}
+              primaryColor={primaryColor}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Footer */}

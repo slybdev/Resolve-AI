@@ -785,7 +785,11 @@ export const AllConversations = ({
                   )} />
                   
                   <div className="relative shrink-0">
-                    {chat.identified ? (
+                    {(chat.meta_data?.is_system || chat.primary_channel === 'system') ? (
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center border border-primary/20 shadow-lg shadow-primary/20">
+                        <Bot className="w-6 h-6 text-primary-foreground" />
+                      </div>
+                    ) : chat.identified ? (
                       <LetterAvatar name={chat.customerName} size="md" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center border border-border">
@@ -813,7 +817,7 @@ export const AllConversations = ({
                         "text-sm font-bold truncate transition-colors flex items-center gap-2",
                         selectedId === chat.id ? "text-primary" : "text-foreground group-hover:text-primary/80"
                       )}>
-                        {chat.customerName}
+                        {(chat.meta_data?.is_system || chat.primary_channel === 'system') ? "Xentral Desk" : chat.customerName}
                       </h4>
                       <span className="text-[10px] text-muted-foreground font-medium shrink-0 ml-2">{chat.time}</span>
                     </div>
@@ -869,16 +873,26 @@ export const AllConversations = ({
                     
                     <div className="flex items-center gap-2 mt-1.5 transition-opacity">
                       <div className="flex items-center gap-1 px-1.5 py-0.5 bg-accent/50 rounded text-[8px] font-black text-muted-foreground uppercase tracking-tighter">
-                        {(chat.primary_channel === 'website' || chat.channel === 'website') && <Globe className="w-2.5 h-2.5" />}
-                        {(chat.primary_channel === 'whatsapp' || chat.channel === 'whatsapp') && <MessageCircle className="w-2.5 h-2.5" />}
-                        {(chat.primary_channel === 'email' || chat.channel === 'email') && <Mail className="w-2.5 h-2.5" />}
-                        {(chat.primary_channel === 'telegram' || chat.channel === 'telegram') && <Send className="w-2.5 h-2.5" />}
-                        {(chat.primary_channel === 'slack' || chat.channel === 'slack') && <Hash className="w-2.5 h-2.5" />}
-                        {(chat.primary_channel === 'voice' || chat.channel === 'voice') && <Mic className="w-2.5 h-2.5" />}
-                        <span>{chat.primary_channel || chat.channel}</span>
+                        {(chat.meta_data?.is_system || chat.primary_channel === 'system') ? (
+                          <>
+                            <Bot className="w-2.5 h-2.5" />
+                            <span>Xentral Desk</span>
+                          </>
+                        ) : (
+                          <>
+                            {(chat.primary_channel === 'website' || chat.channel === 'website') && <Globe className="w-2.5 h-2.5" />}
+                            {(chat.primary_channel === 'whatsapp' || chat.channel === 'whatsapp') && <MessageCircle className="w-2.5 h-2.5" />}
+                            {(chat.primary_channel === 'email' || chat.channel === 'email') && <Mail className="w-2.5 h-2.5" />}
+                            {(chat.primary_channel === 'telegram' || chat.channel === 'telegram') && <Send className="w-2.5 h-2.5" />}
+                            {(chat.primary_channel === 'slack' || chat.channel === 'slack') && <Hash className="w-2.5 h-2.5" />}
+                            {(chat.primary_channel === 'voice' || chat.channel === 'voice') && <Mic className="w-2.5 h-2.5" />}
+                            <span>{chat.primary_channel || chat.channel}</span>
+                          </>
+                        )}
                       </div>
 
-                      {(chat.assigned_to || chat.status === 'closed' || chat.status === 'resolved') && (
+
+                      {(!(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (chat.assigned_to || chat.status === 'closed' || chat.status === 'resolved')) && (
                         <div className={cn(
                           "flex items-center gap-1 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-tighter border animate-in fade-in slide-in-from-left-1 duration-300",
                           (chat.status === 'closed' || chat.status === 'resolved')
@@ -953,7 +967,11 @@ export const AllConversations = ({
                     onClick={() => setIsDetailsOpen(true)}
                     title="Show Customer Details"
                   >
-                    {currentConversation?.identified ? (
+                    {(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? (
+                      <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center border border-primary/20">
+                        <Bot className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                    ) : currentConversation?.identified ? (
                       <LetterAvatar 
                         name={activeConversationMetadata?.customerName || currentConversation?.customerName || '?'} 
                         size="sm" 
@@ -975,10 +993,10 @@ export const AllConversations = ({
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
                         <h3 className="text-sm font-bold text-foreground truncate">
-                          {activeConversationMetadata?.customerName || currentConversation?.customerName}
+                          {(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? "Xentral Desk" : (activeConversationMetadata?.customerName || currentConversation?.customerName)}
                         </h3>
                       </div>
-                      {currentConversation?.meta_data?.ip_address && (
+                      {currentConversation?.meta_data?.ip_address && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (
                         <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tighter leading-none mt-0.5">
                           {currentConversation.meta_data.ip_address} • {currentConversation.meta_data.timezone || 'UTC'}
                         </p>
@@ -1011,7 +1029,7 @@ export const AllConversations = ({
                 */}
                 
                 <div className="flex items-center gap-1 bg-accent/30 p-1 rounded-full border border-border/50">
-                  {(conversationsList.find(c => c.id === selectedId)?.channel !== 'email') && (
+                  {(conversationsList.find(c => c.id === selectedId)?.channel !== 'email' && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system')) && (
                     <>
                       <button 
                         className="w-7 h-7 flex items-center justify-center hover:bg-accent rounded-full text-foreground transition-all"
@@ -1033,6 +1051,7 @@ export const AllConversations = ({
                   </button>
                 </div>
 
+                {!(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (
                 <button 
                   onClick={() => setIsTicketModalOpen(true)}
                   className="flex items-center gap-2 px-3 py-1.5 bg-accent hover:bg-accent/80 text-foreground rounded-full text-[11px] font-bold transition-all border border-border shadow-sm group"
@@ -1040,14 +1059,17 @@ export const AllConversations = ({
                   <Ticket className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
                   <span className="hidden md:inline">Create Ticket</span>
                 </button>
+                )}
 
+                {!currentConversation?.meta_data?.is_system && (
                 <button className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-full text-[11px] font-bold hover:opacity-90 transition-all shadow-sm" onClick={handleCloseConversation} disabled={isClosing}>
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span className="hidden md:inline">{isClosing ? 'Closing...' : 'Close'}</span>
                 </button>
+                )}
 
                 {/* AI Handoff Button (Optimistic) */}
-                {currentConversation?.routing_mode === 'human' && currentConversation?.assigned_to === currentUser?.id && (
+                {currentConversation?.routing_mode === 'human' && currentConversation?.assigned_to === currentUser?.id && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (
                   <button 
                     onClick={async () => {
                       if (!selectedId) return;
@@ -1123,30 +1145,35 @@ export const AllConversations = ({
               </div>
 
               <AnimatePresence mode="popLayout">
-                {(messages[selectedId] || []).filter(m => m.sender !== 'system').map((msg) => (
+                {(messages[selectedId] || []).map((msg) => (
                   <motion.div 
                     key={msg.id}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={cn(
                       "flex gap-3 max-w-[85%]",
-                      (msg.sender === 'ai' || msg.sender === 'human') && "ml-auto flex-row-reverse",
-                      (msg.isInternal || msg.sender === 'system') && "max-w-full w-full justify-center"
+                      ((msg.sender === 'ai' || msg.sender === 'human' || msg.sender === 'agent') && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system')) && "ml-auto flex-row-reverse",
+                      ((msg.sender === 'system' || msg.sender === 'customer') || (currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system')) && "mr-auto",
+                      (msg.isInternal) && "max-w-full w-full justify-center"
                     )}
                   >
                     {msg.isInternal ? (
                       <CollapsibleNote msg={msg} />
                     ) : msg.sender === 'system' ? (
-                      <div className="flex flex-col items-center gap-1 my-2">
-                        <div className="px-4 py-1.5 rounded-full bg-accent dark:bg-accent/50 backdrop-blur-sm shadow-sm border border-border">
-                          <span className="text-[10px] font-black tracking-[0.2em] uppercase text-muted-foreground dark:text-muted-foreground/80">
-                            {msg.text || 'System Event'}
-                          </span>
-                        </div>
-                        <span className="text-[9px] font-medium text-muted-foreground/60 tracking-wider">
-                          {msg.time}
-                        </span>
-                      </div>
+                      <>
+                         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-lg">
+                           <Bot className="w-5 h-5 text-primary-foreground" />
+                         </div>
+                         <div className="space-y-1 min-w-0 text-left">
+                           <div className="rounded-2xl text-sm shadow-lg border overflow-hidden backdrop-blur-md bg-zinc-100 dark:bg-black/60 border-zinc-200 dark:border-white/10 text-bubble-agent rounded-tl-none p-3">
+                             <ExpandableMessage text={msg.text} sender="system" />
+                           </div>
+                           <div className="flex items-center justify-start gap-1 text-[10px] text-muted-foreground ml-1">
+                             <span className="px-1 bg-primary/10 text-primary rounded-[2px] font-black text-[7px] uppercase tracking-tighter">Xentral Desk</span>
+                             <span>• {msg.time}</span>
+                           </div>
+                         </div>
+                      </>
                     ) : (
                       <>
                         {msg.sender === 'customer' ? (
@@ -1166,13 +1193,13 @@ export const AllConversations = ({
                         )}
                         <div className={cn(
                           "space-y-1 min-w-0",
-                          (msg.sender === 'ai' || msg.sender === 'human') && "text-right"
+                          ((msg.sender === 'ai' || msg.sender === 'human') && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system')) && "text-right"
                         )}>
                           <div className={cn(
                             "rounded-2xl text-sm shadow-lg border overflow-hidden backdrop-blur-md",
                             msg.sender === 'customer' 
                               ? "bg-blue-500/20 dark:bg-blue-500/40 border-blue-500/30 dark:border-blue-400/20 text-bubble-customer rounded-tl-none" 
-                              : "bg-zinc-100 dark:bg-black/60 border-zinc-200 dark:border-white/10 text-bubble-agent rounded-tr-none",
+                              : cn("bg-zinc-100 dark:bg-black/60 border-zinc-200 dark:border-white/10 text-bubble-agent", (currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? "rounded-tl-none" : "rounded-tr-none"),
                             (msg.type === 'image' || msg.type === 'video') && "p-1"
                           )}>
                             {msg.type === 'image' ? (
@@ -1226,11 +1253,14 @@ export const AllConversations = ({
                           </div>
                           <div className={cn(
                             "flex items-center gap-1 text-[10px] text-muted-foreground",
-                            (msg.sender === 'ai' || msg.sender === 'human') ? "justify-end mr-1" : "ml-1"
+                            ((msg.sender === 'ai' || msg.sender === 'human' || msg.sender === 'agent') && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system')) ? "justify-end mr-1" : "ml-1"
                           )}>
+                            {(msg.sender === 'ai' || ((currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (msg.sender === 'human' || msg.sender === 'agent'))) && (
+                              <span className="px-1 bg-primary/10 text-primary rounded-[2px] font-black text-[7px] uppercase tracking-tighter">Xentral Desk</span>
+                            )}
                             {msg.sender === 'ai' && <ShieldCheck className="w-3 h-3 text-blue-400" />}
                             <span>
-                              {msg.sender === 'ai' ? 'AI Assistant' : msg.sender === 'human' ? 'You' : ''} {msg.sender !== 'customer' && '• '} {msg.time}
+                              {msg.sender === 'ai' ? 'AI Assistant' : (msg.sender === 'human' || msg.sender === 'agent') ? ((currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? '' : 'You') : ''} {msg.sender !== 'customer' && msg.sender !== 'system' && '• '} {msg.time}
                             </span>
                           </div>
                         </div>
@@ -1244,9 +1274,10 @@ export const AllConversations = ({
             </div>
 
             {/* Reply Area with Collision Guard */}
+            {!(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? (
             <div className="p-6 border-t border-border bg-card relative">
               {/* Guards Overlay (Mutually Exclusive) */}
-              {currentConversation?.assigned_to && currentConversation?.assigned_to !== currentUser?.id && !['closed', 'resolved'].includes(currentConversation?.status) ? (
+              {currentConversation?.assigned_to && currentConversation?.assigned_to !== currentUser?.id && !['closed', 'resolved'].includes(currentConversation?.status) && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? (
                 <div className="absolute inset-x-0 bottom-0 top-0 z-20 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center border-t border-border">
                   <div className="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center mb-3">
                     <Lock className="w-6 h-6 text-orange-600" />
@@ -1256,7 +1287,7 @@ export const AllConversations = ({
                     This chat is currently being handled by another agent to prevent conflicting responses.
                   </p>
                 </div>
-              ) : currentConversation?.routing_mode === 'ai' ? (
+              ) : currentConversation?.routing_mode === 'ai' && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? (
                 <div className="absolute inset-x-0 bottom-0 top-0 z-20 bg-primary/5 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center border-t border-primary/20">
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(var(--primary),0.3)] border border-primary/20">
                     <Bot className="w-6 h-6 text-primary animate-pulse" />
@@ -1301,7 +1332,7 @@ export const AllConversations = ({
                   </button>
                 </div>
               ) : null}
-
+              
               <div className="flex items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-4">
                   <button 
@@ -1502,6 +1533,17 @@ export const AllConversations = ({
               />
               </div>
             </div>
+            ) : (
+              <div className="p-8 border-t border-border bg-accent/5 flex flex-col items-center justify-center text-center">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                  <ShieldCheck className="w-6 h-6 text-primary" />
+                </div>
+                <h4 className="text-sm font-black text-foreground uppercase tracking-widest mb-1">Xentral Desk Only</h4>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-tight max-w-[250px]">
+                  Only Xentral Desk can send messages in this specialized system thread.
+                </p>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -1605,7 +1647,13 @@ export const AllConversations = ({
               </button>
               <div className="flex flex-col items-center text-center mb-6">
                 <div className="relative mb-4">
-                  <LetterAvatar name={conversationsList.find(c => c.id === selectedId)?.customerName || '?'} size="lg" />
+                  {(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? (
+                    <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center border border-primary/20 shadow-2xl shadow-primary/30">
+                      <Bot className="w-10 h-10 text-primary-foreground" />
+                    </div>
+                  ) : (
+                    <LetterAvatar name={conversationsList.find(c => c.id === selectedId)?.customerName || '?'} size="lg" />
+                  )}
                 </div>
                 <div className="group relative">
                   {isEditingContact ? (
@@ -1659,10 +1707,13 @@ export const AllConversations = ({
                     </div>
                   ) : (
                     <>
-                      <h3 className="text-lg font-bold text-foreground leading-tight">{currentConversation?.customerName}</h3>
-                      {currentConversation?.customerEmail && (
+                      <h3 className="text-lg font-bold text-foreground leading-tight">
+                        {(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') ? "Xentral Desk" : currentConversation?.customerName}
+                      </h3>
+                      {currentConversation?.customerEmail && !(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (
                         <p className="text-[11px] text-primary font-medium mt-1">{currentConversation?.customerEmail}</p>
                       )}
+                      {!(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (
                       <button 
                         onClick={() => {
                           setEditName(currentConversation?.customerName || '');
@@ -1674,6 +1725,7 @@ export const AllConversations = ({
                       >
                         <Edit2 className="w-3 h-3" />
                       </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -1683,6 +1735,7 @@ export const AllConversations = ({
                 </div>
               </div>
 
+              {!(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (
               <div className="grid grid-cols-2 gap-2">
                 <button 
                   onClick={() => setIsAssignModalOpen(true)}
@@ -1699,6 +1752,7 @@ export const AllConversations = ({
                   Escalate
                 </button>
               </div>
+              )}
             </div>
 
             <div className="flex-1 overflow-y-auto p-5 space-y-8 no-scrollbar">
@@ -1778,6 +1832,7 @@ export const AllConversations = ({
           </div>
         </div>
 
+        {!(currentConversation?.meta_data?.is_system || currentConversation?.primary_channel === 'system') && (
         <div className="p-6 border-t border-border space-y-3">
           <button 
             onClick={handleCloseConversation}
@@ -1792,6 +1847,7 @@ export const AllConversations = ({
             )}
           </button>
         </div>
+        )}
       </>
     )}
   </div>

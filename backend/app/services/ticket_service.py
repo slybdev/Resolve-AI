@@ -214,7 +214,12 @@ class TicketService:
         if status:
             query = query.where(Ticket.status == status)
             
-        result = await db.execute(query.order_by(Ticket.created_at.desc()))
+        query = query.options(
+            selectinload(Ticket.assigned_team),
+            selectinload(Ticket.sla_tracking)
+        ).order_by(Ticket.created_at.desc())
+        
+        result = await db.execute(query)
         return result.scalars().all()
 
     @staticmethod

@@ -292,6 +292,57 @@ async def get_campaign_stats(
         "open_rate": (campaign.opened_count / campaign.sent_count * 100) if campaign.sent_count > 0 else 0
     }
 
+@router.post("/campaigns", response_model=CampaignResponse, status_code=status.HTTP_201_CREATED)
+async def create_campaign(
+    workspace_id: uuid.UUID,
+    campaign_in: CampaignCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    campaign = Campaign(
+        **campaign_in.model_dump(),
+        workspace_id=workspace_id
+    )
+    db.add(campaign)
+    await db.commit()
+    await db.refresh(campaign)
+    return campaign
+
+@router.patch("/campaigns/{campaign_id}", response_model=CampaignResponse)
+async def update_campaign(
+    campaign_id: uuid.UUID,
+    campaign_in: CampaignUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(select(Campaign).where(Campaign.id == campaign_id))
+    campaign = result.scalar_one_or_none()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    update_data = campaign_in.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(campaign, key, value)
+    
+    await db.commit()
+    await db.refresh(campaign)
+    return campaign
+
+@router.delete("/campaigns/{campaign_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_campaign(
+    campaign_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    result = await db.execute(select(Campaign).where(Campaign.id == campaign_id))
+    campaign = result.scalar_one_or_none()
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    await db.delete(campaign)
+    await db.commit()
+    return None
+
 # ── Escalations ──
 
 @router.get("/escalations/rules", response_model=List[EscalationRuleResponse])

@@ -83,13 +83,33 @@ class APIClient {
     logout: () => {
       this.setToken(null);
     },
-    getMe: async () => this.request('/auth/me'),
+    getMe: () => this.request('/auth/me'),
+    listUsers: () => this.request('/auth/users'),
+    sendMessage: (userId: string, message: string) => 
+      this.request(`/auth/users/${userId}/message`, { 
+        method: 'POST', 
+        body: JSON.stringify({ message }) 
+      }),
+    sendEmail: (userId: string, message: string) => 
+      this.request(`/auth/users/${userId}/email`, { 
+        method: 'POST', 
+        body: JSON.stringify({ message }) 
+      }),
   };
 
   // CRM: Contacts
   contacts = {
-    list: (workspaceId: string, page = 1, size = 20) => 
-      this.request(`/contacts/?workspace_id=${workspaceId}&page=${page}&size=${size}`),
+    list: (workspaceId: string, params?: { segment?: string, tag?: string, page?: number, size?: number }) => {
+      const searchParams = new URLSearchParams();
+      searchParams.append('workspace_id', workspaceId);
+      if (params?.segment) searchParams.append('segment', params.segment);
+      if (params?.tag) searchParams.append('tag', params.tag);
+      if (params?.page) searchParams.append('page', params.page.toString());
+      if (params?.size) searchParams.append('size', params.size.toString());
+      
+      return this.request(`/contacts/?${searchParams.toString()}`);
+    },
+    stats: (workspaceId: string) => this.request(`/contacts/stats?workspace_id=${workspaceId}`),
     get: (id: string) => this.request(`/contacts/${id}`),
     create: (workspaceId: string, data: any) => 
       this.request(`/contacts/?workspace_id=${workspaceId}`, {
@@ -614,6 +634,13 @@ class APIClient {
       create: (workspaceId: string, data: any) => this.request(`/automations/campaigns?workspace_id=${workspaceId}`, {
         method: 'POST',
         body: JSON.stringify(data),
+      }),
+      update: (id: string, data: any) => this.request(`/automations/campaigns/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      }),
+      delete: (id: string) => this.request(`/automations/campaigns/${id}`, {
+        method: 'DELETE',
       }),
     },
     logs: {

@@ -40,10 +40,11 @@ class ConversationRead(BaseModel):
     assigned_to: Optional[UUID] = None
     updated_at: Optional[datetime] = None
     routing_mode: str = "human"
-    identified: bool = False
+    identified: Optional[bool] = False
     customerEmail: Optional[str] = None
     primary_channel: Optional[str] = None
     channels_used: Optional[List[str]] = []
+    meta_data: Optional[dict] = {}
 
     class Config:
         from_attributes = True

@@ -115,14 +115,19 @@ class WorkflowResponse(BaseModel):
 class CampaignCreate(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     message: str = Field(min_length=1, max_length=5000)
+    type: str = "news"
+    status: Optional[str] = "draft"
     audience_filters: Dict[str, Any] = Field(default_factory=dict)
+    config: Optional[Dict[str, Any]] = Field(default_factory=dict)
     channel: str = "email"
     scheduled_at: Optional[datetime] = None
 
 class CampaignUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=255)
     message: Optional[str] = Field(None, max_length=5000)
+    type: Optional[str] = None
     audience_filters: Optional[Dict[str, Any]] = None
+    config: Optional[Dict[str, Any]] = None
     status: Optional[str] = None
     channel: Optional[str] = None
     scheduled_at: Optional[datetime] = None
@@ -132,7 +137,9 @@ class CampaignResponse(BaseModel):
     workspace_id: uuid.UUID
     name: str
     message: str
+    type: str
     audience_filters: Dict[str, Any]
+    config: Optional[Dict[str, Any]] = Field(default_factory=dict)
     status: str
     channel: str
     scheduled_at: Optional[datetime] = None

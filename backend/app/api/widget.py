@@ -13,6 +13,8 @@ from app.core.dependencies import get_db
 from app.models.channel import Channel, ChannelType
 from app.models.workspace import Workspace
 from app.models.ticket import Ticket
+from app.models.campaign import Campaign
+from app.schemas.automation import CampaignResponse
 from app.core import security
 from app.services.identity_service import IdentityService, ComplianceLayer
 import datetime
@@ -867,3 +869,29 @@ async def submit_widget_rating(
     await db.commit()
 
     return {"status": "success", "rating_id": str(rating.id)}
+
+@router.get("/campaigns", response_model=List[CampaignResponse])
+async def get_widget_campaigns(
+    workspace_key: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Returns active campaigns (banners, news, etc.) for the widget.
+    """
+    result = await db.execute(select(Workspace).where(Workspace.public_key == workspace_key))
+    workspace = result.scalar_one_or_none()
+    if not workspace:
+        raise HTTPException(status_code=404, detail="Invalid workspace key.")
+        
+    await verify_widget_origin(workspace, request)
+    
+    # Fetch campaigns that are actively running (status = 'running')
+    result = await db.execute(
+        select(Campaign)
+        .where(
+            Campaign.workspace_id == workspace.id,
+            Campaign.status.in_(["running", "active"])
+        )
+    )
+    return result.scalars().all()

@@ -12,6 +12,28 @@ from app.services.ai_service import AIService
 router = APIRouter(prefix="/api/v1/ai", tags=["ai"])
 logger = logging.getLogger(__name__)
 
+@router.post("/query", response_model=AIQueryResponse)
+async def ai_query(
+    request: AIQueryRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Execute a direct RAG query against the knowledge base."""
+    try:
+        result = await AIService.query(
+            db=db,
+            user_id=current_user.id,
+            workspace_id=request.workspace_id,
+            query_text=request.query,
+            conversation_id=request.conversation_id,
+            folder_id=request.folder_id
+        )
+        return result
+    except Exception as e:
+        logger.error(f"Error in AI query endpoint: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/config/{workspace_id}", response_model=AIConfigurationOut)
 async def get_ai_config(
     workspace_id: UUID,
