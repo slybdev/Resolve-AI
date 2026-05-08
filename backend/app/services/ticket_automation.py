@@ -17,28 +17,26 @@ async def widget_auto_ticket_handler(db: AsyncSession, message: Message):
     Automatically creates a Support Ticket when a new message 
     is received via the Chat Widget channel.
     """
-    # 1. Check if it's a widget message from a customer
+    # 1. Check if it's a customer message
     if message.sender_type != "customer":
         return
 
-    result = await db.execute(
-        select(Conversation).where(Conversation.id == message.conversation_id)
-    )
-    conversation = result.scalar_one_or_none()
+    # 2. Get the conversation
+    conversation = message.conversation
+    if not conversation:
+        result = await db.execute(
+            select(Conversation).where(Conversation.id == message.conversation_id)
+        )
+        conversation = result.scalar_one_or_none()
+    
     if not conversation:
         return
         
-    # We need the channel to check the channel type
-    from app.models.channel import Channel
-    result = await db.execute(
-        select(Channel).where(Channel.id == message.channel_id)
-    )
-    channel = result.scalar_one_or_none()
-    
-    if not channel or channel.type != ChannelType.WIDGET:
+    # 3. Check if it's a widget conversation
+    if conversation.primary_channel != "widget":
         return
 
-    # 3. Check if ticket already exists for this conversation
+    # 4. Check if ticket already exists for this conversation
     result = await db.execute(
         select(Ticket).where(Ticket.conversation_id == message.conversation_id).order_by(Ticket.created_at.desc())
     )
@@ -47,7 +45,7 @@ async def widget_auto_ticket_handler(db: AsyncSession, message: Message):
     if not existing_ticket:
         logger.info(f"Auto-creating ticket for Widget conversation: {message.conversation_id}")
         
-        # 4. Create the Ticket (with AI Triage enabled)
+        # 5. Create the Ticket (with AI Triage enabled)
         customer_name = conversation.meta_data.get("customer_name", "Web Visitor") if conversation.meta_data else "Web Visitor"
         
         ticket_in = TicketCreate(
@@ -64,5 +62,4 @@ async def widget_auto_ticket_handler(db: AsyncSession, message: Message):
 
 # Register the handler globally
 def initialize_ticket_automation():
-    # register_handler(widget_auto_ticket_handler)
-    pass
+    register_handler(widget_auto_ticket_handler)
