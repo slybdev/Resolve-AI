@@ -151,12 +151,17 @@ const Dashboard = () => {
           setSelectedConversationId(null);
       }
       
-      if (view === 'campaign-builder' && id) {
+      if (view === 'campaign-builder') {
+        if (id) {
           setSelectedCampaignId(id);
           searchParams.set('campaign_id', id);
-      } else if (view !== 'campaign-builder') {
-          searchParams.delete('campaign_id');
+        } else {
           setSelectedCampaignId(null);
+          searchParams.delete('campaign_id');
+        }
+      } else if (view !== 'campaign-builder') {
+        searchParams.delete('campaign_id');
+        setSelectedCampaignId(null);
       }
       
       window.history.pushState({}, '', `${window.location.pathname}?${searchParams.toString()}`);
@@ -250,7 +255,7 @@ const Dashboard = () => {
       case 'outbound': return <Outbound workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
       case 'campaign-builder': return <CampaignBuilder workspaceId={workspaceId} campaignId={selectedCampaignId} onBack={handleBack} />;
       case 'product-tours': return <Outbound workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
-      case 'news': return <News workspaceId={workspaceId} />;
+      case 'news': return <News workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
       case 'help-center': return <HelpCenter workspaceId={workspaceId} />;
       case 'website-chat': return <WebsiteChatChannel workspaceId={workspaceId} />;
       case 'email': return <EmailChannel workspaceId={workspaceId} />;

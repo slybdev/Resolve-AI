@@ -19,6 +19,9 @@ import {
 } from 'lucide-react';
 import { cn } from '@/src/lib/utils';
 import { motion } from 'framer-motion';
+import { api } from '@/src/lib/api';
+import { Spinner } from '@/src/components/ui/ios-spinner';
+import { useToast } from '@/src/components/ui/Toast';
 
 interface NewsItem {
   id: string;
@@ -38,8 +41,66 @@ const newsItems: NewsItem[] = [
   { id: '4', title: 'New Integration: Slack & Microsoft Teams', status: 'draft', author: 'Bruce Banner', views: 0, clicks: 0, date: 'Mar 15, 2026', category: 'Integrations' },
 ];
 
-export const News = ({ workspaceId }: { workspaceId: string }) => {
+export const News = ({ workspaceId, onSelectCampaign }: { workspaceId: string, onSelectCampaign: (id: string | null) => void }) => {
   const [activeTab, setActiveTab] = useState<'all' | 'published' | 'drafts'>('all');
+  const [campaigns, setCampaigns] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const { toast } = useToast();
+
+  const fetchCampaigns = React.useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await api.automations.campaigns.list(workspaceId);
+      setCampaigns(data.filter((c: any) => c.type === 'news'));
+    } catch (error: any) {
+      toast("Error", "Failed to fetch news updates: " + error.message, "error");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [workspaceId, toast]);
+
+  React.useEffect(() => {
+    fetchCampaigns();
+  }, [fetchCampaigns]);
+
+  const stats = React.useMemo(() => {
+    const published = campaigns.filter(c => c.status === 'running' || c.status === 'published');
+    const scheduled = campaigns.filter(c => c.status === 'scheduled');
+    const totalViews = campaigns.reduce((acc, c) => acc + (c.opened_count || 0), 0);
+    const totalSent = campaigns.reduce((acc, c) => acc + (c.sent_count || 0), 0);
+    const avgCtr = totalSent > 0 ? (totalViews / totalSent * 100).toFixed(1) : '0';
+
+    return [
+      { label: 'Total Views', value: totalViews.toLocaleString(), icon: Eye, color: 'text-blue-500' },
+      { label: 'Avg. CTR', value: `${avgCtr}%`, icon: BarChart3, color: 'text-green-500' },
+      { label: 'Active Updates', value: published.length.toString(), icon: Megaphone, color: 'text-purple-500' },
+      { label: 'Scheduled', value: scheduled.length.toString(), icon: Calendar, color: 'text-orange-500' },
+    ];
+  }, [campaigns]);
+
+  const filteredItems = campaigns.filter(item => {
+    const matchesTab = 
+      activeTab === 'all' ? true :
+      activeTab === 'published' ? (item.status === 'running' || item.status === 'published') :
+      activeTab === 'drafts' ? (item.status === 'draft') : true;
+    
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          (item.category || '').toLowerCase().includes(searchQuery.toLowerCase());
+    
+    return matchesTab && matchesSearch;
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this update?")) return;
+    try {
+      await api.automations.campaigns.delete(id);
+      toast("Deleted", "Update removed successfully.", "success");
+      fetchCampaigns();
+    } catch (error: any) {
+      toast("Error", "Failed to delete: " + error.message, "error");
+    }
+  };
 
   return (
     <div className="flex h-full w-full bg-transparent overflow-hidden gap-2 p-2">
@@ -51,20 +112,21 @@ export const News = ({ workspaceId }: { workspaceId: string }) => {
               <h1 className="text-3xl font-bold text-foreground">News & Updates</h1>
               <p className="text-muted-foreground">Announce new features and updates directly in the messenger.</p>
             </div>
-            <button className="flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold hover:opacity-90 transition-all btn-press shadow-lg shadow-primary/20">
+            <button 
+              type="button"
+              onClick={() => {
+                console.log("Create Update clicked");
+                onSelectCampaign(null);
+              }}
+              className="relative flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-2xl font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20 z-20 cursor-pointer"
+            >
               <Plus className="w-4 h-4" />
-              Create Update
+              <span>Create Update</span>
             </button>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-4 gap-4">
-            {[
-              { label: 'Total Views', value: '2.1k', icon: Eye, color: 'text-blue-500' },
-              { label: 'Avg. CTR', value: '18.4%', icon: BarChart3, color: 'text-green-500' },
-              { label: 'Active Updates', value: '12', icon: Megaphone, color: 'text-purple-500' },
-              { label: 'Scheduled', value: '3', icon: Calendar, color: 'text-orange-500' },
-            ].map((stat, i) => (
+            {stats.map((stat, i) => (
               <div key={i} className="p-6 bg-card border border-border rounded-3xl space-y-2 card-hover">
                 <div className="flex items-center justify-between">
                   <stat.icon className={cn("w-5 h-5", stat.color)} />
@@ -100,6 +162,8 @@ export const News = ({ workspaceId }: { workspaceId: string }) => {
                 <input 
                   type="text" 
                   placeholder="Search updates..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 pr-4 py-2 bg-accent/50 border border-border rounded-xl text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/20 w-64"
                 />
               </div>
@@ -124,50 +188,74 @@ export const News = ({ workspaceId }: { workspaceId: string }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {newsItems.map((item) => (
-                  <tr key={item.id} className="hover:bg-accent/20 transition-colors group cursor-pointer">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shrink-0">
-                          <Megaphone className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{item.title}</p>
-                          <p className="text-[10px] text-muted-foreground">{item.category}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className={cn(
-                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
-                        item.status === 'published' ? "bg-green-500/10 text-green-500" :
-                        item.status === 'scheduled' ? "bg-blue-500/10 text-blue-500" :
-                        "bg-yellow-500/10 text-yellow-500"
-                      )}>
-                        {item.status === 'published' && <CheckCircle2 className="w-3 h-3" />}
-                        {item.status === 'scheduled' && <Clock className="w-3 h-3" />}
-                        {item.status === 'draft' && <AlertCircle className="w-3 h-3" />}
-                        {item.status}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-accent border border-border flex items-center justify-center text-[10px] font-bold">
-                          {item.author[0]}
-                        </div>
-                        <span className="text-xs text-foreground">{item.author}</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-xs text-foreground font-mono">{item.views.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-xs text-foreground font-mono">{item.clicks.toLocaleString()}</td>
-                    <td className="px-6 py-4 text-xs text-muted-foreground">{item.date}</td>
-                    <td className="px-6 py-4 text-right">
-                      <button className="p-2 hover:bg-accent rounded-lg text-muted-foreground transition-all">
-                        <MoreHorizontal className="w-4 h-4" />
-                      </button>
+                {isLoading ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center">
+                      <Spinner size="lg" />
                     </td>
                   </tr>
-                ))}
+                ) : filteredItems.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground text-sm font-medium">
+                      No updates found.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredItems.map((item) => (
+                    <tr 
+                      key={item.id} 
+                      onClick={() => onSelectCampaign(item.id)}
+                      className="hover:bg-accent/20 transition-colors group cursor-pointer"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shrink-0">
+                            <Megaphone className="w-5 h-5 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">{item.name}</p>
+                            <p className="text-[10px] text-muted-foreground">{item.category || 'General'}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className={cn(
+                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                          (item.status === 'running' || item.status === 'published') ? "bg-green-500/10 text-green-500" :
+                          item.status === 'scheduled' ? "bg-blue-500/10 text-blue-500" :
+                          "bg-yellow-500/10 text-yellow-500"
+                        )}>
+                          {(item.status === 'running' || item.status === 'published') && <CheckCircle2 className="w-3 h-3" />}
+                          {item.status === 'scheduled' && <Clock className="w-3 h-3" />}
+                          {item.status === 'draft' && <AlertCircle className="w-3 h-3" />}
+                          {item.status === 'running' ? 'published' : item.status}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-accent border border-border flex items-center justify-center text-[10px] font-bold uppercase">
+                            {(item.creator_name || 'U')[0]}
+                          </div>
+                          <span className="text-xs text-foreground">{item.creator_name || 'System User'}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-xs text-foreground font-mono">{(item.opened_count || 0).toLocaleString()}</td>
+                      <td className="px-6 py-4 text-xs text-foreground font-mono">{(item.replied_count || 0).toLocaleString()}</td>
+                      <td className="px-6 py-4 text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</td>
+                      <td className="px-6 py-4 text-right">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(item.id);
+                          }}
+                          className="p-2 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -200,13 +288,17 @@ export const News = ({ workspaceId }: { workspaceId: string }) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-4 no-scrollbar">
-              {newsItems.filter(i => i.status === 'published').map(item => (
-                <div key={item.id} className="p-4 bg-accent/50 border border-border rounded-2xl space-y-2 hover:bg-accent transition-all cursor-pointer group">
+              {campaigns.filter(i => i.status === 'running' || i.status === 'published').map(item => (
+                <div 
+                  key={item.id} 
+                  onClick={() => onSelectCampaign(item.id)}
+                  className="p-4 bg-accent/50 border border-border rounded-2xl space-y-2 hover:bg-accent transition-all cursor-pointer group"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-[8px] font-bold text-primary uppercase tracking-widest">{item.category}</span>
-                    <span className="text-[8px] text-muted-foreground">{item.date}</span>
+                    <span className="text-[8px] font-bold text-primary uppercase tracking-widest">{item.category || 'General'}</span>
+                    <span className="text-[8px] text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</span>
                   </div>
-                  <h5 className="text-xs font-bold text-foreground leading-snug group-hover:text-primary transition-colors">{item.title}</h5>
+                  <h5 className="text-xs font-bold text-foreground leading-snug group-hover:text-primary transition-colors">{item.name}</h5>
                   <div className="flex items-center gap-1 text-[8px] text-muted-foreground">
                     <span>Read more</span>
                     <ArrowRight className="w-2 h-2" />

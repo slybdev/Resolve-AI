@@ -121,6 +121,7 @@ class CampaignCreate(BaseModel):
     config: Optional[Dict[str, Any]] = Field(default_factory=dict)
     channel: str = "email"
     scheduled_at: Optional[datetime] = None
+    category: Optional[str] = None
 
 class CampaignUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=255)
@@ -131,6 +132,7 @@ class CampaignUpdate(BaseModel):
     status: Optional[str] = None
     channel: Optional[str] = None
     scheduled_at: Optional[datetime] = None
+    category: Optional[str] = None
 
 class CampaignResponse(BaseModel):
     id: uuid.UUID
@@ -143,6 +145,9 @@ class CampaignResponse(BaseModel):
     status: str
     channel: str
     scheduled_at: Optional[datetime] = None
+    category: Optional[str] = None
+    created_by: Optional[uuid.UUID] = None
+    creator_name: Optional[str] = None
     sent_count: int
     delivered_count: int
     opened_count: int

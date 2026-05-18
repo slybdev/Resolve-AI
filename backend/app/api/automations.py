@@ -270,8 +270,30 @@ async def list_campaigns(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    result = await db.execute(select(Campaign).where(Campaign.workspace_id == workspace_id))
-    return result.scalars().all()
+    from app.models.user import User as UserModel
+    result = await db.execute(
+        select(Campaign, UserModel.full_name, UserModel.email)
+        .outerjoin(UserModel, Campaign.created_by == UserModel.id)
+        .where(Campaign.workspace_id == workspace_id)
+    )
+    
+    campaigns = []
+    for row in result.all():
+        camp = row[0]
+        full_name = row[1]
+        email = row[2]
+        
+        # Fallback for creator name: use email username if full_name is generic or missing
+        if full_name and full_name != 'System User' and full_name != email:
+            camp.creator_name = full_name
+        elif email:
+            camp.creator_name = email.split('@')[0]
+        else:
+            camp.creator_name = 'System User'
+            
+        campaigns.append(camp)
+        
+    return campaigns
 
 @router.get("/campaigns/{campaign_id}/stats", response_model=Dict[str, Any])
 async def get_campaign_stats(
@@ -301,11 +323,23 @@ async def create_campaign(
 ):
     campaign = Campaign(
         **campaign_in.model_dump(),
-        workspace_id=workspace_id
+        workspace_id=workspace_id,
+        created_by=current_user.id
     )
     db.add(campaign)
     await db.commit()
     await db.refresh(campaign)
+    
+    # Set creator_name for the response
+    full_name = current_user.full_name
+    email = current_user.email
+    if full_name and full_name != 'System User' and full_name != email:
+        campaign.creator_name = full_name
+    elif email:
+        campaign.creator_name = email.split('@')[0]
+    else:
+        campaign.creator_name = 'System User'
+        
     return campaign
 
 @router.patch("/campaigns/{campaign_id}", response_model=CampaignResponse)

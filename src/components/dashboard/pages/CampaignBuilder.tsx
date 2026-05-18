@@ -46,6 +46,10 @@ export const CampaignBuilder = ({ workspaceId, campaignId, onBack }: CampaignBui
     { id: '1', title: 'Get started', description: 'Create your first workspace' }
   ]);
 
+  const [category, setCategory] = useState('Product Update');
+  const [scheduledAt, setScheduledAt] = useState<string | null>(null);
+  const [isScheduling, setIsScheduling] = useState(false);
+
   const [previewTheme, setPreviewTheme] = useState<'light' | 'dark'>('dark');
 
   useEffect(() => {
@@ -68,6 +72,11 @@ export const CampaignBuilder = ({ workspaceId, campaignId, onBack }: CampaignBui
           if (campaign.type === 'news') setNewsConfig(campaign.config);
           if (campaign.type === 'tour') setTourSteps(campaign.config.steps || []);
           if (campaign.type === 'checklist') setChecklistItems(campaign.config.items || []);
+        }
+        if (campaign.category) setCategory(campaign.category);
+        if (campaign.scheduled_at) {
+          setScheduledAt(new Date(campaign.scheduled_at).toISOString().slice(0, 16));
+          setIsScheduling(true);
         }
       }
     } catch (error) {
@@ -98,8 +107,10 @@ export const CampaignBuilder = ({ workspaceId, campaignId, onBack }: CampaignBui
         name,
         message,
         type,
-        status: publish ? 'running' : 'draft',
+        status: publish ? (isScheduling ? 'scheduled' : 'running') : 'draft',
         config,
+        category,
+        scheduled_at: (publish && isScheduling) ? scheduledAt : null,
         audience_filters: {},
         channel: 'widget'
       };
@@ -218,15 +229,27 @@ export const CampaignBuilder = ({ workspaceId, campaignId, onBack }: CampaignBui
             {/* Basic Config */}
             <section className="space-y-6">
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Internal Name</label>
-                  <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="E.g. Summer Sale Announcement"
-                    className="w-full bg-card border rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/30 transition-all"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Internal Name</label>
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="E.g. Summer Sale Announcement"
+                      className="w-full bg-card border rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/30 transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Category</label>
+                    <input
+                      value={category}
+                      onChange={(e) => setCategory(e.target.value)}
+                      placeholder="E.g. Product Update"
+                      className="w-full bg-card border rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/30 transition-all"
+                    />
+                  </div>
                 </div>
+                
                 <div className="space-y-2">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Campaign Message</label>
                   <textarea
@@ -235,6 +258,50 @@ export const CampaignBuilder = ({ workspaceId, campaignId, onBack }: CampaignBui
                     placeholder="Write your main message here..."
                     className="w-full bg-card border rounded-xl px-4 py-3 text-sm min-h-[120px] focus:ring-1 focus:ring-primary/30 transition-all resize-none"
                   />
+                </div>
+
+                <div className="pt-4 border-t border-border">
+                  <div className="flex items-center justify-between p-4 bg-accent/20 rounded-2xl border border-border">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-xl">
+                        <Rocket className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold">Schedule for later</h4>
+                        <p className="text-[10px] text-muted-foreground">Pick a specific time to launch this campaign.</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => setIsScheduling(!isScheduling)}
+                      className={cn(
+                        "w-12 h-6 rounded-full p-1 transition-colors relative",
+                        isScheduling ? "bg-primary" : "bg-muted"
+                      )}
+                    >
+                      <motion.div 
+                        animate={{ x: isScheduling ? 24 : 0 }}
+                        className="w-4 h-4 bg-white rounded-full shadow-sm" 
+                      />
+                    </button>
+                  </div>
+
+                  <AnimatePresence>
+                    {isScheduling && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="mt-4"
+                      >
+                        <input
+                          type="datetime-local"
+                          value={scheduledAt || ''}
+                          onChange={(e) => setScheduledAt(e.target.value)}
+                          className="w-full bg-card border rounded-xl px-4 py-3 text-sm focus:ring-1 focus:ring-primary/30 transition-all [color-scheme:dark]"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </section>

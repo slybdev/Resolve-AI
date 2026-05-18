@@ -13,6 +13,7 @@ class Campaign(Base):
     
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     message: Mapped[str] = mapped_column(String(5000), nullable=False)
+    category: Mapped[str | None] = mapped_column(String(100), nullable=True)
     
     audience_filters: Mapped[dict] = mapped_column(JSON, default=dict, nullable=False)
     config: Mapped[dict] = mapped_column(JSON, default=dict, nullable=True)  # Type-specific: news CTA, tour steps, checklist items
@@ -24,6 +25,7 @@ class Campaign(Base):
     scheduled_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     
     # Tracking & Analytics
+    created_by: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id"), nullable=True)
     sent_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     delivered_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     opened_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
@@ -31,3 +33,4 @@ class Campaign(Base):
 
     # Relationships
     workspace = relationship("Workspace", backref="campaigns")
+    creator = relationship("User", foreign_keys=[created_by])

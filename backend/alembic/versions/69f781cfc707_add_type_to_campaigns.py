@@ -19,8 +19,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    # Add 'type' column to campaigns table
-    op.add_column('campaigns', sa.Column('type', sa.String(length=50), nullable=False, server_default='news'))
+    # Add 'type' column to campaigns table using raw SQL for IF NOT EXISTS support
+    op.execute(sa.text("ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'news' NOT NULL"))
 
 
 def downgrade() -> None:
