@@ -42,38 +42,41 @@ export const CreateTicketModal = ({ isOpen, onClose, workspaceId, conversationId
 
   useEffect(() => {
     if (isOpen && conversationId) {
-      checkExistingTicket();
-      fetchTeams();
+      initData();
     }
   }, [isOpen, conversationId]);
 
-  const checkExistingTicket = async () => {
+  const initData = async () => {
+    setIsCheckingTicket(true);
+    setIsFetchingTeams(true);
     try {
-      setIsCheckingTicket(true);
-      const ticket = await api.tickets.getByConversation(conversationId);
+      const [ticket, fetchedTeams] = await Promise.all([
+        api.tickets.getByConversation(conversationId).catch(() => null),
+        api.team.getFunctionalTeams(workspaceId).catch(() => [])
+      ]);
+      
       setExistingTicket(ticket);
+      setTeams(fetchedTeams);
+
       if (ticket) {
         setTitle(ticket.title);
         setPriority(ticket.priority);
-        setTeamId(ticket.assigned_team_id || '');
+        // For escalation, try to select a DIFFERENT team than the current one
+        const availableTeams = fetchedTeams.filter(t => t.id !== ticket.assigned_team_id);
+        if (availableTeams.length > 0) {
+          setTeamId(availableTeams[0].id);
+        } else if (fetchedTeams.length > 0) {
+          setTeamId(fetchedTeams[0].id);
+        }
+      } else {
+        if (fetchedTeams.length > 0) {
+          setTeamId(fetchedTeams[0].id);
+        }
       }
     } catch (err) {
-      console.error('Failed to check existing ticket:', err);
+      console.error('Failed to init data:', err);
     } finally {
       setIsCheckingTicket(false);
-    }
-  };
-
-  const fetchTeams = async () => {
-    try {
-      setIsFetchingTeams(true);
-      const data = await api.team.getFunctionalTeams(workspaceId);
-      setTeams(data);
-      if (data.length > 0) setTeamId(data[0].id);
-    } catch (err) {
-      console.error('Failed to fetch teams:', err);
-      toast("Error", "Failed to load teams", "error");
-    } finally {
       setIsFetchingTeams(false);
     }
   };

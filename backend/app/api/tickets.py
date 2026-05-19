@@ -53,13 +53,29 @@ async def list_tickets(
     current_user: User = Depends(get_current_user),
 ):
     """List tickets for a workspace with optional filters, respecting team isolation."""
+    from sqlalchemy import select
+    from app.models.workspace import WorkspaceMember
+    
+    # Check workspace role
+    role_res = await db.execute(
+        select(WorkspaceMember.role)
+        .where(
+            WorkspaceMember.user_id == current_user.id, 
+            WorkspaceMember.workspace_id == workspace_id
+        )
+    )
+    role = role_res.scalar_one_or_none()
+    
+    # Admins and Owners can see all tickets across all teams
+    is_admin = current_user.is_superuser or role in ["owner", "admin"]
+
     return await TicketService.list_tickets(
         db, 
         workspace_id, 
         team_id, 
         status, 
         user_id=current_user.id, 
-        is_admin=current_user.is_superuser,
+        is_admin=is_admin,
         assigned_user_id=assigned_user_id
     )
 

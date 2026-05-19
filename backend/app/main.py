@@ -191,7 +191,7 @@ def create_app() -> FastAPI:
     from app.services.rule_engine import initialize_rule_engine
     register_handler(event_service.broadcast_message)
     register_handler(ai_handler.handle_message)
-    initialize_ticket_automation()
+    # initialize_ticket_automation()
     initialize_rule_engine()
 
     # ── Static Files ──

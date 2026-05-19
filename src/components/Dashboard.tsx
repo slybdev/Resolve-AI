@@ -33,7 +33,7 @@ import { HelpCenter } from './dashboard/pages/HelpCenter';
 import { Outbound } from './dashboard/pages/Outbound';
 import { Macros } from './dashboard/pages/Macros';
 import { CSAT } from './dashboard/pages/CSAT';
-import { News } from './dashboard/pages/News';
+// News page removed — consolidated into Outbound
 import { BusinessHours } from './dashboard/pages/BusinessHours';
 import { CampaignBuilder } from './dashboard/pages/CampaignBuilder';
 import { WebsiteChatChannel } from './dashboard/pages/channels/WebsiteChatChannel';
@@ -255,7 +255,7 @@ const Dashboard = () => {
       case 'outbound': return <Outbound workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
       case 'campaign-builder': return <CampaignBuilder workspaceId={workspaceId} campaignId={selectedCampaignId} onBack={handleBack} />;
       case 'product-tours': return <Outbound workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
-      case 'news': return <News workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
+      case 'news': return <Outbound workspaceId={workspaceId} onSelectCampaign={(id) => handleViewChange('campaign-builder', id)} />;
       case 'help-center': return <HelpCenter workspaceId={workspaceId} />;
       case 'website-chat': return <WebsiteChatChannel workspaceId={workspaceId} />;
       case 'email': return <EmailChannel workspaceId={workspaceId} />;

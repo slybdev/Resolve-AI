@@ -204,7 +204,6 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
             />
           )}
           {canAccess('assigned-to-me') && <NavItem icon={UserCheck} label="Assigned to Me" active={currentView === 'assigned-to-me'} onClick={() => onViewChange('assigned-to-me')} isCollapsed={isCollapsed} />}
-          {canAccess('unassigned') && <NavItem icon={Users} label="Unassigned" active={currentView === 'unassigned'} onClick={() => onViewChange('unassigned')} isCollapsed={isCollapsed} />}
           {canAccess('urgent-sla') && <NavItem icon={AlertCircle} label="Urgent / SLA" active={currentView === 'urgent-sla'} onClick={() => onViewChange('urgent-sla')} isCollapsed={isCollapsed} />}
         </SidebarSection>
         )}
@@ -224,11 +223,9 @@ export const Sidebar = ({ currentView, onViewChange, isCollapsed = false, onTogg
         </SidebarSection>
         )}
 
-        {(canAccess('outbound') || canAccess('product-tours') || canAccess('news')) && (
+        {canAccess('outbound') && (
         <SidebarSection title="Outbound" icon={Megaphone} isCollapsed={isCollapsed} onToggle={onToggle}>
-          {canAccess('outbound') && <NavItem icon={Megaphone} label="Campaigns" active={currentView === 'outbound'} onClick={() => onViewChange('outbound')} isCollapsed={isCollapsed} />}
-          {canAccess('product-tours') && <NavItem icon={LayoutDashboard} label="Product Tours" active={currentView === 'product-tours'} onClick={() => onViewChange('product-tours')} isCollapsed={isCollapsed} />}
-          {canAccess('news') && <NavItem icon={Megaphone} label="News & Updates" active={currentView === 'news'} onClick={() => onViewChange('news')} isCollapsed={isCollapsed} />}
+          <NavItem icon={Megaphone} label="Campaigns" active={currentView === 'outbound'} onClick={() => onViewChange('outbound')} isCollapsed={isCollapsed} />
         </SidebarSection>
         )}
 
